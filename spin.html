@@ -5047,12 +5047,13 @@
         this.websocket = null;
         this.reconnectInterval = null;
         this.WEBSOCKET_URL = (function() {
-          const urlParams = new URLSearchParams(window.location.search);
-          const paramServer = urlParams.get('server');
-          if (paramServer) return paramServer;
-          const savedServer = localStorage.getItem('wsServerUrl');
-          if (savedServer) return savedServer;
-          return 'wss://serverbbgithubio-production.up.railway.app';
+          var room = new URLSearchParams(window.location.search).get('room') || localStorage.getItem('selectedRoom') || 'room_1';
+          localStorage.setItem('selectedRoom', room);
+          var base;
+          var p = new URLSearchParams(window.location.search).get('server');
+          if (p) base = p;
+          else { var s = localStorage.getItem('wsServerUrl'); base = s || 'wss://serverbbgithubio-production.up.railway.app'; }
+          return base + (base.includes('?') ? '&' : '?') + 'room=' + encodeURIComponent(room);
         })();
       }
 
@@ -9703,5 +9704,6 @@
 <a href="voix.html" style="background:rgba(0,0,0,0.85);color:#a855f7;border:2px solid #a855f7;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(168,85,247,0.5);">🎤 Voix</a>
 <a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
 </div>
+<script src="room-selector.js"></script>
 </body>
 </html>
