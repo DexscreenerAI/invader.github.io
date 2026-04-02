@@ -5329,6 +5329,7 @@
         let winDisplayBusy = false;
         
         function showWinMsg(amount, user) {
+            if (amount === 0) return; // Pas de popup pour les vides
             // Ajouter dans la file d'attente au lieu d'afficher directement
             winDisplayQueue.push({ amount, user });
             _updateWinQueueBadge();
