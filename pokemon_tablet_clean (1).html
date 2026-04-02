@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JEREM BATTLEBOX - TABLET LIVE</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background-image: url('https://m.gettywallpapers.com/fr/wp-content/uploads/2023/09/Galaxie-Fond-decran-dordinateur-4k-HD.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #main-layout { display: flex; width: 100%; height: 100vh; justify-content: center; align-items: center; padding: 20px; gap: 50px; position: relative; }
+    #center-zone { display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 10; }
+    
+    /* ======== TABLET STYLES ======== */
+    .tablet-container { 
+      position: relative; 
+      width: 700px; 
+      height: 520px; 
+      background: linear-gradient(145deg, #1a1a1a, #2a2a2a, #1a1a1a); 
+      border-radius: 18px;
+      padding: 14px; 
+      box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05), 0 0 0 2px #444; 
+      border: 3px solid #333; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      flex-shrink: 0; 
+    }
+    .tablet-container::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 6px;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 5px;
+      background: #222;
+      border-radius: 50%;
+      border: 1px solid #444;
+      z-index: 1001;
+    }
+    .tablet-container::after { 
+      content: ''; 
+      position: absolute; 
+      top: 0; left: 0; right: 0; bottom: 0; 
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, rgba(255,255,255,0.03) 100%); 
+      pointer-events: none; 
+    }
+    .tablet-screen { 
+      position: relative; 
+      width: 100%; 
+      height: 100%; 
+      background: #050505; 
+      border-radius: 8px;
+      overflow: hidden; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      border: 2px solid #111; 
+      background-image: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%); 
+      background-size: cover; 
+      background-position: center; 
+    }
+    .screen-content { 
+      width: 100%; 
+      height: 100%; 
+      padding: 15px 20px; 
+      display: flex; 
+      flex-direction: row; 
+      align-items: center; 
+      justify-content: space-between; 
+      background: rgba(0, 0, 0, 0.1); 
+      gap: 15px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* TABLET INNER LAYOUT - 3 columns */
+    .col-left { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      width: 25%; 
+      height: 100%; 
+      gap: 8px;
+    }
+    .col-center { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      width: 50%; 
+      height: 100%; 
+      position: relative;
+      overflow: visible;
+    }
+    .col-right { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-start; 
+      width: 25%; 
+      height: 100%; 
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    /* CONTROLS */
+    .external-controls { display: flex; gap: 15px; background: rgba(0, 0, 0, 0.6); padding: 15px 25px; border-radius: 30px; border: 2px solid #daa520; backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .external-controls button { padding: 10px 20px; font-size: 12px; cursor: pointer; border: none; border-radius: 20px; background: linear-gradient(45deg, #b8860b, #daa520); color: #fff; font-weight: bold; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+    .external-controls button:hover { transform: translateY(-3px) scale(1.05); filter: brightness(1.2); }
+    
+    /* PANELS */
+    .draggable-panel { position: fixed; background: rgba(10, 15, 25, 0.95); border-radius: 12px; border: 2px solid #ffd700; backdrop-filter: blur(10px); z-index: 100; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); cursor: move; overflow: hidden; text-align: left; width: 240px; }
+    .panel-header { padding: 8px 15px; background: rgba(218, 165, 32, 0.2); border-bottom: 1px solid rgba(255, 215, 0, 0.3); font-weight: bold; color: #ffd700; font-size: 0.85em; text-transform: uppercase; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+    .panel-content { padding: 12px; }
+    
+    /* POSITIONS */
+    #attackerPanel { top: 20px; left: 20px; border-color: #ff4d4d; }
+    #manualInputPanel { top: 120px; left: 20px; border-color: #ef4444; }
+    #queuePanel { top: 310px; left: 20px; border-color: #3b82f6; }
+    #poolPanel { top: 500px; left: 20px; width: 180px; }
+    #leaderboardPanel { top: 20px; right: 20px; width: 280px; border-color: #22c55e; }
+    #audioPanel { bottom: 20px; right: 20px; width: 260px; border-color: #94a3b8; }
+    #hpPanel { bottom: 20px; left: 50%; transform: translateX(-50%); width: 340px; }
+    #cyclePanel { top: 20px; left: 50%; transform: translateX(-50%); width: 320px; border-color: #a855f7; z-index: 200; }
+    #impactPanel { top: 580px; left: 20px; border-color: #fca5a5; } 
+    #voicePanel { bottom: 20px; left: 20px; width: 260px; border-color: #e879f9; }
+    #blacklistPanel { top: 420px; right: 20px; width: 240px; border-color: #ef4444; }
+    
+    /* LISTS & SCROLL */
+    .leaderboard-list, .cycle-list, .winners-list { max-height: 200px; overflow-y: auto; font-size: 0.8em; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 10px; }
+    
+    /* TOASTS */
+    #notification-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 60%; z-index: 3000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast { background: rgba(10, 15, 30, 0.95); border: 2px solid #ffd700; border-radius: 10px; padding: 10px 20px; color: white; text-align: center; animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.5s ease 2s forwards; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+    
+    /* GAME ELEMENTS */
+    h1 { font-size: 1.1em; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); background: linear-gradient(45deg, #ffd700, #daa520, #b8860b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2px; text-align: center; }
+    #lastAttackerInfoTitle { font-size: 0.75em; color: #ff4d4d; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0,0,0,0.8); background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 10px; text-align: center; }
+    
+    .gold-container { position: relative; width: 100%; height: 280px; display: flex; justify-content: center; align-items: center; perspective: 1000px; overflow: visible; }
+    .gold-bar { width: 240px; height: 240px; background-image: url('https://i.gifer.com/4o45.gif'); background-size: contain; background-repeat: no-repeat; background-position: center; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7)); transition: all 0.3s ease; }
+    
+    /* CACHÉ COMME DEMANDÉ */
+    .server-status { display: none !important; }
+
+    /* IMPACT EFFECT ANIMATION */
+    .impact-effect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 200px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      pointer-events: none;
+      z-index: 150;
+      animation: impactPop 0.5s ease-out forwards;
+    }
+    @keyframes impactPop {
+      0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+      20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      40% { transform: translate(-50%, -50%) scale(1.0); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+    }
+
+    /* ANIMATION IMPACT */
+    .gold-bar.hit { animation: redHit 0.25s ease-out; }
+    @keyframes redHit {
+      0% { transform: scale(1); filter: drop-shadow(0 0 30px red) sepia(1) hue-rotate(-50deg) saturate(5); }
+      50% { transform: scale(0.92); }
+      100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7)); }
+    }
+
+    /* ---- STYLE LOW HP (40% ou moins) - ROUGE ---- */
+    .gold-bar.low-hp {
+      filter: sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 30px red) !important;
+      animation: pulseRed 1s infinite alternate;
+    }
+
+    /* ---- STYLE CRITICAL HP (10% ou moins) - VERT ---- */
+    .gold-bar.critical-hp {
+      filter: sepia(1) hue-rotate(60deg) saturate(5) drop-shadow(0 0 30px #00ff00) !important;
+      animation: pulseGreen 0.6s infinite alternate;
+    }
+
+    @keyframes pulseRed {
+      from { transform: scale(1); }
+      to { transform: scale(1.03); }
+    }
+
+    @keyframes pulseGreen {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+
+    .gold-bar.broken { opacity: 0.4; filter: grayscale(1) brightness(0.5) !important; animation: none; }
+    
+
+    
+    .target-lock { position: absolute; width: 120px; height: 120px; border: 4px solid rgba(255, 0, 0, 0.8); border-radius: 50%; transform: translate(-50%, -50%) scale(2); opacity: 0; pointer-events: none; z-index: 90; transition: all 0.2s; }
+    .target-lock.locked { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(45deg); border-color: #ffd700; box-shadow: 0 0 30px #ffd700; }
+    
+    /* HP BAR - inside tablet */
+    .hp-bar-inline { width: 100%; margin-top: 8px; }
+    .pool-bar-container { width: 100%; height: 22px; background: rgba(0, 0, 0, 0.5); border: 2px solid #ffd700; border-radius: 11px; position: relative; overflow: hidden; }
+    .pool-bar-progress { width: 0%; height: 100%; background: linear-gradient(90deg, #ff0000, #ff4d4d, #ff0000); background-size: 200% 100%; animation: barGlow 2s linear infinite; transition: width 0.3s ease; }
+    @keyframes barGlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+    .pool-bar-text { position: absolute; width: 100%; top: 50%; left: 0; transform: translateY(-50%); font-weight: bold; font-size: 11px; color: white; text-align: center; text-shadow: 0 0 5px black; }
+    .hp-controls { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .hp-row { display: flex; gap: 5px; justify-content: center; }
+    .hp-btn { flex: 1; padding: 5px; font-size: 10px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-weight: bold; transition: all 0.1s; }
+    .hp-btn.minus { background: rgba(220, 38, 38, 0.6); }
+    .hp-btn.plus { background: rgba(5, 150, 105, 0.6); }
+    
+    .floating-text { position: absolute; font-size: 1.8em; font-weight: bold; pointer-events: none; z-index: 1001; animation: floatUp 0.8s ease-out forwards; text-shadow: 0 0 10px black; }
+    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px) scale(1.6); } }
+    
+    input, select { background: #000; color: #fff; border: 1px solid #444; font-size: 0.9em; padding: 5px; border-radius: 6px; width: 100%; }
+    
+    /* SCORE & CYCLE ITEMS */
+    .score-item { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .score-actions { display: flex; gap: 5px; }
+    .delete-btn { color: #ff4d4d; font-weight: bold; cursor: pointer; padding: 0 5px; font-size: 1.1em; }
+    .edit-btn { color: #3b82f6; font-weight: bold; cursor: pointer; padding: 0 5px; font-size: 1.1em; }
+    .move-btn { color: #a855f7; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: 1.1em; user-select: none; }
+    .move-btn:hover { color: #d8b4fe; }
+    .cycle-item { display: flex; justify-content: space-between; align-items: center; padding: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .cycle-item.active { background: rgba(168, 85, 247, 0.3); border-left: 3px solid #a855f7; }
+    
+    .setup-hidden { display: none !important; }
+
+    /* ======== LASER ATTACK EFFECT ======== */
+    .laser-attacker {
+      position: absolute;
+      z-index: 120;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      pointer-events: none;
+      animation: laserAppear 1.8s ease-out forwards;
+    }
+    .laser-attacker .attacker-pic {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid #ffd700;
+      object-fit: cover;
+      background: #222;
+      box-shadow: 0 0 10px rgba(255,215,0,0.6);
+    }
+    .laser-attacker .attacker-name {
+      font-size: 0.6em;
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 0 0 6px #000, 0 0 3px #000;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .laser-attacker .attacker-pts {
+      font-size: 0.6em;
+      color: #ffd700;
+      font-weight: bold;
+      text-shadow: 0 0 6px #000;
+    }
+    .laser-attacker .attacker-dmg {
+      font-size: 0.75em;
+      color: #ff4444;
+      font-weight: bold;
+      text-shadow: 0 0 8px #000;
+      animation: dmgPulse 0.3s ease-out;
+    }
+    @keyframes dmgPulse {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .laser-beam {
+      position: absolute;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #ff0000, #ff4444, #ffaa00, #ffd700);
+      z-index: 110;
+      pointer-events: none;
+      box-shadow: 0 0 8px #ff4444, 0 0 15px rgba(255,68,68,0.5);
+      transform-origin: left center;
+      animation: laserShoot 0.4s ease-out forwards;
+      border-radius: 2px;
+    }
+    @keyframes laserShoot {
+      0% { opacity: 0; width: 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes laserAppear {
+      0% { opacity: 0; transform: scale(0.3); }
+      10% { opacity: 1; transform: scale(1.1); }
+      20% { transform: scale(1); }
+      75% { opacity: 1; }
+      100% { opacity: 0; transform: scale(0.8) translateY(-10px); }
+    }
+
+    /* Default profile icon when no pic */
+    .attacker-pic-placeholder {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid #ffd700;
+      background: linear-gradient(135deg, #333, #555);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      box-shadow: 0 0 10px rgba(255,215,0,0.6);
+    }
+
+    /* COIN COUNTER TOP CENTER */
+    .coin-counter-top {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,0.7);
+      padding: 5px 18px;
+      border-radius: 15px;
+      border: 2px solid rgba(255,215,0,0.5);
+      font-size: 1em;
+      color: #ffd700;
+      font-weight: bold;
+      z-index: 2000;
+      box-shadow: 0 0 15px rgba(255,215,0,0.3);
+    }
+
+    /* COIN COUNTER inside tablet */
+    .coin-counter {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(0,0,0,0.5);
+      padding: 4px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,215,0,0.3);
+      font-size: 0.85em;
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    /* QUEUE MINI inside tablet */
+    .queue-mini {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.7em;
+      width: 100%;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .queue-mini-title {
+      color: #3b82f6;
+      font-weight: bold;
+      font-size: 0.75em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+
+
+    /* ======== SCORE POPUP (etoile / point) ======== */
+    .score-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.85);
+      border: 3px solid #ffd700;
+      border-radius: 20px;
+      padding: 18px 30px;
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.5), 0 0 80px rgba(255, 215, 0, 0.2);
+      animation: popupAppear 3.5s ease forwards;
+      pointer-events: none;
+    }
+    @keyframes popupAppear {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+      10% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+      15% { transform: translate(-50%, -50%) scale(1); }
+      75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) translateY(-30px); }
+    }
+    .popup-pic {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ffd700;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    .popup-pic-placeholder {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #333, #555);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      border: 3px solid #ffd700;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    .popup-name {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.1em;
+      text-shadow: 0 0 10px #000;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .popup-score {
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 2em;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <div id="main-layout">
+    
+    <div id="center-zone">
+      <!-- ======== TABLET DEVICE ======== -->
+      <div class="tablet-container">
+        <div class="tablet-screen" id="mainScreen">
+          <div id="notification-container"></div>
+          <div class="coin-counter-top">💎 <span id="poolDisplayValueTop">0</span></div>
+          <div class="screen-content">
+
+            <!-- LEFT COLUMN -->
+            <div class="col-left">
+              <div class="server-status">
+                <span class="status-offline" id="statusText">DÉCONNECTÉ</span>
+              </div>
+              <h1 id="mainTitle" style="display:none !important;">COMBAT NARUTO DIVERTISSEMENT</h1>
+              <div id="lastAttackerInfoTitle" style="display:none !important;">Dernier: - (0)</div>
+              <div class="coin-counter" style="display:none;">💎 <span id="poolDisplayValue">0</span></div>
+              
+              <div class="queue-mini" style="display:none !important;">
+                <div class="queue-mini-title">⏳ File (<span id="queueTotal">0</span>)</div>
+                <div id="queueList"></div>
+              </div>
+            </div>
+
+            <!-- CENTER COLUMN: Boss -->
+            <div class="col-center">
+              <div class="game-container" style="width:100%; position:relative; overflow:visible;">
+                <div id="target-lock" class="target-lock"></div>
+                <div class="gold-container">
+                  <div class="gold-bar" id="goldBar"></div>
+                </div>
+              </div>
+              <h2 id="gameTitle" style="font-size: 1.1em; color: #ffd700; margin-top: 5px; text-align:center;">EN ATTENTE</h2>
+              <div class="hp-bar-inline" style="display:none !important;">
+                <div class="pool-bar-container">
+                  <div class="pool-bar-progress" id="poolBarProgress"></div>
+                  <div class="pool-bar-text" id="poolBarText">PV: 0 / 0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-right">
+              <div id="lastAttackerName" style="color:#ff4d4d; font-weight:bold; text-align:center; font-size:0.85em; margin-top:4px;">...</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="external-controls">
+        <button onclick="startCycle()" style="background: #22c55e;">DÉMARRER CYCLE</button>
+        <button onclick="initGame()" style="background: #475569;">RESET JEU</button>
+        <button onclick="toggleSetup()" style="background: #a855f7;">MODE CONFIG</button>
+      </div>
+    </div>
+
+    <!-- EXTERNAL PANELS (draggable, outside tablet) -->
+
+    <div class="draggable-panel last-attacker-panel" id="attackerPanel">
+      <div class="panel-header">🔫 DERNIER ATTAQUANT</div>
+      <div class="panel-content"><div id="lastAttackerNamePanel" style="color:#ff4d4d; font-weight:bold; text-align:center; font-size:1.1em;">...</div></div>
+    </div>
+
+    <div class="draggable-panel" id="manualInputPanel">
+      <div class="panel-header" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">🎯 AJOUT MANUEL</div>
+      <div class="panel-content">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <input type="text" id="manualUsername" placeholder="Nom du joueur">
+          <input type="number" id="manualHits" placeholder="Nombre de pièces (= PV retirés)" min="1">
+          <button onclick="addManualPlayer()" style="background: #ef4444; border:none; padding:8px; border-radius:8px; color:white; font-weight:bold; cursor:pointer;">LANCER ATTAQUE</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="draggable-panel queue-panel" id="queuePanel">
+      <div class="panel-header">⏳ FILE D'ATTENTE (<span id="queueTotalExt">0</span>)</div>
+      <div class="panel-content"><div id="queueListExt" style="max-height: 120px; overflow: auto;"></div></div>
+    </div>
+
+    <div class="draggable-panel leaderboard-panel" id="leaderboardPanel">
+      <div class="panel-header" style="background: rgba(34, 197, 94, 0.2); color: #22c55e; border-color: rgba(34, 197, 94, 0.3);">
+        <span>📊 TOTAL GAGNÉ (<span id="globalTotalPoints">0</span>)</span>
+      </div>
+      <div class="panel-content">
+        <div style="margin-bottom: 10px;">
+          <input type="text" id="leaderboardSearch" placeholder="Rechercher..." oninput="updateLeaderboardUI()" style="margin-bottom: 5px;">
+          <select id="leaderboardSort" onchange="updateLeaderboardUI()" style="font-size: 0.8em;">
+            <option value="recent" selected>Trier par Récents</option>
+            <option value="points">Trier par Points (Max)</option>
+          </select>
+        </div>
+        <div id="leaderboardList" class="leaderboard-list"></div>
+        <button onclick="resetAllScores()" style="background: #ef4444; width: 100%; border:none; padding:8px; border-radius:5px; color:white; font-size: 11px; cursor:pointer; margin-top: 10px;">RÉINITIALISER LES SCORES</button>
+      </div>
+    </div>
+
+    <div class="draggable-panel hp-panel" id="hpPanel">
+      <div class="panel-header">❤️ VIE DU BOSS</div>
+      <div class="panel-content">
+        <div class="pool-bar-container">
+          <div class="pool-bar-progress" id="poolBarProgressExt"></div>
+          <div class="pool-bar-text" id="poolBarTextExt">PV: 0 / 0</div>
+        </div>
+        <div class="hp-controls">
+          <div class="hp-row">
+            <button class="hp-btn minus" onclick="adjustHP(-10)">-10</button>
+            <button class="hp-btn minus" onclick="adjustHP(-100)">-100</button>
+            <button class="hp-btn minus" onclick="adjustHP(-500)">-500</button>
+          </div>
+          <div class="hp-row">
+            <button class="hp-btn plus" onclick="adjustHP(10)">+10</button>
+            <button class="hp-btn plus" onclick="adjustHP(100)">+100</button>
+            <button class="hp-btn plus" onclick="adjustHP(500)">+500</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="draggable-panel pool-display" id="poolPanel">
+      <div class="panel-header" style="min-height: 20px;"></div>
+      <div class="panel-content"><div id="poolDisplayValueExt" style="font-size: 1.5em; color: #ffd700; font-weight: bold; text-align: center;">0</div></div>
+    </div>
+
+    <!-- IMPACT PANEL -->
+    <div class="draggable-panel impact-panel setup-hidden" id="impactPanel">
+      <div class="panel-header">💥 EFFETS D'IMPACT</div>
+      <div class="panel-content">
+        <div id="impactList" class="cycle-list"></div>
+        <div style="border-top:1px solid #444; margin-top:10px; padding-top:10px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; gap:5px;">
+            <input type="number" id="impactMin" placeholder="Min Dmg">
+            <input type="number" id="impactMax" placeholder="Max Dmg">
+          </div>
+          <input type="text" id="impactImg" placeholder="URL GIF/PNG">
+          <button onclick="addImpactRule()" style="background: #ef4444; border:none; padding:8px; border-radius:5px; color:white; cursor:pointer;">AJOUTER EFFET</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOICE PANEL -->
+    <div class="draggable-panel voice-panel setup-hidden" id="voicePanel">
+      <div class="panel-header">🎤 VOIX OFF (AUTO)</div>
+      <div class="panel-content">
+        <label style="font-size:10px;color:#ffd700">TAUNT (Inactivité 20s):</label>
+        <input type="text" id="voiceTaunt" placeholder="URL MP3..." onchange="updateVoiceSettings()">
+        
+        <label style="font-size:10px;color:#ffd700">CRITIQUE (< 40%):</label>
+        <input type="text" id="voiceCritical" placeholder="URL MP3..." onchange="updateVoiceSettings()">
+        
+        <label style="font-size:10px;color:#ffd700">BURST (-15% / 2s):</label>
+        <input type="text" id="voiceBurst" placeholder="URL MP3..." onchange="updateVoiceSettings()">
+        
+        <label style="font-size:10px;color:#ffd700">GROS BOSS (>3k PV):</label>
+        <input type="text" id="voiceBigBoss" placeholder="URL MP3..." onchange="updateVoiceSettings()">
+        
+        <label style="font-size:10px;color:#ffd700">VICTOIRE:</label>
+        <input type="text" id="voiceWin" placeholder="URL MP3..." onchange="updateVoiceSettings()">
+        
+        <div style="margin-top:5px; font-size:10px; color:#888;">Cooldown: 25s (Sauf Victoire)</div>
+
+        <div style="border-top: 1px solid #444; margin-top: 10px; padding-top: 5px;">
+          <label style="font-size: 10px; color:#e879f9;">VOLUME VOIX : <span id="voiceVolValue">100%</span></label>
+          <input type="range" id="voiceVolumeSlider" min="0" max="100" value="100" oninput="updateVoiceVolume()">
+        </div>
+      </div>
+    </div>
+
+    <div class="draggable-panel audio-panel setup-hidden" id="audioPanel">
+      <div class="panel-header">🔊 CONFIG SYSTÈME</div>
+      <div class="panel-content">
+        <label style="font-size: 10px; color:#ffd700;">TITRE :</label>
+        <input type="text" id="titleInput" oninput="updateMainTitle()" value="COMBAT NARUTO DIVERTISSEMENT" style="margin-bottom: 8px;">
+
+        <label style="font-size: 10px; color:#888;">FOND ANIMÉ :</label>
+        <input type="text" id="screenBgInput" onchange="updateScreenBg()" placeholder="Lien GIF..." style="margin-bottom: 4px;">
+        <div style="display:flex; gap:5px; margin-bottom:8px;">
+          <button onclick="document.getElementById('screenBgFile').click()" style="flex:1; background:#475569; border:none; color:white; padding:5px; border-radius:5px; font-size:10px; cursor:pointer;">📁 CHARGER FICHIER</button>
+          <button onclick="clearScreenBg()" style="background:#ef4444; border:none; color:white; padding:5px 10px; border-radius:5px; font-size:10px; cursor:pointer;">✘</button>
+        </div>
+        <input type="file" id="screenBgFile" style="display:none" accept="image/*,video/*,.gif,.mp4,.webm,.webp" onchange="loadScreenBgFile(event)">
+        
+        <div style="border-top: 1px solid #444; padding-top: 10px;">
+          <label style="font-size: 10px; color:#888;">SON IMPACT (URL) :</label>
+          <input type="text" id="soundUrlInput" onchange="updateSoundUrl()" value="https://files.catbox.moe/yfaz3w.mp3" style="margin-bottom: 5px;">
+          <button onclick="playHitSound()" style="width:100%; margin-bottom:10px; background:#475569; border:none; color:white; padding:5px; border-radius:5px; font-size:10px;">TESTER IMPACT</button>
+          
+          <label style="font-size: 10px; color:#ffd700;">SON VICTOIRE (URL) :</label>
+          <input type="text" id="winSoundUrlInput" onchange="updateWinSoundUrl()" value="https://files.catbox.moe/4cp0m0.mp3" style="margin-bottom: 5px;">
+          <button onclick="playWinSound()" style="width:100%; background:#daa520; border:none; color:white; padding:5px; border-radius:5px; font-size:10px;">TESTER GAIN</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 10px;">
+          <span>Volume SFX (Bruitages)</span>
+          <span id="volValue">50%</span>
+        </div>
+        <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="updateVolume()">
+      </div>
+    </div>
+
+    <div class="draggable-panel cycle-panel setup-hidden" id="cyclePanel">
+      <div class="panel-header">♻️ CYCLE <label><input type="checkbox" id="loopCycle" checked> BOUCLE</label></div>
+      <div class="panel-content">
+        <div id="cycleList" class="cycle-list"></div>
+        <div style="border-top:1px solid #444; margin-top:10px; padding-top:10px; display:flex; flex-direction:column; gap:5px;">
+          <input type="text" id="newLevelName" placeholder="Nom Boss">
+          <div style="display:flex; gap:5px;">
+            <input type="number" id="newLevelHP" placeholder="PV">
+            <input type="number" id="newLevelReward" placeholder="Points">
+          </div>
+          <input type="text" id="newLevelImg" placeholder="URL Image">
+          <button id="btnAddLevel" onclick="addCustomLevel()" style="background: #a855f7; border:none; padding:8px; border-radius:5px; color:white; cursor:pointer;">AJOUTER</button>
+          
+          <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+            <div style="color: #ffd700; font-size: 0.8em; text-align: center; margin-bottom: 5px;">💾 SAUVEGARDE COMPLÈTE</div>
+            <div style="display:flex; gap:5px;">
+              <button onclick="exportAll()" style="background:#3b82f6; flex:1; border:none; padding:8px; border-radius:5px; color:white; cursor:pointer; font-weight:bold;">SAUVER TOUT</button>
+              <button onclick="triggerImport()" style="background:#f59e0b; flex:1; border:none; padding:8px; border-radius:5px; color:white; cursor:pointer; font-weight:bold;">CHARGER TOUT</button>
+              <input type="file" id="importFile" style="display:none" accept=".json" onchange="importAll(event)">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- BLACKLIST PANEL -->
+    <div class="draggable-panel" id="blacklistPanel">
+      <div class="panel-header" style="background: rgba(220, 38, 38, 0.2); color: #ff4d4d; border-color: rgba(220, 38, 38, 0.3);">🚫 BLACKLIST</div>
+      <div class="panel-content">
+        <div style="display:flex; gap:5px; margin-bottom:8px;">
+          <input type="text" id="blacklistInput" placeholder="Nom utilisateur..." style="flex:1;" onkeydown="if(event.key==='Enter')addToBlacklist()">
+          <button onclick="addToBlacklist()" style="background:#ef4444; border:none; color:white; padding:5px 12px; border-radius:5px; font-weight:bold; cursor:pointer;">+</button>
+        </div>
+        <div id="blacklistList" style="max-height:150px; overflow-y:auto; font-size:0.8em;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let maxHP, currentHP;
+    let coinPool = 0;
+    let isAttacking = false;
+    let isTransitioning = false;
+    let socket = null;
+    let shootingQueue = [];
+    
+    // AUDIO
+    let hitSound = new Audio('https://files.catbox.moe/yfaz3w.mp3');
+    let winSound = new Audio('https://files.catbox.moe/4cp0m0.mp3');
+    hitSound.volume = 0.5;
+    winSound.volume = 0.5;
+
+    // VOICE SYSTEM
+    let voiceAudio = new Audio();
+    let voiceSettings = { taunt: '', critical: '', burst: '', bigBoss: '', win: '' };
+    let voiceCooldown = false;
+    let lastActionTime = Date.now();
+    let hasPlayedCritical = false;
+    let damageHistory = [];
+
+    let defaultPhrases = {
+      taunt: ["Alors ? On fait la sieste ?", "Il va pas se casser tout seul !", "Y'a quelqu'un ?", "C'est mou tout ça !"],
+      critical: ["Il est en fin de vie !", "Achevez-le !", "C'est le moment de tout donner !", "Il ne tient plus debout !"],
+      burst: ["Oulala calmez-vous !", "Quelle violence !", "C'est une boucherie !", "Mais ils sont fous !"],
+      bigBoss: ["Attention, c'est du lourd !", "Bon courage pour celui-là !", "Un sac à PV sauvage apparaît !", "Sortez les muscles !"],
+      win: ["Et c'est le K.O !", "Victoire !", "Au suivant !", "C'est gagné !"]
+    };
+
+    let levelCycle = [];
+    let impactRules = []; 
+    let currentCycleIndex = -1;
+    let currentLevelConfig = null;
+    let playerScores = {}; 
+    let editingCycleIndex = -1; 
+
+    // --- DRAG & DROP ---
+    function makeDraggable(element) {
+      const header = element.querySelector('.panel-header');
+      header.onmousedown = (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON" || e.target.tagName === "SELECT" || e.target.type === "checkbox") return;
+        let pos1 = 0, pos2 = 0, pos3 = e.clientX, pos4 = e.clientY;
+        document.onmouseup = () => { document.onmouseup = null; document.onmousemove = null; };
+        document.onmousemove = (ev) => {
+          pos1 = pos3 - ev.clientX; pos2 = pos4 - ev.clientY;
+          pos3 = ev.clientX; pos4 = ev.clientY;
+          element.style.top = (element.offsetTop - pos2) + "px";
+          element.style.left = (element.offsetLeft - pos1) + "px";
+        };
+      };
+    }
+
+    // --- CONFIG & AUDIO ---
+    function updateMainTitle() { document.getElementById('mainTitle').innerText = document.getElementById('titleInput').value; }
+    function updateSoundUrl() { const url = document.getElementById('soundUrlInput').value.trim(); if (url) hitSound = new Audio(url); }
+    function updateWinSoundUrl() { const url = document.getElementById('winSoundUrlInput').value.trim(); if (url) winSound = new Audio(url); }
+    function updateScreenBg() {
+      const url = document.getElementById('screenBgInput').value.trim();
+      const screen = document.getElementById('mainScreen');
+      // Remove video background if exists
+      const oldVideo = screen.querySelector('.bg-video');
+      if (oldVideo) oldVideo.remove();
+      
+      if(url) {
+        screen.style.backgroundImage = `url('${url}')`;
+        screen.style.backgroundSize = 'cover';
+        screen.style.backgroundPosition = 'center';
+      }
+      else {
+        screen.style.backgroundImage = `radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%)`;
+      }
+    }
+
+    function loadScreenBgFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const screen = document.getElementById('mainScreen');
+      
+      // Remove old video if exists
+      const oldVideo = screen.querySelector('.bg-video');
+      if (oldVideo) oldVideo.remove();
+
+      if (file.type.startsWith('video/')) {
+        // VIDEO background
+        const videoUrl = URL.createObjectURL(file);
+        const video = document.createElement('video');
+        video.className = 'bg-video';
+        video.src = videoUrl;
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;border-radius:8px;';
+        screen.insertBefore(video, screen.firstChild);
+        screen.style.backgroundImage = 'none';
+        document.getElementById('screenBgInput').value = '[FICHIER VIDÉO]';
+      } else {
+        // IMAGE / GIF background
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          screen.style.backgroundImage = `url('${e.target.result}')`;
+          screen.style.backgroundSize = 'cover';
+          screen.style.backgroundPosition = 'center';
+          document.getElementById('screenBgInput').value = '[FICHIER IMAGE]';
+        };
+        reader.readAsDataURL(file);
+      }
+      event.target.value = '';
+    }
+
+    function clearScreenBg() {
+      const screen = document.getElementById('mainScreen');
+      const oldVideo = screen.querySelector('.bg-video');
+      if (oldVideo) oldVideo.remove();
+      screen.style.backgroundImage = `radial-gradient(circle at center, #1a1a2e 0%, #0a0a0a 100%)`;
+      document.getElementById('screenBgInput').value = '';
+    }
+
+    function updateVolume() {
+      const vol = document.getElementById('volumeSlider').value;
+      hitSound.volume = vol / 100; 
+      winSound.volume = vol / 100;
+      document.getElementById('volValue').textContent = vol + "%";
+    }
+
+    function updateVoiceVolume() {
+      const vol = document.getElementById('voiceVolumeSlider').value;
+      voiceAudio.volume = vol / 100;
+      document.getElementById('voiceVolValue').textContent = vol + "%";
+    }
+
+    function playHitSound() { hitSound.currentTime = 0; hitSound.play().catch(e => {}); }
+    function playWinSound() { winSound.currentTime = 0; winSound.play().catch(e => {}); }
+    function toggleSetup() { document.querySelectorAll('.setup-hidden').forEach(el => el.classList.toggle('setup-hidden')); }
+
+    // --- VOICE ---
+    function updateVoiceSettings() {
+      voiceSettings.taunt = document.getElementById('voiceTaunt').value.trim();
+      voiceSettings.critical = document.getElementById('voiceCritical').value.trim();
+      voiceSettings.burst = document.getElementById('voiceBurst').value.trim();
+      voiceSettings.bigBoss = document.getElementById('voiceBigBoss').value.trim();
+      voiceSettings.win = document.getElementById('voiceWin').value.trim();
+    }
+
+    function tryPlayVoice(type) {
+      if (type !== 'win' && voiceCooldown) return;
+      const url = voiceSettings[type];
+      if (url) {
+        voiceAudio.src = url;
+        voiceAudio.play().catch(e => console.log("Voice Play Error:", e));
+      } else {
+        const phrases = defaultPhrases[type];
+        if (phrases && phrases.length > 0) {
+          const text = phrases[Math.floor(Math.random() * phrases.length)];
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'fr-FR';
+          utterance.volume = document.getElementById('voiceVolumeSlider').value / 100;
+          utterance.rate = 1.1;
+          const voices = window.speechSynthesis.getVoices();
+          const frVoice = voices.find(v => v.lang.includes('fr'));
+          if(frVoice) utterance.voice = frVoice;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+      if (type !== 'win') {
+        voiceCooldown = true;
+        setTimeout(() => { voiceCooldown = false; }, 25000);
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {}; 
+    }
+
+    // Taunt loop
+    setInterval(() => {
+      if (!isTransitioning && currentHP > 0 && Date.now() - lastActionTime > 20000) {
+        tryPlayVoice('taunt');
+        lastActionTime = Date.now();
+      }
+    }, 1000);
+
+    // --- GAME LOGIC ---
+    function adjustHP(amount) {
+      if (isTransitioning) return;
+      currentHP += amount;
+      if (currentHP > maxHP) currentHP = maxHP;
+      if (currentHP <= 0) { currentHP = 0; checkStatus("ADMIN"); }
+      updateUI();
+    }
+
+    function addManualPlayer() {
+      const user = document.getElementById('manualUsername').value.trim();
+      const hits = parseInt(document.getElementById('manualHits').value);
+      if (user && hits > 0) { performAttack(hits, user, ''); document.getElementById('manualUsername').value = ""; document.getElementById('manualHits').value = ""; }
+    }
+
+    // --- IMPACT RULES ---
+    function addImpactRule() {
+      const min = parseInt(document.getElementById('impactMin').value);
+      const max = parseInt(document.getElementById('impactMax').value);
+      const img = document.getElementById('impactImg').value.trim();
+      if (!isNaN(min) && !isNaN(max) && img) {
+        impactRules.push({ min, max, img });
+        updateImpactRulesUI();
+        document.getElementById('impactMin').value = "";
+        document.getElementById('impactMax').value = "";
+        document.getElementById('impactImg').value = "";
+      }
+    }
+
+    function deleteImpactRule(index) {
+      impactRules.splice(index, 1);
+      updateImpactRulesUI();
+    }
+
+    function updateImpactRulesUI() {
+      const list = document.getElementById('impactList');
+      list.innerHTML = impactRules.map((rule, idx) => `
+        <div class="cycle-item">
+          <span>${rule.min}-${rule.max} dmg</span>
+          <div class="score-actions">
+            <img src="${rule.img}" style="width:20px;height:20px;object-fit:contain;background:#000;">
+            <span class="delete-btn" onclick="deleteImpactRule(${idx})">✘</span>
+          </div>
+        </div>
+      `).join('') || '<div style="text-align: center; color: #555; padding: 10px;">Aucun effet défini.</div>';
+    }
+
+    function showImpactEffect(damage) {
+      const rule = impactRules.find(r => damage >= r.min && damage <= r.max);
+      if (rule) {
+        const effect = document.createElement('div');
+        effect.className = 'impact-effect';
+        effect.style.backgroundImage = `url('${rule.img}')`;
+        document.querySelector('.gold-container').appendChild(effect);
+        setTimeout(() => effect.remove(), 500); 
+      }
+    }
+
+    // --- LEADERBOARD ---
+    function updatePlayerScore(username, amount) {
+      if (!playerScores[username]) playerScores[username] = { score: 0, last: Date.now() };
+      else if (typeof playerScores[username] === 'number') playerScores[username] = { score: playerScores[username], last: Date.now() };
+      
+      playerScores[username].score += amount;
+      playerScores[username].last = Date.now(); 
+      const currentPts = playerScores[username].score;
+      document.getElementById('lastAttackerInfoTitle').textContent = `Dernier: ${username} (${currentPts})`;
+      updateLeaderboardUI();
+    }
+
+    function editPlayerScore(name) {
+      let current = typeof playerScores[name] === 'object' ? playerScores[name].score : playerScores[name];
+      let newScore = prompt(`Nouveau score pour ${name}:`, current);
+      if (newScore !== null && !isNaN(newScore)) {
+        if (typeof playerScores[name] === 'object') {
+          playerScores[name].score = parseInt(newScore);
+        } else {
+          playerScores[name] = parseInt(newScore);
+        }
+        updateLeaderboardUI();
+      }
+    }
+
+    function removePlayerFromLeaderboard(name) { delete playerScores[name]; updateLeaderboardUI(); }
+    function resetAllScores() { if(confirm("Supprimer tous les scores ?")) { playerScores = {}; updateLeaderboardUI(); } }
+
+    function updateLeaderboardUI() {
+      const list = document.getElementById('leaderboardList');
+      const searchQuery = document.getElementById('leaderboardSearch').value.toLowerCase();
+      const sortType = document.getElementById('leaderboardSort').value;
+      
+      const names = Object.keys(playerScores).filter(name => {
+        const score = typeof playerScores[name] === 'object' ? playerScores[name].score : playerScores[name];
+        return name.toLowerCase().includes(searchQuery) && score > 0;
+      });
+      
+      names.sort((a, b) => {
+        const dataA = typeof playerScores[a] === 'object' ? playerScores[a] : { score: playerScores[a], last: 0 };
+        const dataB = typeof playerScores[b] === 'object' ? playerScores[b] : { score: playerScores[b], last: 0 };
+        return sortType === 'points' ? dataB.score - dataA.score : dataB.last - dataA.last;
+      });
+      
+      let total = 0;
+      for (let name in playerScores) total += (typeof playerScores[name] === 'object' ? playerScores[name].score : playerScores[name]);
+      document.getElementById('globalTotalPoints').textContent = total;
+
+      list.innerHTML = names.map(name => {
+        const score = typeof playerScores[name] === 'object' ? playerScores[name].score : playerScores[name];
+        return `
+          <div class="score-item">
+            <span style="flex:1"><strong>${name}</strong>: ${score} pts</span>
+            <div class="score-actions">
+              <span class="edit-btn" onclick="editPlayerScore('${name.replace(/'/g, "\\'")}')">✎</span>
+              <span class="delete-btn" onclick="removePlayerFromLeaderboard('${name.replace(/'/g, "\\'")}')">✘</span>
+            </div>
+          </div>`;
+      }).join('') || '<div style="text-align: center; color: #555; padding: 10px;">Aucun point (> 0)</div>';
+    }
+
+    // --- SAVE & LOAD ---
+    function exportAll() {
+      const data = { 
+        cycle: levelCycle,
+        impactRules: impactRules, 
+        voiceSettings: voiceSettings,
+        blacklist: blacklist,
+        scores: playerScores, 
+        pool: coinPool, 
+        sound: document.getElementById('soundUrlInput').value, 
+        winSound: document.getElementById('winSoundUrlInput').value, 
+        screenBg: document.getElementById('screenBgInput').value, 
+        title: document.getElementById('titleInput').value,
+        currentHP: currentHP, 
+        maxHP: maxHP, 
+        cycleIndex: currentCycleIndex,
+        bossTitle: document.getElementById('gameTitle').textContent,
+        bossImg: document.getElementById('goldBar').style.backgroundImage
+      };
+      const link = document.createElement('a');
+      link.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+      link.download = "jerem_battlebox_full_save.json";
+      link.click();
+    }
+
+    function triggerImport() { document.getElementById('importFile').click(); }
+    function importAll(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const d = JSON.parse(e.target.result);
+          
+          if (d.cycle) levelCycle = d.cycle;
+          if (d.impactRules) impactRules = d.impactRules; 
+          if (d.blacklist) { blacklist = d.blacklist; updateBlacklistUI(); }
+          
+          if (d.voiceSettings) {
+            voiceSettings = d.voiceSettings;
+            document.getElementById('voiceTaunt').value = voiceSettings.taunt || "";
+            document.getElementById('voiceCritical').value = voiceSettings.critical || "";
+            document.getElementById('voiceBurst').value = voiceSettings.burst || "";
+            document.getElementById('voiceBigBoss').value = voiceSettings.bigBoss || "";
+            document.getElementById('voiceWin').value = voiceSettings.win || "";
+          }
+
+          if (d.scores) {
+            playerScores = d.scores;
+            for(let key in playerScores) {
+              if (typeof playerScores[key] === 'number') {
+                playerScores[key] = { score: playerScores[key], last: Date.now() };
+              }
+            }
+          }
+
+          if (d.pool !== undefined) coinPool = d.pool;
+          if (d.sound) { document.getElementById('soundUrlInput').value = d.sound; updateSoundUrl(); }
+          if (d.winSound) { document.getElementById('winSoundUrlInput').value = d.winSound; updateWinSoundUrl(); }
+          if (d.screenBg !== undefined) { document.getElementById('screenBgInput').value = d.screenBg; updateScreenBg(); }
+          if (d.title) { document.getElementById('titleInput').value = d.title; updateMainTitle(); }
+          
+          if (d.maxHP) maxHP = d.maxHP;
+          if (d.currentHP !== undefined) currentHP = d.currentHP;
+          if (d.cycleIndex !== undefined) currentCycleIndex = d.cycleIndex;
+          if (d.bossTitle) document.getElementById('gameTitle').textContent = d.bossTitle;
+          if (d.bossImg) document.getElementById('goldBar').style.backgroundImage = d.bossImg;
+
+          updateCycleUI();
+          updateImpactRulesUI();
+          updateLeaderboardUI(); 
+          updateUI();
+          showToast("✅ CHARGÉ", "Jeu, Scores, Config et Voix restaurés !");
+        } catch (err) { alert("Erreur importation !"); }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // --- CYCLE ---
+    function editCycleLevel(index) {
+      const lvl = levelCycle[index];
+      document.getElementById('newLevelName').value = lvl.name;
+      document.getElementById('newLevelHP').value = lvl.hp;
+      document.getElementById('newLevelReward').value = lvl.reward;
+      document.getElementById('newLevelImg').value = lvl.img;
+      editingCycleIndex = index;
+      const btn = document.getElementById('btnAddLevel');
+      btn.textContent = "MODIFIER (N°" + (index + 1) + ")";
+      btn.style.background = "#f59e0b"; 
+    }
+
+    function addCustomLevel() {
+      const name = document.getElementById('newLevelName').value || "Boss";
+      const hp = parseInt(document.getElementById('newLevelHP').value) || 1000;
+      const reward = parseInt(document.getElementById('newLevelReward').value) || 100;
+      const img = document.getElementById('newLevelImg').value || 'https://i.gifer.com/4o45.gif';
+      const newLvl = { name, hp, reward, img };
+
+      if (editingCycleIndex > -1) {
+        levelCycle[editingCycleIndex] = newLvl;
+        editingCycleIndex = -1;
+        const btn = document.getElementById('btnAddLevel');
+        btn.textContent = "AJOUTER";
+        btn.style.background = "#a855f7"; 
+        showToast("♻️ CYCLE", "Boss modifié !");
+      } else {
+        levelCycle.push(newLvl);
+        showToast("♻️ CYCLE", "Boss ajouté au cycle !");
+      }
+
+      document.getElementById('newLevelName').value = ""; document.getElementById('newLevelHP').value = ""; document.getElementById('newLevelReward').value = ""; document.getElementById('newLevelImg').value = "";
+      updateCycleUI();
+    }
+
+    function moveCycleLevel(index, direction) {
+      if (direction === -1 && index > 0) {
+        [levelCycle[index], levelCycle[index - 1]] = [levelCycle[index - 1], levelCycle[index]];
+        if (currentCycleIndex === index) currentCycleIndex--;
+        else if (currentCycleIndex === index - 1) currentCycleIndex++;
+      } else if (direction === 1 && index < levelCycle.length - 1) {
+        [levelCycle[index], levelCycle[index + 1]] = [levelCycle[index + 1], levelCycle[index]];
+        if (currentCycleIndex === index) currentCycleIndex++;
+        else if (currentCycleIndex === index + 1) currentCycleIndex--;
+      }
+      updateCycleUI();
+    }
+
+    function updateCycleUI() {
+      const list = document.getElementById('cycleList');
+      list.innerHTML = levelCycle.map((lvl, idx) => `
+        <div class="cycle-item ${idx === currentCycleIndex ? 'active' : ''}">
+          <div style="display:flex; align-items:center; gap:5px;">
+             <span style="font-size:0.8em; color:#666;">${idx+1}.</span>
+             <span>${lvl.name} (${lvl.hp} PV)</span>
+          </div>
+          <div class="score-actions">
+            ${idx > 0 ? `<span class="move-btn" onclick="moveCycleLevel(${idx}, -1)">⬆️</span>` : '<span style="width:20px;display:inline-block;"></span>'}
+            ${idx < levelCycle.length - 1 ? `<span class="move-btn" onclick="moveCycleLevel(${idx}, 1)">⬇️</span>` : '<span style="width:20px;display:inline-block;"></span>'}
+            <span class="edit-btn" onclick="editCycleLevel(${idx})">✎</span>
+            <span class="delete-btn" onclick="levelCycle.splice(${idx},1);updateCycleUI();">✘</span>
+          </div>
+        </div>
+      `).join('') || '<div style="text-align: center; color: #555; padding: 10px;">Cycle vide.</div>';
+    }
+
+    function startCycle() { if (levelCycle.length) { currentCycleIndex = 0; loadLevelFromCycle(); } }
+
+    function loadLevelFromCycle() {
+      if (currentCycleIndex >= levelCycle.length) {
+        if (document.getElementById('loopCycle').checked) currentCycleIndex = 0;
+        else { currentCycleIndex = -1; updateCycleUI(); return; }
+      }
+      currentLevelConfig = levelCycle[currentCycleIndex];
+      initGame(currentLevelConfig);
+      isTransitioning = false;
+      updateCycleUI();
+    }
+
+    // =============================================
+    // ====== WEBSOCKET - CONNEXION PORT 8832 ======
+    // =============================================
+    function connectToServer() {
+      socket = new WebSocket('ws://localhost:8832');
+      const status = document.getElementById('statusText');
+      
+      socket.onopen = () => { 
+        status.textContent = "EN LIGNE"; 
+        status.style.color = "#4CAF50"; 
+        console.log("✅ Connecté au serveur 8832");
+      };
+      
+      socket.onclose = () => { 
+        status.textContent = "DÉCONNECTÉ"; 
+        status.style.color = "#F44336"; 
+        console.log("❌ Déconnecté du serveur, reconnexion dans 5s...");
+        setTimeout(connectToServer, 5000); 
+      };
+      
+      socket.onerror = (err) => {
+        console.log("⚠️ Erreur WebSocket:", err);
+      };
+
+      socket.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          
+          // ============================================
+          // ATTAQUE DIRECTE - PAS DE FILE D'ATTENTE
+          // Tout le monde attaque en même temps !
+          // 1 pièce = 1 PV de dégât
+          // ============================================
+          if (msg.type === 'ACTION' && msg.action === 'shoot_balloon') {
+            const user = msg.data.user || "Anonyme";
+            const coins = msg.data.count || msg.data.diamondCount || 1;
+            const pic = msg.data.profilePictureUrl || '';
+            performAttack(coins, user, pic);
+            console.log(`🎁 ${user} envoie ${coins} pièces → ${coins} PV de dégâts`);
+          }
+
+          // Ancien format compatible (shoot_balloon_X)
+          if (msg.type === 'ACTION' && msg.action.startsWith('shoot_balloon_')) {
+            const user = msg.data.user || "Anonyme";
+            const hits = parseInt(msg.action.replace('shoot_balloon_', ''));
+            const pic = msg.data.profilePictureUrl || '';
+            if (hits > 0) {
+              performAttack(hits, user, pic);
+            }
+          }
+
+          // ============================================
+          // COMMANDE CHAT: "etoile" ou "point"
+          // Affiche le total de points du joueur en popup
+          // ============================================
+          if (msg.type === 'ACTION' && msg.action === 'chat') {
+            const user = msg.data.user || "Anonyme";
+            const pic = msg.data.profilePictureUrl || '';
+            const comment = (msg.data.comment || '').toLowerCase().trim();
+            
+            // Stocker la photo de profil
+            if (pic) playerPics[user] = pic;
+
+            if (!isBlacklisted(user) && (comment === 'etoile' || comment === 'étoile' || comment === 'point' || comment === 'points' || comment === 'score')) {
+              const totalPts = playerScores[user] ? (typeof playerScores[user] === 'object' ? playerScores[user].score : playerScores[user]) : 0;
+              const userPic = pic || playerPics[user] || '';
+              showScorePopup(user, userPic, totalPts);
+            }
+          }
+
+        } catch (err) {
+          console.log("Erreur parsing message:", err);
+        }
+      };
+    }
+
+    function updateQueueUI() {
+      // Kept for compatibility but queue is disabled
+      document.getElementById('queueTotal').textContent = 0;
+      document.getElementById('queueTotalExt').textContent = 0;
+    }
+
+    function performAttack(count, user, profilePic) {
+      // Store profile pic for user (always, even if boss dead)
+      if (profilePic) {
+        playerPics[user] = profilePic;
+      }
+
+      // BLACKLIST CHECK
+      if (isBlacklisted(user)) return;
+
+      // BLOCK si boss déjà mort ou en transition
+      const isBroken = document.getElementById('goldBar').classList.contains('broken');
+      if (isTransitioning || isBroken || currentHP <= 0) return;
+
+      document.getElementById('lastAttackerName').textContent = user;
+      document.getElementById('lastAttackerNamePanel').textContent = user;
+      
+      updatePlayerScore(user, 0); 
+      lastActionTime = Date.now();
+
+      const lock = document.getElementById('target-lock');
+      lock.style.left = "50%"; lock.style.top = "50%"; lock.classList.add('locked');
+
+      document.getElementById('goldBar').classList.add('hit');
+      playHitSound();
+
+      let damage = count;
+      if (count > currentHP) { damage = currentHP; }
+      currentHP -= damage;
+      
+      showImpactEffect(damage);
+      
+      // SHOW LASER + PROFILE PIC
+      const pic = profilePic || playerPics[user] || '';
+      const totalPts = playerScores[user] ? (typeof playerScores[user] === 'object' ? playerScores[user].score : playerScores[user]) : 0;
+      showLaserAttack(user, pic, totalPts, damage);
+
+      // Burst detection
+      let now = Date.now();
+      damageHistory.push({ time: now, amount: damage });
+      damageHistory = damageHistory.filter(d => now - d.time < 2000);
+      let totalBurst = damageHistory.reduce((sum, d) => sum + d.amount, 0);
+      
+      if (totalBurst > maxHP * 0.15 && maxHP > 500) {
+        tryPlayVoice('burst');
+      }
+
+      coinPool += (damage * 0.01);
+      // JACKPOT: quand le pool atteint 1000+, chance aléatoire de tomber pour l'attaquant
+      if (coinPool >= 1000) {
+        if (Math.random() < 0.05) {
+          const jackpotAmount = Math.floor(coinPool);
+          updatePlayerScore(user, jackpotAmount);
+          showToast("💎 JACKPOT !", `${user} récupère ${jackpotAmount} pièces du pool !`);
+          showFloatingText(`+${jackpotAmount} 💎`, '#00ffff');
+          coinPool = 0;
+        }
+      }
+      updateUI();
+      // UN SEUL TUEUR : celui qui porte le coup fatal gagne les points
+      checkStatus(user);
+      
+      setTimeout(() => {
+        lock.classList.remove('locked');
+        document.getElementById('goldBar').classList.remove('hit');
+      }, 200);
+    }
+
+    // ======== LASER ATTACK VISUAL ========
+    let playerPics = {}; // cache des photos de profil
+    let blacklist = []; // liste noire
+
+    function showLaserAttack(user, profilePic, totalPts, damage) {
+      const container = document.querySelector('.gold-container');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+
+      // Position aléatoire autour du boss (cercle)
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 120 + Math.random() * 40;
+      const centerX = container.offsetWidth / 2;
+      const centerY = container.offsetHeight / 2;
+      const posX = centerX + Math.cos(angle) * radius;
+      const posY = centerY + Math.sin(angle) * radius;
+
+      // Create attacker bubble
+      const bubble = document.createElement('div');
+      bubble.className = 'laser-attacker';
+      bubble.style.left = (posX - 25) + 'px';
+      bubble.style.top = (posY - 25) + 'px';
+
+      // Profile pic or placeholder
+      if (profilePic) {
+        bubble.innerHTML = `
+          <img class="attacker-pic" src="${profilePic}" onerror="this.outerHTML='<div class=\\'attacker-pic-placeholder\\'>⚔️</div>'">
+          <div class="attacker-name">${user}</div>
+          <div class="attacker-pts">${totalPts} pts</div>
+          <div class="attacker-dmg">-${damage}</div>
+        `;
+      } else {
+        bubble.innerHTML = `
+          <div class="attacker-pic-placeholder">⚔️</div>
+          <div class="attacker-name">${user}</div>
+          <div class="attacker-pts">${totalPts} pts</div>
+          <div class="attacker-dmg">-${damage}</div>
+        `;
+      }
+
+      container.appendChild(bubble);
+
+      // Create laser beam from bubble to center
+      const beam = document.createElement('div');
+      beam.className = 'laser-beam';
+      const dx = centerX - posX;
+      const dy = centerY - posY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
+      
+      beam.style.left = posX + 'px';
+      beam.style.top = posY + 'px';
+      beam.style.width = dist + 'px';
+      beam.style.transform = `rotate(${angleDeg}deg)`;
+
+      container.appendChild(beam);
+
+      // Cleanup
+      setTimeout(() => beam.remove(), 500);
+      setTimeout(() => bubble.remove(), 1800);
+    }
+
+    function checkStatus(user) {
+      if (currentHP <= 0 && !document.getElementById('goldBar').classList.contains('broken')) {
+        document.getElementById('goldBar').classList.add('broken');
+        isTransitioning = true;
+        playWinSound();
+        tryPlayVoice('win');
+
+        const win = currentLevelConfig ? currentLevelConfig.reward : 0;
+        showToast("🏆 VICTOIRE !", `${user} gagne ${win} points`);
+        if (win > 0) { updatePlayerScore(user, win); }
+
+        // TTS: annoncer le gagnant
+        setTimeout(() => {
+          announceWinner(user, win);
+        }, 800);
+
+        setTimeout(() => {
+          if (currentCycleIndex !== -1) { currentCycleIndex++; loadLevelFromCycle(); }
+          else { initGame(); isTransitioning = false; }
+        }, 2500);
+      }
+    }
+
+    // ======== TTS ANNONCE GAGNANT ========
+    function announceWinner(user, points) {
+      if (!('speechSynthesis' in window)) return;
+      
+      // Annuler toute voix en cours sauf la musique
+      window.speechSynthesis.cancel();
+
+      const bossName = document.getElementById('gameTitle').textContent || 'le boss';
+      let text;
+      if (points > 0) {
+        text = `${user} a détruit ${bossName} et gagne ${points} points ! Bravo !`;
+      } else {
+        text = `${user} a détruit ${bossName} ! Bien joué !`;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.volume = document.getElementById('voiceVolumeSlider').value / 100;
+      utterance.rate = 1.05;
+      utterance.pitch = 1.1;
+
+      // Chercher une voix française
+      const voices = window.speechSynthesis.getVoices();
+      const frVoice = voices.find(v => v.lang.includes('fr'));
+      if (frVoice) utterance.voice = frVoice;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // ======== SCORE POPUP (commande etoile/point) ========
+    function showScorePopup(user, profilePic, totalPts) {
+      const screen = document.getElementById('mainScreen');
+      
+      // Remove existing popups to avoid spam
+      const existing = screen.querySelectorAll('.score-popup');
+      if (existing.length >= 3) existing[0].remove();
+
+      const popup = document.createElement('div');
+      popup.className = 'score-popup';
+      
+      const picHtml = profilePic 
+        ? `<img class="popup-pic" src="${profilePic}" onerror="this.outerHTML='<div class=\\'popup-pic-placeholder\\'>⭐</div>'">`
+        : `<div class="popup-pic-placeholder">⭐</div>`;
+      
+      popup.innerHTML = `
+        ${picHtml}
+        <div class="popup-name">${user}</div>
+        <div class="popup-score">${totalPts} <span style="font-size:0.6em;">pts</span></div>
+      `;
+      
+      screen.appendChild(popup);
+      setTimeout(() => popup.remove(), 3500);
+    }
+
+    // ======== BLACKLIST ========
+    function addToBlacklist() {
+      const input = document.getElementById('blacklistInput');
+      const name = input.value.trim().toLowerCase().replace('@', '');
+      if (!name) return;
+      if (!blacklist.includes(name)) {
+        blacklist.push(name);
+        updateBlacklistUI();
+      }
+      input.value = '';
+    }
+
+    function removeFromBlacklist(name) {
+      blacklist = blacklist.filter(n => n !== name);
+      updateBlacklistUI();
+    }
+
+    function isBlacklisted(user) {
+      return blacklist.includes(user.toLowerCase().replace('@', ''));
+    }
+
+    function updateBlacklistUI() {
+      const list = document.getElementById('blacklistList');
+      if (blacklist.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color:#555; padding:8px;">Aucun joueur bloqué</div>';
+        return;
+      }
+      list.innerHTML = blacklist.map(name => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#ff6b6b;">🚫 ${name}</span>
+          <span class="delete-btn" onclick="removeFromBlacklist('${name.replace(/'/g, "\\'")}')" style="cursor:pointer;">✘</span>
+        </div>
+      `).join('');
+    }
+
+    function updateUI() {
+      const pct = (currentHP / maxHP * 100);
+      document.getElementById('poolBarProgress').style.width = pct + '%';
+      document.getElementById('poolBarText').textContent = `PV: ${currentHP} / ${maxHP}`;
+      
+      // External panel mirror
+      document.getElementById('poolBarProgressExt').style.width = pct + '%';
+      document.getElementById('poolBarTextExt').textContent = `PV: ${currentHP} / ${maxHP}`;
+      
+      document.getElementById('poolDisplayValue').textContent = Math.floor(coinPool);
+      document.getElementById('poolDisplayValueExt').textContent = Math.floor(coinPool);
+      document.getElementById('poolDisplayValueTop').textContent = Math.floor(coinPool);
+
+      const bar = document.getElementById('goldBar');
+      const percentage = currentHP / maxHP;
+
+      if (currentHP > 0) {
+        if (percentage <= 0.40) {
+          if (!hasPlayedCritical) {
+            tryPlayVoice('critical');
+            hasPlayedCritical = true;
+          }
+        }
+      }
+    }
+
+    function initGame(config = null) {
+      if (!config) config = { name: "Attente", hp: 1000, img: 'https://i.gifer.com/4o45.gif', reward: 0 };
+      maxHP = config.hp; currentHP = maxHP;
+      document.getElementById('gameTitle').textContent = config.name.toUpperCase();
+      document.getElementById('goldBar').style.backgroundImage = `url('${config.img}')`;
+      document.getElementById('goldBar').classList.remove('broken');
+      document.getElementById('goldBar').classList.remove('low-hp');
+      document.getElementById('goldBar').classList.remove('critical-hp');
+      
+      hasPlayedCritical = false; 
+      damageHistory = [];
+      
+      if (maxHP >= 3000) {
+        setTimeout(() => tryPlayVoice('bigBoss'), 500);
+      }
+
+      updateUI();
+    }
+
+    function showToast(title, message) {
+      const container = document.getElementById('notification-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<div style="color: #ffd700; font-weight:bold;">${title}</div><div>${message}</div>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function showFloatingText(text, color) {
+      const ft = document.createElement('div');
+      ft.className = 'floating-text'; ft.textContent = text; ft.style.color = color;
+      ft.style.left = "50%"; ft.style.top = "40%";
+      document.getElementById('mainScreen').appendChild(ft);
+      setTimeout(() => ft.remove(), 800);
+    }
+
+    // MAIN LOOP
+    window.onload = () => {
+      document.querySelectorAll('.draggable-panel').forEach(makeDraggable);
+      initGame(); connectToServer(); updateLeaderboardUI(); updateBlacklistUI();
+    };
+  </script>
+</body>
+</html>
