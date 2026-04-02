@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Protection par session - redirige vers login si pas connecté
+        if (sessionStorage.getItem('aa_session') !== 'aa_authenticated_v1') {
+            window.location.href = 'login.html?redirect=index.html';
+        }
+    </script>
     <title>Space Invader - Phone Edition (Optimized)</title>
     <style>
         body {
