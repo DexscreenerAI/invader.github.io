@@ -6250,6 +6250,13 @@
         // ==========================================
         // ROUE DE LA FORTUNE (500+ pièces)
         // ==========================================
+        const WHEEL_SPIN_SOUND = 'https://files.catbox.moe/b3dzx2.mp3';
+        const WHEEL_WIN_SOUND = 'https://files.catbox.moe/2gpchn.mp3';
+
+        function playWheelSound(url) {
+            try { const a = new Audio(url); a.volume = 0.5; a.play().catch(()=>{}); return a; } catch(e) { return null; }
+        }
+
         const WHEEL_SEGMENTS = [
             { label: '10 PTS', value: 10, type: 'pts', color: '#3498db' },
             { label: '30 PTS', value: 30, type: 'pts', color: '#2ecc71' },
@@ -6376,10 +6383,12 @@
             }
 
             drawWheel(0);
+            var _wheelSpinAudio = playWheelSound(WHEEL_SPIN_SOUND);
             requestAnimationFrame(animateWheel);
         }
 
         function applyWheelResult(user, segment) {
+            playWheelSound(WHEEL_WIN_SOUND);
             const resultDisplay = document.getElementById('wheel-result-display');
 
             if (segment.type === 'pts') {
@@ -6514,6 +6523,7 @@
                     }
                     throttledUpdateQueueUI();
 
+                    playWheelSound(WHEEL_WIN_SOUND);
                     resultDisplay.innerHTML = '🎯 +' + segment.value + ' TIRS BONUS !';
                     resultDisplay.style.color = '#00f2ff';
                     console.log('[MINI-WHEEL] ' + user + ' gagne +' + segment.value + ' tirs bonus');
@@ -6530,6 +6540,7 @@
             }
 
             drawMiniWheel(0);
+            playWheelSound(WHEEL_SPIN_SOUND);
             requestAnimationFrame(animateMiniWheel);
         }
 
