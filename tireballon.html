@@ -1891,14 +1891,16 @@
             } 
         }
 
-        function setBackground(screenId, url, forceVideo = false) {
+        function setBackground(screenId, url, forceVideo = false, itemMuted = null) {
             const container = document.getElementById(`container-${screenId}`);
             const bgVideo = document.getElementById(`bg-video-${screenId}`);
             if(!container || !bgVideo) return;
-            
+
             const isVideo = forceVideo || (url && url.match(/\.(mp4|webm|ogg|mov)(\?|$)/i)) || (url && url.startsWith('data:video'));
-            const isMuted = document.getElementById('bg-mute-check')?.checked ?? true;
-            
+            // Priorité : muet global > muet par vidéo
+            const globalMuted = document.getElementById('bg-mute-check')?.checked ?? false;
+            const muted = globalMuted || (itemMuted !== null ? itemMuted : false);
+
             if (!url) {
                 container.style.backgroundImage = 'none';
                 bgVideo.classList.add('hidden');
@@ -1907,7 +1909,7 @@
             } else if (isVideo) {
                 container.style.backgroundImage = 'none';
                 bgVideo.src = url;
-                bgVideo.muted = isMuted;
+                bgVideo.muted = muted;
                 bgVideo.classList.remove('hidden');
                 bgVideo.play().catch(() => {});
             } else {
@@ -1958,18 +1960,23 @@
                 statusEl.textContent = items.length + ' fond(s)';
                 items.forEach(({ item, i }) => {
                     const isVideo = item.type === 'video';
+                    const isMuted = item.muted !== undefined ? item.muted : false;
                     const li = document.createElement('li');
                     li.className = 'mb-1 p-2 rounded-lg';
                     li.style.cssText = 'background: rgba(255,255,255,0.03); display:flex; align-items:center; gap:8px;';
                     let thumb = isVideo
                         ? `<video src="${item.url}" muted class="w-9 h-9 object-cover rounded border border-gray-600" preload="metadata"></video>`
                         : `<img src="${item.url}" class="w-9 h-9 object-cover rounded border border-gray-600">`;
+                    const muteBtn = isVideo
+                        ? `<button onclick="window._bgToggleMute(${i})" class="text-[11px] px-2 py-1 rounded border ${isMuted ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-blue-500 text-blue-400 bg-blue-500/10'}" title="${isMuted ? 'Activer le son' : 'Couper le son'}">${isMuted ? '🔇' : '🔊'}</button>`
+                        : '';
                     li.innerHTML = `
                         ${thumb}
                         <div class="flex-1 min-w-0">
                             <div class="text-xs font-bold text-white truncate">${item.name}</div>
-                            <div class="text-[10px] text-gray-400">${isVideo ? '🎬 Vidéo' : '🖼️ Image'}</div>
+                            <div class="text-[10px] text-gray-400">${isVideo ? '🎬 Vidéo' : '🖼️ Image'}${isVideo ? (isMuted ? ' 🔇' : ' 🔊') : ''}</div>
                         </div>
+                        ${muteBtn}
                         <button onclick="window._bgPlay(${i})" class="text-[11px] px-2 py-1 rounded border border-green-500 text-green-400 bg-green-500/10 hover:bg-green-500/20 font-bold">▶</button>
                         <button onclick="window._bgDelete(${i})" class="text-[11px] px-2 py-1 rounded border border-red-500 text-red-400 bg-red-500/10 hover:bg-red-500/20 font-bold">✕</button>`;
                     targetList.appendChild(li);
@@ -1984,9 +1991,24 @@
             const item = bgLibrary[index];
             if (!item) return;
             stopBgAutoplay();
-            setBackground(item.screenId, item.url, item.type === 'video');
+            const itemMuted = item.muted !== undefined ? item.muted : false;
+            setBackground(item.screenId, item.url, item.type === 'video', itemMuted);
         };
-        
+
+        window._bgToggleMute = function(index) {
+            const item = bgLibrary[index];
+            if (!item) return;
+            item.muted = !item.muted;
+            // Si cette vidéo est en cours de lecture, appliquer immédiatement
+            const bgVideo = document.getElementById(`bg-video-${item.screenId}`);
+            if (bgVideo && bgVideo.src && !bgVideo.classList.contains('hidden')) {
+                const globalMuted = document.getElementById('bg-mute-check')?.checked ?? false;
+                bgVideo.muted = globalMuted || item.muted;
+            }
+            updateBgLibraryUI();
+            autoSaveDebounced();
+        };
+
         window._bgDelete = function(index) {
             bgLibrary.splice(index, 1);
             updateBgLibraryUI();
