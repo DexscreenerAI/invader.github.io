@@ -5571,7 +5571,7 @@
                         if(data.coinVideoTriggers) coinVideoTriggers = data.coinVideoTriggers;
                         showTopNotification("Sauvegarde Space Invader chargée !");
                     }
-                     // CAS 2: Format "BattleBox" (Jerem Save JSON)
+                     // CAS 2: Format "Diamant" (Jerem Save JSON)
                     else if (data.scores && data.cycle) {
                         sessionScores = data.scores;
                         prizePool = [];
@@ -5595,7 +5595,7 @@
                             if (!soundConfig.wins) soundConfig.wins = {};
                             soundConfig.wins["100"] = data.winSound;
                         }
-                        showTopNotification("Sauvegarde BattleBox convertie avec succès !");
+                        showTopNotification("Sauvegarde Diamant convertie avec succès !");
                     }
                     // CAS 2B: Format "Battle Arena / Nemo Arena" (étoiles + nemos)
                     else if (data.players && Array.isArray(data.players) && data.players.length > 0 && data.players[0].score_etoiles !== undefined) {
@@ -5681,7 +5681,7 @@
                      updateCoinVideoUI();
                 updateDelayedRewardUI();
                      
-                     // Si le pool est vide après import BattleBox, on génère un pool par défaut pour que le jeu tourne
+                     // Si le pool est vide après import Diamant, on génère un pool par défaut pour que le jeu tourne
                     if (prizePool.length < 10) generatePrizePool();
 
                     autoSave();
@@ -6441,7 +6441,7 @@
 <a href="tireballon.html" style="background:rgba(0,0,0,0.85);color:#00f2ff;border:2px solid #00f2ff;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(0,242,255,0.5);">🎈 Ballon</a>
 <a href="spin.html" style="background:rgba(0,0,0,0.85);color:#FFDE00;border:2px solid #FFDE00;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,222,0,0.5);">🎰 Spin</a>
 <a href="jetx.html" style="background:rgba(0,0,0,0.85);color:#ff8800;border:2px solid #ff8800;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,136,0,0.5);">✈️ JetX</a>
-<a href="battlebox.html" style="background:rgba(0,0,0,0.85);color:#ff6b6b;border:2px solid #ff6b6b;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,107,107,0.5);">⚔️ BattleBox</a>
+<a href="diamant.html" style="background:rgba(0,0,0,0.85);color:#ff6b6b;border:2px solid #ff6b6b;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,107,107,0.5);">⚔️ Diamant</a>
 <a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
 </div>
 </body>

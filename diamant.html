@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
     if (sessionStorage.getItem('aa_session') !== 'aa_authenticated_v1') {
-      window.location.href = 'login.html?redirect=battlebox.html';
+      window.location.href = 'login.html?redirect=diamant.html';
     }
   </script>
-  <title>JEREM BATTLEBOX - TABLET LIVE</title>
+  <title>DIAMANT - TABLET LIVE</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -1027,7 +1027,7 @@
       };
       const link = document.createElement('a');
       link.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-      link.download = "jerem_battlebox_full_save.json";
+      link.download = "diamant_full_save.json";
       link.click();
     }
 
