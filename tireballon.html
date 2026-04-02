@@ -1443,6 +1443,11 @@
                 console.log('[WHEEL] 500+ pièces pour', user, '→ Roue de la fortune !');
                 spinWheel(user);
             }
+            // Mini-roue bonus tirs si 100+ pièces (mais < 500)
+            else if (count >= 100) {
+                console.log('[MINI-WHEEL] 100+ pièces pour', user, '→ Mini roue bonus tirs !');
+                spinMiniWheel(user);
+            }
         }
 
         function updateQueueUI() {
@@ -3035,6 +3040,132 @@
             }
 
             autoSaveDebounced();
+        }
+
+        // ==========================================
+        // MINI-ROUE BONUS TIRS (100+ pièces)
+        // ==========================================
+        const MINI_WHEEL_SEGMENTS = [
+            { label: '+1', value: 1, color: '#7f8c8d' },
+            { label: '+5', value: 5, color: '#3498db' },
+            { label: '+10', value: 10, color: '#2ecc71' },
+            { label: '+15', value: 15, color: '#1abc9c' },
+            { label: '+20', value: 20, color: '#e67e22' },
+            { label: '+25', value: 25, color: '#9b59b6' },
+            { label: '+30', value: 30, color: '#e74c3c' },
+            { label: '+35', value: 35, color: '#f39c12' },
+            { label: '+40', value: 40, color: '#d35400' },
+            { label: '+50', value: 50, color: '#FFD700' }
+        ];
+
+        let miniWheelSpinning = false;
+        let miniWheelQueue = [];
+
+        function drawMiniWheel(rotation) {
+            const canvas = document.getElementById('wheel-canvas');
+            const ctx2 = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const r = cx - 5;
+            const segCount = MINI_WHEEL_SEGMENTS.length;
+            const segAngle = (Math.PI * 2) / segCount;
+
+            ctx2.clearRect(0, 0, canvas.width, canvas.height);
+
+            MINI_WHEEL_SEGMENTS.forEach((seg, i) => {
+                const startAngle = rotation + i * segAngle;
+                const endAngle = startAngle + segAngle;
+
+                ctx2.beginPath();
+                ctx2.moveTo(cx, cy);
+                ctx2.arc(cx, cy, r, startAngle, endAngle);
+                ctx2.closePath();
+                ctx2.fillStyle = seg.color;
+                ctx2.fill();
+                ctx2.strokeStyle = '#fff';
+                ctx2.lineWidth = 2;
+                ctx2.stroke();
+
+                ctx2.save();
+                ctx2.translate(cx, cy);
+                ctx2.rotate(startAngle + segAngle / 2);
+                ctx2.textAlign = 'center';
+                ctx2.fillStyle = '#fff';
+                ctx2.font = 'bold 14px "Courier New", monospace';
+                ctx2.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx2.shadowBlur = 4;
+                ctx2.fillText(seg.label, r * 0.65, 5);
+                ctx2.shadowBlur = 0;
+                ctx2.restore();
+            });
+
+            ctx2.beginPath();
+            ctx2.arc(cx, cy, 18, 0, Math.PI * 2);
+            ctx2.fillStyle = '#1a1a2e';
+            ctx2.fill();
+            ctx2.strokeStyle = '#00f2ff';
+            ctx2.lineWidth = 3;
+            ctx2.stroke();
+        }
+
+        function spinMiniWheel(user) {
+            if (wheelSpinning || miniWheelSpinning) {
+                miniWheelQueue.push(user);
+                return;
+            }
+            miniWheelSpinning = true;
+
+            const overlay = document.getElementById('wheel-overlay');
+            const userDisplay = document.getElementById('wheel-user-display');
+            const resultDisplay = document.getElementById('wheel-result-display');
+
+            userDisplay.textContent = '🎯 ' + user + ' - BONUS TIRS 🎯';
+            resultDisplay.textContent = '';
+            overlay.classList.add('show');
+
+            const segCount = MINI_WHEEL_SEGMENTS.length;
+            const segAngle = (Math.PI * 2) / segCount;
+            const winIndex = Math.floor(Math.random() * segCount);
+            const targetAngle = -Math.PI / 2 - winIndex * segAngle - segAngle / 2;
+            const totalRotation = targetAngle - Math.PI * 2 * (5 + Math.random() * 3);
+
+            let startTime = null;
+            const duration = 4000;
+
+            function animateMiniWheel(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentRotation = totalRotation * eased;
+
+                drawMiniWheel(currentRotation);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateMiniWheel);
+                } else {
+                    const segment = MINI_WHEEL_SEGMENTS[winIndex];
+                    for (let i = 0; i < segment.value; i++) {
+                        shootingQueue.push({ user: user });
+                    }
+                    updateQueueUI();
+
+                    resultDisplay.innerHTML = '🎯 +' + segment.value + ' TIRS BONUS !';
+                    resultDisplay.style.color = '#00f2ff';
+
+                    setTimeout(() => {
+                        overlay.classList.remove('show');
+                        miniWheelSpinning = false;
+                        if (miniWheelQueue.length > 0) {
+                            const nextUser = miniWheelQueue.shift();
+                            setTimeout(() => spinMiniWheel(nextUser), 500);
+                        }
+                    }, 2500);
+                }
+            }
+
+            drawMiniWheel(0);
+            requestAnimationFrame(animateMiniWheel);
         }
 
         // ==========================================
