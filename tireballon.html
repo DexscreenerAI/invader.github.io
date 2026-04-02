@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Protection par session - redirige vers login si pas connecté
+        if (sessionStorage.getItem('aa_session') !== 'aa_authenticated_v1') {
+            window.location.href = 'login.html?redirect=tireballon.html';
+        }
+    </script>
     <title>Simulateur Mobile - TikFinity Smart Queue v7 (Robin Hood Hack)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
