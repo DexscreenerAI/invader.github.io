@@ -1438,14 +1438,16 @@
             }
             for(let i=0; i<count; i++) shootingQueue.push({ user: user });
             updateQueueUI();
-            // Roue de la fortune si 500+ pièces envoyées d'un coup
-            if (count >= 500) {
-                console.log('[WHEEL] 500+ pièces pour', user, '→ Roue de la fortune !');
+            // Roues selon le nombre de pièces
+            const bigWheels = Math.floor(count / 500);
+            const remaining = count % 500;
+            const miniWheels = Math.floor(remaining / 100);
+            for (let i = 0; i < bigWheels; i++) {
+                console.log('[WHEEL] Grande roue', (i+1) + '/' + bigWheels, 'pour', user);
                 spinWheel(user);
             }
-            // Mini-roue bonus tirs si 100+ pièces (mais < 500)
-            else if (count >= 100) {
-                console.log('[MINI-WHEEL] 100+ pièces pour', user, '→ Mini roue bonus tirs !');
+            for (let i = 0; i < miniWheels; i++) {
+                console.log('[MINI-WHEEL] Mini roue', (i+1) + '/' + miniWheels, 'pour', user);
                 spinMiniWheel(user);
             }
         }
