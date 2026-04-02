@@ -1601,7 +1601,15 @@
 
         // TikFinity
         let ws;
-        const wsUrl = "ws://localhost:8832";
+        function getServerUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramServer = urlParams.get('server');
+            if (paramServer) return paramServer;
+            const savedServer = localStorage.getItem('wsServerUrl');
+            if (savedServer) return savedServer;
+            return "wss://serverbbgithubio-production.up.railway.app";
+        }
+        let wsUrl = getServerUrl();
         let wsReconnectInterval = null;
 
         // Filtre Guest (pour co-host) - seuls les cadeaux envoyés à cet @ comptent
