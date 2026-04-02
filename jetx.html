@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if (sessionStorage.getItem('aa_session') !== 'aa_authenticated_v1') {
+            window.location.href = 'login.html?redirect=jetx.html';
+        }
+    </script>
     <title>TikTok Live - Course d'Avions (JetX)</title>
     <style>
         body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:radial-gradient(circle at center,#2a2a35 0%,#0d0d12 100%); display:flex; flex-direction:column; justify-content:center; align-items:center; padding-right:52px; box-sizing:border-box; }
@@ -5008,7 +5013,7 @@ function showStarsPopupNemo(username, avatar, nemos, levelInfo){
 // ==========================================
 let ws;
 function connectWS(){
-    ws=new WebSocket('ws://localhost:8832');
+    ws=new WebSocket((function(){var p=new URLSearchParams(location.search).get('server');if(p)return p;var s=localStorage.getItem('wsServerUrl');if(s)return s;return'wss://serverbbgithubio-production.up.railway.app'})());
     const sb=document.getElementById('statusBanner');
     ws.onopen=()=>{sb.innerText="✅ Connecté au serveur Local (En attente du Live)";sb.className="connected";};
     ws.onmessage=(event)=>{
@@ -5110,5 +5115,12 @@ function connectWS(){
 }
 connectWS();
 </script>
+<div id="game-nav" style="position:fixed;bottom:20px;left:20px;display:flex;gap:8px;z-index:9999;flex-wrap:wrap;">
+<a href="index.html" style="background:rgba(0,0,0,0.85);color:#00f2ff;border:2px solid #00f2ff;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(0,242,255,0.5);">👾 Space Invader</a>
+<a href="tireballon.html" style="background:rgba(0,0,0,0.85);color:#00f2ff;border:2px solid #00f2ff;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(0,242,255,0.5);">🎈 Ballon</a>
+<a href="spin.html" style="background:rgba(0,0,0,0.85);color:#FFDE00;border:2px solid #FFDE00;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,222,0,0.5);">🎰 Spin</a>
+<a href="battlebox.html" style="background:rgba(0,0,0,0.85);color:#ff6b6b;border:2px solid #ff6b6b;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,107,107,0.5);">⚔️ BattleBox</a>
+<a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
+</div>
 </body>
 </html>
