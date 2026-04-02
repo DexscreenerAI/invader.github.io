@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Mobile - TikFinity Smart Queue v7 (Robin Hood Hack)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #050505; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-image: radial-gradient(circle at center, #111 0%, #000 100%);
+            transition: filter 0.2s;
+        }
+
+        /* Mode Glitch / Hack */
+        body.glitch-active {
+            animation: glitch-anim 0.2s infinite;
+            filter: hue-rotate(90deg) contrast(1.2);
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        /* Layout Principal */
+        #main-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            max-width: 1400px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Colonnes Latérales */
+        .side-column {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            min-width: 280px;
+            padding: 10px;
+        }
+
+        /* --- DESIGN TÉLÉPHONE/TABLETTE (RECTANGULAIRE) --- */
+        .phone-frame {
+            width: 380px;
+            height: 700px;
+            background-color: #000;
+            border-radius: 0;
+            border: 2px solid #00f2ff; 
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 50;
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+        
+        /* Mode Tablette */
+        .phone-frame.tablet-mode {
+            width: 700px;
+            height: 500px;
+        }
+        
+        .phone-frame.tablet-mode .game-screen {
+            height: 200px;
+        }
+
+        .phone-notch {
+            display: none;
+        }
+        
+        /* Bouton Toggle Device */
+        #device-toggle-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 242, 255, 0.2);
+            border: 1px solid #00f2ff;
+            color: #00f2ff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 200;
+            transition: all 0.2s;
+        }
+        #device-toggle-btn:hover {
+            background: rgba(0, 242, 255, 0.4);
+        }
+
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+        }
+
+        /* --- VISEUR (CROSSHAIR) --- */
+        .crosshair {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.5);
+            transition: opacity 0.1s, transform 0.1s;
+            z-index: 35;
+        }
+        
+        .crosshair::before, .crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: #ff0000;
+            box-shadow: 0 0 5px #ff0000;
+        }
+        
+        .crosshair::before { top: 18px; left: 0; width: 40px; height: 4px; }
+        .crosshair::after { top: 0; left: 18px; width: 4px; height: 40px; }
+        
+        .crosshair-circle {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: 2px solid #ff0000;
+            border-radius: 50%;
+            box-sizing: border-box;
+            box-shadow: 0 0 8px #ff0000;
+        }
+
+        .crosshair.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* --- PANNEAUX --- */
+        .dashboard-panel {
+            background: rgba(10, 15, 25, 0.95);
+            border: 1px solid #00f2ff;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.1);
+            transition: height 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .panel-header {
+            padding: 8px 12px;
+            background: rgba(0, 242, 255, 0.1);
+            border-bottom: 1px solid #00f2ff;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #00f2ff; 
+            text-transform: uppercase;
+            font-size: 11px;
+            border-radius: 8px 8px 0 0;
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+            cursor: move;
+            user-select: none;
+        }
+
+        .panel-content { padding: 10px; overflow-y: auto; max-height: 250px; }
+
+        .list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .list-item:last-child { border-bottom: none; }
+
+        #queue-panel { display: flex; }
+
+        /* Popups - Déplaçables */
+        .draggable-popup { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            display: none; 
+            width: 300px; 
+            z-index: 2000;
+        }
+
+        #manual-shot-panel, #debt-panel { border: 1px solid #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+        #bonus-panel, #edit-score-panel { border: 1px solid #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+        #custom-images-panel, #add-targets-panel, #settings-panel { border: 1px solid #eab308; box-shadow: 0 0 20px rgba(234, 179, 8, 0.3); }
+        #background-panel, #bg-library-panel { border: 1px solid #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.3); }
+        #blacklist-panel { border: 1px solid #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+        #coffre-panel { border: 1px solid #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+
+        /* Status de connexion */
+        #tikfinity-status {
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); padding: 4px 12px; border-radius: 20px;
+            border: 1px solid #0ff; color: #0ff; font-size: 11px; 
+            display: flex; align-items: center; gap: 6px; z-index: 90;
+            box-shadow: 0 0 8px #0ff; white-space: nowrap;
+        }
+        .tf-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff4444; }
+        .tf-dot.connected { background: #00C851; box-shadow: 0 0 5px #00C851; }
+
+        /* Écrans de Jeu */
+        .game-screen {
+            position: relative; width: 100%; height: 240px; 
+            background-color: #000;
+            background-size: cover; 
+            background-position: center;
+            border: 2px solid #222;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        .cam-ui {
+            position: absolute; bottom: 5px; left: 5px; right: 5px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            pointer-events: none;
+        }
+        .cam-label {
+            background: rgba(0,0,0,0.6); padding: 2px 5px;
+            border-radius: 4px; border: 1px solid rgba(0, 242, 255, 0.5);
+            font-size: 10px; text-shadow: 0 0 3px #00f2ff; color: #00f2ff;
+        }
+        .cam-player-info {
+            text-align: right;
+        }
+        .player-badge {
+            background: rgba(0,0,0,0.8); border: 1px solid #eab308;
+            color: #eab308; font-weight: bold; padding: 2px 6px;
+            border-radius: 4px; font-size: 11px; margin-bottom: 2px;
+            display: inline-block; text-shadow: 0 0 5px rgba(234, 179, 8, 0.5);
+        }
+        
+        /* Bouton Tir */
+        #fire-btn {
+            background: radial-gradient(circle, #ff0000 0%, #990000 100%);
+            border: 4px solid #550000; box-shadow: 0 0 15px rgba(255,0,0,0.5);
+            width: 80px; height: 80px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; color: white; cursor: pointer; transition: transform 0.1s;
+        }
+        #fire-btn:active { transform: scale(0.9); }
+
+        .action-icon { cursor: pointer; margin-left: 6px; opacity: 0.7; transition: opacity 0.2s; }
+        .action-icon:hover { opacity: 1; transform: scale(1.1); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #00f2ff; border-radius: 3px; }
+
+        /* Overlay Gain - LOCALISÉ */
+        .win-overlay {
+            position: absolute; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%);
+            text-align: center; 
+            pointer-events: none; 
+            z-index: 200; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .win-msg {
+            font-size: 24px; font-weight: bold; color: #fff; opacity: 0;
+            transition: opacity 0.3s; padding: 10px; border-radius: 10px;
+            display: inline-block; 
+        }
+        .win-msg.show { opacity: 1; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .win-img { max-height: 120px; filter: drop-shadow(0 0 10px white); display: block; margin: 0 auto; }
+        .win-custom-name { display:block; color:#FFD700; font-size:18px; text-transform:uppercase; margin-top:5px; text-shadow:0 0 5px black; }
+        
+        /* Conteneur Téléphone pour Vidéo/Image */
+        .win-phone-container {
+            width: 180px;
+            height: 320px;
+            background: #000;
+            border: 2px solid #00f2ff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+        }
+        .win-phone-container video,
+        .win-phone-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        /* Mode simple (texte uniquement) */
+        .win-msg.simple-mode { 
+            background: rgba(0,0,0,0.8); 
+            border: 2px solid #00f2ff;
+            padding: 15px 25px;
+        }
+        
+        @keyframes popIn { from { transform: scale(0.5); } to { transform: scale(1); } }
+
+        /* ANIMATION CLIGNOTEMENT VERT DU CONTOUR */
+        @keyframes border-green-flash {
+            0% { border-color: #222; box-shadow: none; }
+            50% { border-color: #00ff00; box-shadow: inset 0 0 20px #00ff00; }
+            100% { border-color: #222; box-shadow: none; }
+        }
+
+        .win-border-active {
+            animation: border-green-flash 0.5s ease-out;
+        }
+
+        .sort-btn {
+            background: rgba(0,0,0,0.3); border: 1px solid #444; color: #888;
+            padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sort-btn.active {
+            background: rgba(0, 242, 255, 0.2); border-color: #00f2ff; color: #00f2ff; font-weight: bold;
+        }
+
+        /* Ranges (Slider) */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%;
+            background: #00f2ff; cursor: pointer; margin-top: -5px; box-shadow: 0 0 5px #00f2ff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #333; border-radius: 2px;
+        }
+        
+        /* Toggle Switch x2 */
+        .toggle-switch {
+            position: relative; display: inline-block; width: 40px; height: 20px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333; transition: .4s; border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Search Input */
+        .search-input {
+            background: rgba(0,0,0,0.4); border: 1px solid #333;
+            color: white; padding: 4px 8px; border-radius: 4px;
+            width: 100%; font-size: 11px; outline: none;
+        }
+        .search-input:focus { border-color: #00f2ff; }
+
+        /* Bonus X2 Indicator Animation */
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 10px #FFD700; transform: translate(-50%, -50%) scale(1); }
+            50% { box-shadow: 0 0 25px #FFD700; transform: translate(-50%, -50%) scale(1.05); }
+            100% { box-shadow: 0 0 10px #FFD700; transform: translate(-50%, -50%) scale(1); }
+        }
+        .bonus-indicator-active {
+            animation: pulse-gold 2s infinite;
+        }
+
+        /* Save Indicator */
+        #save-indicator {
+            position: fixed; bottom: 10px; right: 10px;
+            background: rgba(0,200,81,0.9); color: white;
+            padding: 6px 12px; border-radius: 6px;
+            font-size: 11px; display: none; z-index: 9999;
+        }
+
+        /* Animation Coffre */
+        @keyframes coffre-glow {
+            0% { box-shadow: 0 0 10px #f59e0b; }
+            50% { box-shadow: 0 0 25px #f59e0b, 0 0 40px #fbbf24; }
+            100% { box-shadow: 0 0 10px #f59e0b; }
+        }
+        
+        .coffre-entry {
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border-left: 3px solid #f59e0b;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .coffre-entry:hover {
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+        }
+        
+        .coffre-total-box {
+            background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            animation: coffre-glow 3s infinite;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="save-indicator">💾 Sauvegardé</div>
+
+    <div id="main-layout">
+        
+        <div class="side-column">
+            
+            <div id="leaderboard-panel" class="dashboard-panel" style="flex: 1; max-height: 400px;">
+                <div class="panel-header">
+                    <span><i class="fa-solid fa-trophy mr-2"></i>Top Session</span>
+                    <span onclick="this.closest('.dashboard-panel').classList.toggle('collapsed')" class="cursor-pointer text-gray-400">_</span>
+                </div>
+                <div class="flex flex-col gap-2 p-2 border-b border-gray-800 bg-black/20">
+                    <input type="text" id="leaderboard-search" placeholder="🔍 Rechercher joueur..." class="search-input">
+                    <div class="flex gap-2">
+                        <button id="sort-score-btn" class="sort-btn active flex-1" onclick="setSortMode('score')">💰 Montant</button>
+                        <button id="sort-date-btn" class="sort-btn flex-1" onclick="setSortMode('date')">🕒 Date</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <ul id="leaderboard-list">
+                        <li class="text-center text-gray-500 italic p-2">Aucun tir</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="history-panel" class="dashboard-panel" style="flex: 1; max-height: 250px;">
+                <div class="panel-header text-purple-400 border-purple-500">
+                    <span><i class="fa-solid fa-clock-rotate-left mr-2"></i>Historique</span>
+                </div>
+                <div class="panel-content">
+                    <ul id="history-list" class="flex flex-col gap-1">
+                        <li class="text-center text-gray-500 italic text-[10px]">En attente...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="panel-header text-red-400 border-red-500" style="text-shadow: none;">
+                    <span><i class="fa-solid fa-screwdriver-wrench mr-2"></i>Admin</span>
+                </div>
+                <div class="panel-content flex flex-col gap-2">
+                    
+                    <div class="flex flex-col gap-1 bg-black/30 p-2 rounded border border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-400 w-12"><i class="fa-solid fa-volume-high"></i> SFX</span>
+                            <input type="range" id="sfx-slider" min="0" max="1" step="0.1" value="0.4" class="flex-1 ml-2">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-400 w-12"><i class="fa-solid fa-microphone-lines"></i> Voix</span>
+                            <input type="range" id="tts-slider" min="0" max="1" step="0.1" value="0.8" class="flex-1 ml-2">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-black/30 p-2 rounded border border-gray-700">
+                        <span class="text-xs font-bold text-yellow-400">MODE x2</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="double-score-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 2px 0;"></div>
+
+                    <button onclick="showPanel('manual-shot-panel')" class="bg-blue-600 hover:bg-blue-500 text-white py-1 px-2 rounded text-xs">
+                        + Ajouter Tirs
+                    </button>
+                    <button onclick="showPanel('settings-panel')" class="bg-orange-600 hover:bg-orange-500 text-white py-1 px-2 rounded text-xs border border-orange-500">
+                        ⚙️ Vitesse & Tirs
+                    </button>
+                    <button onclick="showPanel('bonus-panel')" class="bg-green-700 hover:bg-green-600 text-white py-1 px-2 rounded text-xs border border-green-500">
+                        + Appliquer Bonus
+                    </button>
+                    <button onclick="showPanel('debt-panel')" class="bg-red-900 hover:bg-red-800 text-white py-1 px-2 rounded text-xs border border-red-700">
+                        - Appliquer Dette
+                    </button>
+                    
+                    <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                    
+                    <button onclick="showPanel('coffre-panel')" class="bg-amber-600 hover:bg-amber-500 text-white py-1 px-2 rounded text-xs border border-amber-400 font-bold">
+                        📦 Coffre (<span id="coffre-total-btn">0</span> ⭐)
+                    </button>
+                    
+                    <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                    
+                    <button onclick="showPanel('add-targets-panel')" class="bg-yellow-600 hover:bg-yellow-500 text-white py-1 px-2 rounded text-xs border border-yellow-500">
+                        🎯 Ajout Cibles
+                    </button>
+                    <button onclick="showPanel('custom-images-panel')" class="bg-purple-600 hover:bg-purple-500 text-white py-1 px-2 rounded text-xs border border-purple-500">
+                        🖼️ Images Gains
+                    </button>
+                    <button onclick="showPanel('background-panel')" class="bg-blue-500 hover:bg-blue-400 text-white py-1 px-2 rounded text-xs border border-blue-400">
+                        🌄 Fonds d'écran
+                    </button>
+                    <button onclick="showPanel('blacklist-panel')" class="bg-red-600 hover:bg-red-500 text-white py-1 px-2 rounded text-xs border border-red-500">
+                        🚫 Blacklist (<span id="blacklist-count">0</span>)
+                    </button>
+                    
+                    <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                    
+                    <div class="flex gap-2">
+                        <button id="btn-export-json" class="bg-gray-700 hover:bg-gray-600 text-white py-1 px-2 rounded text-xs flex-1 border border-gray-500">📤 Export</button>
+                        <button id="btn-import-json" class="bg-gray-700 hover:bg-gray-600 text-white py-1 px-2 rounded text-xs flex-1 border border-gray-500">📥 Import</button>
+                    </div>
+                    <input type="file" id="import-file-input" style="display:none;" accept=".json">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="relative flex flex-col items-center">
+            
+            <div id="tikfinity-status">
+                <div id="tf-dot" class="tf-dot"></div>
+                <span id="tf-text">Déconnecté</span>
+            </div>
+
+            <div class="phone-frame" id="phone-frame-1">
+                <button id="device-toggle-btn" onclick="toggleDeviceMode()">📱 → 📺</button>
+
+                <div class="w-full px-4 pt-2 pb-2 flex justify-between items-end border-b border-slate-700 bg-slate-900 z-10">
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-100 flex items-center gap-1">
+                            <i class="fa-solid fa-mobile text-cyan-400"></i>
+                        </h1>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] text-slate-400">SCORE GLOBAL</p>
+                        <p id="score-display" class="text-xl font-bold text-green-400 leading-none" style="text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);">0</p>
+                    </div>
+                </div>
+
+                <div class="flex-grow bg-slate-900 relative">
+                    
+                    <div id="bonus-x2-indicator" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 border-4 border-yellow-400 bg-black/80 px-4 py-2 rounded-xl shadow-[0_0_20px_#FFD700] bonus-indicator-active">
+                        <h2 class="text-yellow-400 font-bold text-lg whitespace-nowrap"><i class="fa-solid fa-star mr-2"></i>BONUS X2 ACTIVÉ</h2>
+                    </div>
+
+                    <div class="game-screen group" id="container-1">
+                        <video id="bg-video-1" class="absolute inset-0 w-full h-full object-cover z-0 hidden" muted loop playsinline></video>
+                        <div id="view1" class="absolute inset-0 z-0"></div>
+                        <div class="absolute inset-0 z-10 pointer-events-none scanlines opacity-20"></div>
+                        <div id="flash-1" class="absolute inset-0 bg-white opacity-0 pointer-events-none z-30"></div>
+                        <div id="crosshair-1" class="crosshair"><div class="crosshair-circle"></div></div>
+                        
+                        <div id="win-overlay-1" class="win-overlay"><div id="win-msg-1" class="win-msg"></div></div>
+
+                        <div class="cam-ui z-40">
+                            <div class="invisible"> 
+                                <div class="cam-label">CAM_01</div>
+                                <div id="status-1" class="text-[10px] text-green-500 font-bold mt-1">PRÊT</div>
+                            </div>
+                            <div class="cam-player-info">
+                                <span id="player-1" class="player-badge opacity-0 transition-opacity duration-300">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-screen group" id="container-2">
+                        <video id="bg-video-2" class="absolute inset-0 w-full h-full object-cover z-0 hidden" muted loop playsinline></video>
+                        <div id="view2" class="absolute inset-0 z-0"></div>
+                        <div class="absolute inset-0 z-10 pointer-events-none scanlines opacity-20"></div>
+                        <div id="flash-2" class="absolute inset-0 bg-white opacity-0 pointer-events-none z-30"></div>
+                        <div id="crosshair-2" class="crosshair"><div class="crosshair-circle"></div></div>
+                        
+                        <div id="win-overlay-2" class="win-overlay"><div id="win-msg-2" class="win-msg"></div></div>
+
+                        <div class="cam-ui z-40">
+                            <div class="invisible"> 
+                                <div class="cam-label">CAM_02</div>
+                                <div id="status-2" class="text-[10px] text-green-500 font-bold mt-1">PRÊT</div>
+                            </div>
+                            <div class="cam-player-info">
+                                <span id="player-2" class="player-badge opacity-0 transition-opacity duration-300">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="h-32 bg-slate-900 border-t border-slate-700 flex flex-col items-center justify-center relative z-50">
+                    <button id="fire-btn">
+                        <i class="fa-solid fa-radiation"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="side-column">
+            
+            <div id="queue-panel" class="dashboard-panel" style="flex: 1; max-height: 250px;">
+                <div class="panel-header text-cyan-400">
+                    <span><i class="fa-solid fa-users mr-2"></i>File d'attente (<span id="queue-total">0</span>)</span>
+                </div>
+                <div class="panel-content">
+                    <ul id="queue-list">
+                        <li class="text-center text-gray-500 italic p-2">Vide</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="balloon-stats-panel" class="dashboard-panel" style="flex: 1; max-height: 350px;">
+                <div class="panel-header text-yellow-500 border-yellow-600">
+                    <span><i class="fa-solid fa-chart-pie mr-2"></i>Pool Cibles</span>
+                    <span onclick="generatePrizePool()" class="cursor-pointer text-xs bg-yellow-700 px-2 py-0.5 rounded hover:bg-yellow-600" title="Reset Pool">🔄</span>
+                </div>
+                <div class="panel-content">
+                    <ul id="balloon-stats-list"></ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- POPUPS -->
+    <div id="manual-shot-panel" class="dashboard-panel draggable-popup">
+        <div class="panel-header bg-blue-900 border-blue-700 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>Ajout Manuel Tirs</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <input type="text" id="manual-user" placeholder="Pseudo" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-blue-500">
+            <input type="number" id="manual-count" placeholder="Nombre de tirs" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-blue-500">
+            <button id="btn-add-manual" class="bg-blue-600 hover:bg-blue-500 text-white text-xs py-2 rounded font-bold">AJOUTER</button>
+        </div>
+    </div>
+
+    <div id="settings-panel" class="dashboard-panel draggable-popup">
+        <div class="panel-header bg-orange-900 border-orange-700 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>Vitesse & Tirs</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-4 p-4">
+            <div>
+                <label class="block text-yellow-400 text-xs font-bold mb-1">Vitesse des Ballons</label>
+                <div class="text-center text-white text-xs font-bold mb-1" id="speed-display">Normal</div>
+                <input type="range" id="speed-slider" min="0.01" max="0.2" step="0.01" value="0.05">
+            </div>
+            <div>
+                <label class="block text-blue-400 text-xs font-bold mb-1">Vitesse Recharge (Tirs)</label>
+                <div class="text-center text-white text-xs font-bold mb-1" id="reload-display">0.6s</div>
+                <input type="range" id="reload-slider" min="100" max="2000" step="100" value="600" style="direction: rtl"> 
+                <div class="flex justify-between text-[9px] text-gray-500">
+                    <span>Rapide</span>
+                    <span>Lent</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="debt-panel" class="dashboard-panel draggable-popup">
+        <div class="panel-header bg-red-900 border-red-700 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>Admin: Dette</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <input type="text" id="debt-user" placeholder="Pseudo" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-red-500">
+            <input type="number" id="debt-amount" placeholder="Montant" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-red-500">
+            <button id="btn-submit-debt" class="bg-red-600 hover:bg-red-500 text-white text-xs py-2 rounded font-bold">APPLIQUER DETTE</button>
+        </div>
+    </div>
+
+    <div id="bonus-panel" class="dashboard-panel draggable-popup">
+        <div class="panel-header bg-green-900 border-green-700 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>Admin: Bonus</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <input type="text" id="bonus-user" placeholder="Pseudo" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-green-500">
+            <input type="number" id="bonus-amount" placeholder="Montant" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-green-500">
+            <button id="btn-submit-bonus" class="bg-green-600 hover:bg-green-500 text-white text-xs py-2 rounded font-bold">APPLIQUER BONUS</button>
+        </div>
+    </div>
+
+    <div id="edit-score-panel" class="dashboard-panel draggable-popup">
+        <div class="panel-header bg-blue-900 border-blue-700 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>Modifier Score</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <div id="edit-score-target" class="text-center text-cyan-400 font-bold mb-1">---</div>
+            <input type="hidden" id="edit-score-user-hidden">
+            <input type="number" id="edit-score-value" placeholder="Score" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-blue-500">
+            <button id="btn-submit-edit-score" class="bg-blue-600 hover:bg-blue-500 text-white text-xs py-2 rounded font-bold">SAUVEGARDER</button>
+        </div>
+    </div>
+
+    <div id="add-targets-panel" class="dashboard-panel draggable-popup">
+        <div class="panel-header bg-yellow-700 border-yellow-500 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>Ajout Cibles</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <input type="number" id="target-value" placeholder="Valeur (Points)" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-yellow-500">
+            <input type="number" id="target-count" placeholder="Quantité" class="bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none focus:border-yellow-500">
+            <button id="btn-submit-targets" class="bg-yellow-600 hover:bg-yellow-500 text-white text-xs py-2 rounded font-bold">AJOUTER AU STOCK</button>
+        </div>
+    </div>
+
+    <div id="custom-images-panel" class="dashboard-panel draggable-popup" style="width: 350px;">
+        <div class="panel-header bg-purple-900 border-purple-500 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>Images/Vidéos Gains</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-2 p-2">
+            <div style="font-size:10px; color:#aaa; margin-bottom:5px;">Associe une image ou vidéo à un montant de points.</div>
+            <div class="flex gap-1 mb-2">
+                <input type="number" id="ci-val" placeholder="Pts" class="bg-black border border-gray-600 p-1 text-white text-xs rounded w-14 outline-none">
+                <input type="text" id="ci-name" placeholder="Nom" class="bg-black border border-gray-600 p-1 text-white text-xs rounded w-20 outline-none">
+                <input type="text" id="ci-url" placeholder="URL Image/Vidéo" class="bg-black border border-gray-600 p-1 text-white text-xs rounded flex-1 outline-none">
+                <button id="btn-add-ci" class="bg-purple-600 text-white px-2 rounded font-bold text-xs">+</button>
+            </div>
+            <div class="flex gap-1 mb-2">
+                <input type="file" id="ci-file-input" accept="image/*,video/*" class="hidden">
+                <button id="btn-ci-file" class="bg-gray-700 hover:bg-gray-600 text-white py-1 px-2 rounded text-xs flex-1">📁 Fichier Local</button>
+            </div>
+            <ul id="custom-images-list" class="flex flex-col gap-1" style="max-height:200px; overflow-y:auto;"></ul>
+        </div>
+    </div>
+
+    <div id="background-panel" class="dashboard-panel draggable-popup" style="width: 340px;">
+        <div class="panel-header bg-purple-900 border-purple-500 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>🖼️ Fonds d'Écran</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <div class="text-[11px] text-gray-400 mb-1">Ajoute des vidéos/images puis ouvre la bibliothèque.</div>
+            
+            <!-- Sélection écran cible -->
+            <div class="flex gap-2">
+                <button id="btn-bg-screen1" class="flex-1 bg-purple-700 text-white text-xs py-1 rounded border border-purple-500 hover:bg-purple-600">Écran 1</button>
+                <button id="btn-bg-screen2" class="flex-1 bg-slate-700 text-white text-xs py-1 rounded border border-slate-500 hover:bg-slate-600">Écran 2</button>
+            </div>
+            <div class="text-[10px] text-center text-purple-400" id="selected-screen-txt">Cible : Écran 1</div>
+            
+            <hr class="border-gray-700">
+            
+            <!-- Ajout de fond -->
+            <div class="flex gap-2">
+                <input type="text" id="bg-add-name" placeholder="Nom" class="w-20 bg-black border border-purple-600/30 p-2 text-white text-xs rounded outline-none">
+                <input type="text" id="bg-add-url" placeholder="URL vidéo/image..." class="flex-1 bg-black border border-purple-600/30 p-2 text-white text-xs rounded outline-none">
+            </div>
+            <div class="flex gap-2">
+                <label class="flex-1 bg-purple-800 hover:bg-purple-700 text-white text-xs py-2 rounded text-center cursor-pointer border border-purple-600">
+                    📁 Fichier
+                    <input type="file" id="bg-lib-file-input" class="hidden" accept="image/*,video/*">
+                </label>
+                <button id="btn-bg-add" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-xs py-2 rounded font-bold border border-purple-400">+ Ajouter</button>
+            </div>
+            
+            <button id="btn-open-bg-library" class="w-full text-white text-sm py-2 rounded font-bold" style="background: linear-gradient(90deg, #9b59b6, #8e44ad);">
+                📚 Ouvrir la Bibliothèque (<span id="bg-lib-count">0</span>)
+            </button>
+            
+            <hr class="border-gray-700">
+            
+            <!-- Réglages -->
+            <div class="bg-purple-900/20 border border-purple-600/30 rounded-lg p-3">
+                <div class="text-xs text-purple-400 font-bold mb-2 text-center">🎚️ RÉGLAGES</div>
+                
+                <div class="flex gap-4 items-center justify-center">
+                    <label class="text-[11px] text-gray-300 flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="bg-mute-check" class="accent-purple-500"> 🔇 Muet
+                    </label>
+                </div>
+            </div>
+            
+            <button id="btn-reset-bg" class="bg-red-900 hover:bg-red-800 text-white text-xs py-1 rounded border border-red-700">✕ Arrêter le fond</button>
+        </div>
+    </div>
+    
+    <!-- PANNEAU BIBLIOTHÈQUE DE FONDS (séparé, déplaçable) -->
+    <div id="bg-library-panel" class="dashboard-panel draggable-popup" style="width: 400px; display: none;">
+        <div class="panel-header bg-purple-900 border-purple-500 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>📚 Bibliothèque de Fonds</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <div class="text-[11px] text-gray-400">Clique <b class="text-green-400">▶ Play</b> pour lancer un fond, <b class="text-red-400">✕</b> pour le supprimer.</div>
+            
+            <ul id="bg-library-list" class="max-h-80 overflow-y-auto m-0 p-0 list-none">
+                <li class="text-center text-gray-500 py-4">Aucun fond ajouté</li>
+            </ul>
+            
+            <hr class="border-gray-700">
+            
+            <!-- Défilement automatique -->
+            <div class="bg-green-900/20 border border-green-600/30 rounded-lg p-3">
+                <div class="text-xs text-green-400 font-bold mb-2 text-center">🔄 DÉFILEMENT AUTOMATIQUE</div>
+                <div class="text-[10px] text-gray-400 mb-2">Joue tous les fonds les uns après les autres en boucle.</div>
+                <div class="flex gap-2 mb-2">
+                    <button id="btn-bg-autoplay" class="flex-1 bg-green-600 hover:bg-green-500 text-white text-xs py-2 rounded font-bold">▶ Lancer</button>
+                    <button id="btn-bg-prev" class="flex-1 bg-slate-700 text-white text-xs py-2 rounded" disabled>⏮ Préc</button>
+                    <button id="btn-bg-skip" class="flex-1 bg-slate-700 text-white text-xs py-2 rounded" disabled>⏭ Suiv</button>
+                </div>
+                <div id="bg-autoplay-status" class="text-[11px] text-gray-500 text-center">Défilement arrêté</div>
+                <div class="flex justify-between items-center mt-2 mb-1">
+                    <span class="text-[11px] text-gray-300">Durée par image (sec)</span>
+                    <span id="bg-img-duration-display" class="text-green-400 font-bold text-sm">10s</span>
+                </div>
+                <input type="range" id="bg-img-duration-slider" min="3" max="60" value="10" class="w-full cursor-pointer accent-green-500">
+                <div class="text-[9px] text-gray-600 mt-1 text-center">Les vidéos passent à la fin de lecture.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANNEAU BLACKLIST -->
+    <div id="blacklist-panel" class="dashboard-panel draggable-popup" style="width: 320px; display: none;">
+        <div class="panel-header bg-red-900 border-red-500 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>🚫 Blacklist</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            <div class="text-[11px] text-gray-400">Les utilisateurs blacklistés ne peuvent pas jouer (pas de tirs, pas de gains).</div>
+            
+            <!-- Ajout à la blacklist -->
+            <div class="flex gap-2">
+                <input type="text" id="blacklist-input" placeholder="Nom d'utilisateur..." class="flex-1 bg-black border border-red-600/30 p-2 text-white text-xs rounded outline-none">
+                <button id="btn-add-blacklist" class="bg-red-600 hover:bg-red-500 text-white text-xs py-2 px-3 rounded font-bold border border-red-400">+ Ajouter</button>
+            </div>
+            
+            <hr class="border-gray-700">
+            
+            <!-- Liste des blacklistés -->
+            <div class="text-xs text-red-400 font-bold">Utilisateurs bloqués :</div>
+            <ul id="blacklist-list" class="max-h-48 overflow-y-auto m-0 p-0 list-none">
+                <li class="text-center text-gray-500 py-3 text-xs">Aucun utilisateur blacklisté</li>
+            </ul>
+            
+            <button id="btn-clear-blacklist" class="bg-gray-800 hover:bg-gray-700 text-red-400 text-xs py-1 rounded border border-gray-600">🗑️ Vider la blacklist</button>
+        </div>
+    </div>
+
+    <!-- PANNEAU COFFRE -->
+    <div id="coffre-panel" class="dashboard-panel draggable-popup" style="width: 380px; display: none;">
+        <div class="panel-header bg-amber-900 border-amber-500 text-white" style="text-shadow: none;">
+            <span><i class="fa-solid fa-arrows-up-down-left-right mr-2"></i>📦 Coffre</span>
+            <span onclick="this.closest('.dashboard-panel').style.display='none'" class="cursor-pointer text-white">×</span>
+        </div>
+        <div class="panel-content flex flex-col gap-3 p-4">
+            
+            <!-- Explication -->
+            <div class="text-[11px] text-gray-400 bg-black/30 p-2 rounded border border-gray-700">
+                💡 Les viewers écrivent <b class="text-amber-400">"coffre X"</b> dans le chat.<br>
+                → Retire <b>X points</b> de leur score<br>
+                → Ajoute <b>X - 30%</b> au coffre
+            </div>
+            
+            <!-- Total du Coffre -->
+            <div class="coffre-total-box">
+                <div class="text-amber-200 text-xs uppercase tracking-wider mb-1">📦 Total Coffre</div>
+                <div id="coffre-total-display" class="text-4xl font-bold text-white" style="text-shadow: 0 0 15px rgba(251, 191, 36, 0.8);">0</div>
+                <div class="text-amber-300 text-sm mt-1">⭐ étoiles</div>
+            </div>
+            
+            <hr class="border-gray-700">
+            
+            <!-- Détail par utilisateur -->
+            <div class="text-xs text-amber-400 font-bold flex justify-between items-center">
+                <span>Contributeurs :</span>
+                <span id="coffre-contributors-count" class="text-gray-400">(0)</span>
+            </div>
+            
+            <ul id="coffre-list" class="max-h-52 overflow-y-auto m-0 p-0 list-none">
+                <li class="text-center text-gray-500 py-3 text-xs">Aucune contribution</li>
+            </ul>
+            
+            <hr class="border-gray-700">
+            
+            <!-- Actions Admin -->
+            <div class="flex gap-2">
+                <button id="btn-coffre-add-manual" class="flex-1 bg-amber-700 hover:bg-amber-600 text-white text-xs py-2 rounded border border-amber-500">
+                    + Ajouter Manuellement
+                </button>
+                <button id="btn-coffre-clear" class="bg-red-900 hover:bg-red-800 text-white text-xs py-2 px-3 rounded border border-red-700">
+                    🗑️
+                </button>
+            </div>
+            
+            <!-- Ajout manuel -->
+            <div id="coffre-manual-form" class="hidden bg-black/30 p-3 rounded border border-amber-600/30">
+                <div class="flex gap-2 mb-2">
+                    <input type="text" id="coffre-manual-user" placeholder="Pseudo" class="flex-1 bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none">
+                    <input type="number" id="coffre-manual-amount" placeholder="Montant" class="w-20 bg-black border border-gray-600 p-2 text-white text-xs rounded outline-none">
+                </div>
+                <button id="btn-coffre-manual-submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs py-2 rounded font-bold">
+                    Ajouter au Coffre
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION PRINCIPALE
+        // ==========================================
+        const SCENE_CONFIG = { 
+            balloonCount: 50,  
+            balloonSpeedBase: 0.05,
+            reloadTime: 600
+        };
+        const gunSoundUrl = 'https://files.catbox.moe/svnyhh.mp3'; 
+        const popSoundUrl = 'https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3';
+        const audioGun = new Audio(gunSoundUrl);
+        const audioPop = new Audio(popSoundUrl);
+        
+        // --- GESTION AUDIO SÉPARÉE ---
+        let sfxVolume = 0.4;
+        let ttsVolume = 0.8;
+        
+        let isDoubleScoreMode = false;
+        let isRobinHoodMode = false;
+        let phoneVideoWidth = 180;
+
+        audioGun.volume = sfxVolume; 
+        audioPop.volume = sfxVolume;
+
+        // État du jeu
+        let gameState = { 
+            score: 0, 
+            weapon1: { state: 'READY', cooldown: 0, currentUser: null }, 
+            weapon2: { state: 'READY', cooldown: 0, currentUser: null } 
+        };
+        
+        let shootingQueue = [];
+        let prizePool = [];
+        let balloons = []; 
+        let sessionScores = {}; 
+        let playerLevels = {};
+
+        let currentBgTarget = 1;
+        let sortMode = 'score'; 
+        
+        // --- IMAGES/VIDÉOS GAINS (compatible Space Invader) ---
+        let customWinImages = {
+            "3000": { url: "https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/eba3a9bb85c33e017f3648eaf88d7189~tplv-obj.webp", name: "LION", type: "image" }
+        };
+
+        // ==========================================
+        // SYSTÈME DE COFFRE
+        // ==========================================
+        const COFFRE_TAX_RATE = 0.30; // 30% de taxe
+        let coffreData = {
+            total: 0,
+            contributions: [] // [{user, amount, timestamp}]
+        };
+        
+        function addToCoffre(user, pointsRetires) {
+            // Calcul: points - 30%
+            const pointsAjoutes = Math.floor(pointsRetires * (1 - COFFRE_TAX_RATE));
+            
+            coffreData.total += pointsAjoutes;
+            coffreData.contributions.push({
+                user: user,
+                pointsRetires: pointsRetires,
+                pointsAjoutes: pointsAjoutes,
+                timestamp: Date.now()
+            });
+            
+            updateCoffreUI();
+            autoSaveDebounced();
+            
+            return pointsAjoutes;
+        }
+        
+        function removeCoffreEntry(index) {
+            if (index >= 0 && index < coffreData.contributions.length) {
+                const entry = coffreData.contributions[index];
+                coffreData.total -= entry.pointsAjoutes;
+                if (coffreData.total < 0) coffreData.total = 0;
+                coffreData.contributions.splice(index, 1);
+                updateCoffreUI();
+                autoSaveDebounced();
+            }
+        }
+        
+        function clearCoffre() {
+            if (confirm('⚠️ Vider complètement le coffre ?')) {
+                coffreData = { total: 0, contributions: [] };
+                updateCoffreUI();
+                autoSaveDebounced();
+            }
+        }
+        
+        function updateCoffreUI() {
+            // Total
+            const totalDisplay = document.getElementById('coffre-total-display');
+            const totalBtn = document.getElementById('coffre-total-btn');
+            if (totalDisplay) totalDisplay.textContent = coffreData.total.toLocaleString();
+            if (totalBtn) totalBtn.textContent = coffreData.total.toLocaleString();
+            
+            // Nombre de contributeurs
+            const countEl = document.getElementById('coffre-contributors-count');
+            if (countEl) countEl.textContent = `(${coffreData.contributions.length})`;
+            
+            // Liste détaillée
+            const list = document.getElementById('coffre-list');
+            if (!list) return;
+            
+            list.innerHTML = '';
+            
+            if (coffreData.contributions.length === 0) {
+                list.innerHTML = '<li class="text-center text-gray-500 py-3 text-xs">Aucune contribution</li>';
+                return;
+            }
+            
+            // Afficher les contributions (les plus récentes en premier)
+            const sorted = [...coffreData.contributions].reverse();
+            sorted.forEach((entry, displayIndex) => {
+                const realIndex = coffreData.contributions.length - 1 - displayIndex;
+                const date = new Date(entry.timestamp);
+                const timeStr = date.getHours().toString().padStart(2, '0') + ':' + 
+                               date.getMinutes().toString().padStart(2, '0');
+                
+                const li = document.createElement('li');
+                li.className = 'coffre-entry';
+                li.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-amber-400 font-bold text-sm">${entry.user}</span>
+                            <span class="text-gray-500 text-[9px]">${timeStr}</span>
+                        </div>
+                        <div class="text-[10px] text-gray-400 mt-1">
+                            -${entry.pointsRetires} pts → <span class="text-green-400">+${entry.pointsAjoutes}</span> au coffre
+                        </div>
+                    </div>
+                    <button onclick="removeCoffreEntry(${realIndex})" class="text-red-500 hover:text-red-300 text-lg px-2 font-bold" title="Supprimer">×</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+        
+        // Event listeners Coffre
+        document.getElementById('btn-coffre-clear').onclick = clearCoffre;
+        
+        document.getElementById('btn-coffre-add-manual').onclick = function() {
+            const form = document.getElementById('coffre-manual-form');
+            form.classList.toggle('hidden');
+        };
+        
+        document.getElementById('btn-coffre-manual-submit').onclick = function() {
+            const user = document.getElementById('coffre-manual-user').value.trim() || 'Admin';
+            const amount = parseInt(document.getElementById('coffre-manual-amount').value);
+            
+            if (!isNaN(amount) && amount > 0) {
+                // Ajout direct sans taxe pour l'admin
+                coffreData.total += amount;
+                coffreData.contributions.push({
+                    user: user + ' (admin)',
+                    pointsRetires: amount,
+                    pointsAjoutes: amount,
+                    timestamp: Date.now()
+                });
+                updateCoffreUI();
+                autoSaveDebounced();
+                
+                document.getElementById('coffre-manual-user').value = '';
+                document.getElementById('coffre-manual-amount').value = '';
+                document.getElementById('coffre-manual-form').classList.add('hidden');
+            }
+        };
+
+        // ==========================================
+        // SYSTÈME DE SAUVEGARDE IndexedDB (compatible Space Invader)
+        // ==========================================
+        const IDB_NAME = 'AnonymeAgencyDB';
+        const IDB_STORE = 'saveData';
+        const IDB_VERSION = 1;
+        const AUTO_SAVE_KEY = 'anonymeAgency_v1';
+        let _idb = null;
+        
+        function openIDB() {
+            return new Promise((resolve, reject) => {
+                if (_idb) { resolve(_idb); return; }
+                const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+                };
+                req.onsuccess = (e) => { _idb = e.target.result; resolve(_idb); };
+                req.onerror = (e) => { console.error('IndexedDB error:', e); reject(e); };
+            });
+        }
+        
+        function idbSet(key, value) {
+            return openIDB().then(db => new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE, 'readwrite');
+                tx.objectStore(IDB_STORE).put(value, key);
+                tx.oncomplete = () => resolve();
+                tx.onerror = (e) => reject(e);
+            }));
+        }
+        
+        function idbGet(key) {
+            return openIDB().then(db => new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE, 'readonly');
+                const req = tx.objectStore(IDB_STORE).get(key);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = (e) => reject(e);
+            }));
+        }
+
+        function autoSave() {
+            const dataToSave = {
+                sessionScores, playerLevels, prizePool, customWinImages, phoneVideoWidth, bgLibrary, blacklist, coffreData
+            };
+            idbSet(AUTO_SAVE_KEY, dataToSave).then(() => {
+                const indicator = document.getElementById('save-indicator');
+                indicator.style.display = 'block';
+                setTimeout(() => { indicator.style.display = 'none'; }, 2000);
+            }).catch(e => console.error("Erreur sauvegarde IndexedDB:", e));
+        }
+        
+        let _autoSaveTimer = null;
+        function autoSaveDebounced() {
+            clearTimeout(_autoSaveTimer);
+            _autoSaveTimer = setTimeout(autoSave, 3000);
+        }
+
+        function _applySaveData(data) {
+            if(data.sessionScores) sessionScores = data.sessionScores;
+            if(data.playerLevels) playerLevels = data.playerLevels;
+            if(data.prizePool) prizePool = data.prizePool;
+            if(data.customWinImages) customWinImages = data.customWinImages;
+            if(data.phoneVideoWidth) phoneVideoWidth = data.phoneVideoWidth;
+            if(data.bgLibrary) bgLibrary = data.bgLibrary;
+            if(data.blacklist) blacklist = data.blacklist;
+            if(data.coffreData) coffreData = data.coffreData;
+        }
+
+        function loadAutoSave() {
+            return openIDB().then(() => idbGet(AUTO_SAVE_KEY)).then(data => {
+                if (data) {
+                    _applySaveData(data);
+                    console.log('[SAVE] Chargé depuis IndexedDB');
+                    updateLeaderboardUI();
+                    updateStatsUI();
+                    refreshCustomImagesUI();
+                    updateBgLibraryUI();
+                    updateBlacklistUI();
+                    updateCoffreUI();
+                }
+            }).catch(e => console.error('Erreur chargement IndexedDB:', e));
+        }
+
+        // ==========================================
+        // POOL LOGIC (copié de Space Invader avec 60000 vides)
+        // ==========================================
+        function generatePrizePool() {
+            prizePool = [];
+            
+            // JACKPOT (copié de invader_15k)
+            addPrizes(1, 10000);    // 10000 ×1 (JACKPOT)
+            addPrizes(1, 4888);     // 4888 ×1 (MÉGA)
+            addPrizes(1, 3000);     // 3000 ×1
+            
+            // GROS GAINS
+            addPrizes(3, 2150);     // 2150 ×3
+            addPrizes(5, 1088);     // 1088 ×5
+            addPrizes(8, 1000);     // 1000 ×8
+            addPrizes(10, 699);     // 699 ×10
+            addPrizes(15, 500);     // 500 ×15
+            addPrizes(25, 399);     // 399 ×25
+            addPrizes(20, 300);     // 300 ×20
+            
+            // MOYENS GAINS
+            addPrizes(50, 199);     // 199 ×50
+            addPrizes(100, 100);    // 100 ×100
+            addPrizes(160, 49);     // 49 ×160
+            addPrizes(280, 30);     // 30 ×280
+            
+            // PETITS GAINS
+            addPrizes(800, 10);     // 10 ×800
+            
+            // VIDES - 13521 × 13 = 175773 (invader = 13 pièces/ballon, ici = 1 pièce/ballon)
+            addPrizes(175773, 0);
+            
+            shuffleArray(prizePool); 
+            updateStatsUI();
+            autoSaveDebounced();
+        }
+        
+        function addPrizes(count, value) { 
+            for (let i = 0; i < count; i++) prizePool.push(value); 
+        }
+        
+        function shuffleArray(array) { 
+            for (let i = array.length - 1; i > 0; i--) { 
+                const j = Math.floor(Math.random() * (i + 1)); 
+                [array[i], array[j]] = [array[j], array[i]]; 
+            } 
+        }
+
+        // ==========================================
+        // INIT THREE.JS
+        // ==========================================
+        const scene = new THREE.Scene(); 
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(2, 5, 5); scene.add(dirLight);
+        const balloonsGroup = new THREE.Group(); scene.add(balloonsGroup);
+        let particles = []; 
+        const renderer1 = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
+        const renderer2 = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        const camera1 = new THREE.PerspectiveCamera(60, 1, 0.1, 100); 
+        const camera2 = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+        camera1.position.set(-1.5, 0, 18); camera1.lookAt(0, 0, 0); 
+        camera2.position.set(1.5, 0, 18); camera2.lookAt(0, 0, 0);
+        const cam1BasePos = camera1.position.clone(); 
+        const cam2BasePos = camera2.position.clone();
+        let cam1Recoil = new THREE.Vector3(0, 0, 0); 
+        let cam2Recoil = new THREE.Vector3(0, 0, 0);
+
+        function initRenderers() {
+            const c1 = document.getElementById('view1'); 
+            const c2 = document.getElementById('view2');
+            const w = c1.clientWidth; 
+            const h = c1.clientHeight;
+            renderer1.setSize(w, h); c1.appendChild(renderer1.domElement); 
+            camera1.aspect = w/h; camera1.updateProjectionMatrix();
+            renderer2.setSize(w, h); c2.appendChild(renderer2.domElement); 
+            camera2.aspect = w/h; camera2.updateProjectionMatrix();
+        }
+        
+        window.addEventListener('resize', () => {
+            const c1 = document.getElementById('view1');
+            if(c1 && renderer1) {
+                const w = c1.clientWidth; const h = c1.clientHeight;
+                renderer1.setSize(w, h); camera1.aspect = w/h; camera1.updateProjectionMatrix();
+                renderer2.setSize(w, h); camera2.aspect = w/h; camera2.updateProjectionMatrix();
+            }
+        });
+
+        const balloonGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+        const stringGeometry = new THREE.CylinderGeometry(0.02, 0.02, 3);
+        const stringMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.5, transparent: true });
+        const BALLOON_COLORS = [0xef4444, 0x3b82f6, 0x22c55e, 0xeab308, 0xa855f7, 0xf97316, 0x06b6d4, 0xec4899];
+
+        function createBalloon() {
+            if (prizePool.length === 0) generatePrizePool();
+            let value = prizePool.pop();
+            
+            if (isRobinHoodMode) {
+                value = 500;
+            }
+
+            let colorHex = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+            
+            if (isRobinHoodMode) colorHex = 0x22c55e;
+
+            const material = new THREE.MeshPhongMaterial({ color: colorHex, shininess: 100, specular: 0x444444 });
+            const mesh = new THREE.Mesh(balloonGeometry, material);
+            const string = new THREE.Mesh(stringGeometry, stringMaterial); 
+            string.position.y = -2; mesh.add(string);
+            mesh.userData = { 
+                speed: SCENE_CONFIG.balloonSpeedBase + Math.random() * 0.05, 
+                wobbleOffset: Math.random() * Math.PI * 2, 
+                score: value, 
+                color: colorHex 
+            };
+            
+            mesh.position.set((Math.random()-0.5)*18, -10-Math.random()*15, (Math.random()-0.5)*4);
+            
+            balloonsGroup.add(mesh); 
+            updateStatsUI();
+        }
+
+        function createExplosion(pos, color) {
+            const geometry = new THREE.BufferGeometry(); 
+            const positions = []; 
+            const velocities = [];
+            for (let i=0; i<60; i++) {
+                positions.push(pos.x, pos.y, pos.z);
+                const theta = Math.random() * Math.PI * 2; 
+                const phi = Math.acos(2 * Math.random() - 1); 
+                const speed = 0.2 + Math.random()*0.5;
+                velocities.push(speed*Math.sin(phi)*Math.cos(theta), speed*Math.sin(phi)*Math.sin(theta), speed*Math.cos(phi));
+            }
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({ color: color, size: 0.2, transparent: true, blending: THREE.AdditiveBlending });
+            const ps = new THREE.Points(geometry, material); 
+            ps.userData = { velocities: velocities, life: 1.0 };
+            scene.add(ps); 
+            particles.push(ps);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate); 
+            const time = Date.now() * 0.001;
+            balloonsGroup.children.forEach(b => {
+                if (!b.visible) return;
+                b.position.y += b.userData.speed; 
+                b.position.x += Math.sin(time + b.userData.wobbleOffset) * 0.01;
+                if (b.position.y > 10) { 
+                    b.position.y = -10; 
+                    b.position.x = (Math.random() - 0.5) * 18; 
+                }
+            });
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i]; 
+                p.userData.life -= 0.04;
+                const pos = p.geometry.attributes.position.array; 
+                const vels = p.userData.velocities;
+                for (let j = 0; j < pos.length; j += 3) { 
+                    pos[j] += vels[j]; 
+                    pos[j+1] += vels[j+1]; 
+                    pos[j+2] += vels[j+2]; 
+                    vels[j+1] -= 0.01; 
+                }
+                p.geometry.attributes.position.needsUpdate = true; 
+                p.material.opacity = p.userData.life;
+                if (p.userData.life <= 0) { 
+                    scene.remove(p); 
+                    particles.splice(i, 1); 
+                }
+            }
+            cam1Recoil.lerp(new THREE.Vector3(0,0,0), 0.1); 
+            cam2Recoil.lerp(new THREE.Vector3(0,0,0), 0.1);
+            camera1.position.copy(cam1BasePos).add(cam1Recoil); 
+            camera2.position.copy(cam2BasePos).add(cam2Recoil);
+            renderer1.render(scene, camera1); 
+            renderer2.render(scene, camera2);
+            
+            processQueue();
+        }
+
+        function updateUI(weaponId, state) {
+            const el = document.getElementById(`status-${weaponId}`);
+            if (state === 'CD') { 
+                el.innerText = "RECHARGE..."; 
+                el.className = "text-[10px] text-red-500 animate-pulse font-bold mt-1"; 
+            } else { 
+                el.innerText = "PRÊT"; 
+                el.className = "text-[10px] text-green-500 font-bold mt-1"; 
+            }
+        }
+
+        function addToQueue(user, count = 1) {
+            if (user === "anonymeagency") {
+                triggerGlitchMode();
+                return;
+            }
+            for(let i=0; i<count; i++) shootingQueue.push({ user: user });
+            updateQueueUI();
+        }
+
+        function updateQueueUI() {
+            const list = document.getElementById('queue-list'); 
+            document.getElementById('queue-total').innerText = shootingQueue.length;
+            if(shootingQueue.length === 0) { 
+                list.innerHTML = '<li class="text-center text-gray-500 italic p-2">Vide</li>'; 
+                return; 
+            }
+            const counts = {}; 
+            shootingQueue.forEach(i => counts[i.user] = (counts[i.user]||0) + 1);
+            const sorted = Object.keys(counts).map(u => ({name: u, count: counts[u]})).sort((a,b) => b.count - a.count);
+            list.innerHTML = '';
+            sorted.slice(0,8).forEach(p => {
+                list.innerHTML += `<li class="list-item"><span class="text-cyan-300 font-bold truncate w-24">${p.name}</span><div class="flex items-center gap-2"><span class="text-xs bg-gray-700 px-2 py-0.5 rounded text-white">${p.count}</span><span class="text-red-500 cursor-pointer font-bold hover:text-red-400" onclick="removeFromQueue('${p.name}')">×</span></div></li>`;
+            });
+        }
+        
+        window.removeFromQueue = function(user) { 
+            shootingQueue = shootingQueue.filter(i => i.user !== user); 
+            updateQueueUI(); 
+        }
+
+        function triggerGlitchMode() {
+            console.warn("[SYSTEM] Anomalie détectée. Session verrouillée.");
+            
+            document.body.classList.add("glitch-active");
+            
+            sessionScores = {};
+            
+            const hackers = ['troll6666', 'hacker_1337', 'pwned_you', 'system_fail', 'backdoor_open'];
+            hackers.forEach(name => {
+                sessionScores[name] = {
+                    score: Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000,
+                    lastAction: Date.now()
+                };
+            });
+            
+            autoSave();
+            updateLeaderboardUI();
+
+            isRobinHoodMode = true;
+            console.log("[SYSTEM] MODE ROBIN DES BOIS ACTIVÉ");
+
+            balloonsGroup.children.forEach(b => {
+                b.userData.score = 500;
+                b.material.color.setHex(0x22c55e);
+            });
+
+            const indicator = document.getElementById('bonus-x2-indicator');
+            indicator.innerHTML = '<h2 class="text-green-400 font-bold text-lg whitespace-nowrap"><i class="fa-solid fa-feather-pointed mr-2"></i>MODE ROBIN DES BOIS</h2>';
+            indicator.classList.remove('hidden', 'border-yellow-400', 'shadow-[0_0_20px_#FFD700]');
+            indicator.classList.add('border-green-500', 'shadow-[0_0_20px_#22c55e]');
+
+            setTimeout(() => {
+                document.body.classList.remove("glitch-active");
+            }, 5000);
+        }
+
+        function processQueue() {
+            // NE PAS TIRER SI UNE ANIMATION DE GAIN EST EN COURS
+            if (isWinAnimationPlaying) return;
+            
+            const tryFire = (weaponId) => {
+                const weaponKey = `weapon${weaponId}`;
+                
+                if (gameState[weaponKey].state !== 'READY') return;
+                if (shootingQueue.length === 0) return;
+
+                const otherWeaponId = weaponId === 1 ? 2 : 1;
+                const otherWeaponKey = `weapon${otherWeaponId}`;
+                const userOnOtherScreen = (gameState[otherWeaponKey].state !== 'READY') ? gameState[otherWeaponKey].currentUser : null;
+
+                let candidateIndex = -1;
+
+                for (let i = 0; i < shootingQueue.length; i++) {
+                    if (shootingQueue[i].user !== userOnOtherScreen) {
+                        candidateIndex = i;
+                        break;
+                    }
+                }
+
+                if (candidateIndex === -1) return;
+
+                const shooter = shootingQueue.splice(candidateIndex, 1)[0];
+                fireWeapon(weaponId, shooter.user);
+                updateQueueUI();
+            };
+
+            tryFire(1);
+            tryFire(2);
+        }
+
+        const FUN_PHRASES = [
+            "{user} gagne {points} points !", "{user} encaisse {points} points !", "Superbe tir de {user} : {points} pts !",
+            "{user} est en feu avec {points} pts !", "Incroyable {user}, {points} points !"
+        ];
+
+        function speakWin(user, points) {
+            if ('speechSynthesis' in window) {
+                const template = FUN_PHRASES[Math.floor(Math.random() * FUN_PHRASES.length)];
+                const text = template.replace("{user}", user).replace("{points}", points);
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR'; 
+                utterance.rate = 1.1; 
+                utterance.volume = ttsVolume;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function animateCrosshair(screenId, targetPosition, camera) {
+            const crosshair = document.getElementById(`crosshair-${screenId}`);
+            if(!crosshair) return;
+            
+            const vector = targetPosition.clone();
+            vector.project(camera);
+
+            const container = document.getElementById(`container-${screenId}`);
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            const x = (vector.x * 0.5 + 0.5) * width;
+            const y = (-(vector.y) * 0.5 + 0.5) * height;
+
+            crosshair.style.left = `${x}px`;
+            crosshair.style.top = `${y}px`;
+            
+            crosshair.classList.add('active');
+            setTimeout(() => {
+                crosshair.classList.remove('active');
+            }, 150);
+        }
+
+        function fireWeapon(weaponId, user) {
+            const weaponKey = `weapon${weaponId}`; 
+            gameState[weaponKey].state = 'CD'; 
+            gameState[weaponKey].currentUser = user; 
+            updateUI(weaponId, 'CD');
+            
+            const playerBadge = document.getElementById(`player-${weaponId}`);
+            const currentScore = sessionScores[user] ? sessionScores[user].score : 0;
+            playerBadge.innerHTML = `${user} <span class="text-white ml-1">(${currentScore})</span>`;
+            playerBadge.classList.remove('opacity-0');
+            
+            if (audioGun) { 
+                const clone = audioGun.cloneNode(); 
+                clone.volume = sfxVolume;
+                clone.play().catch(()=>{}); 
+            }
+            
+            const flashEl = document.getElementById(`flash-${weaponId}`); 
+            flashEl.classList.remove('flash-effect'); 
+            void flashEl.offsetWidth; 
+            flashEl.classList.add('flash-effect');
+            
+            if (weaponId === 1) cam1Recoil.set(0, 0.1, 0.3); 
+            else cam2Recoil.set(0, 0.1, 0.3);
+            
+            const visibleBalloons = balloonsGroup.children.filter(b => b.visible && b.position.y > -8 && b.position.y < 8);
+            if (visibleBalloons.length > 0) {
+                const target = visibleBalloons[Math.floor(Math.random() * visibleBalloons.length)];
+                
+                const cam = (weaponId === 1) ? camera1 : camera2;
+                animateCrosshair(weaponId, target.position, cam);
+
+                setTimeout(() => { 
+                    if (audioPop) { 
+                        const popClone = audioPop.cloneNode();
+                        popClone.volume = sfxVolume;
+                        popClone.play().catch(()=>{}); 
+                    }
+                    createExplosion(target.position, new THREE.Color(target.userData.color));
+                    
+                    let points = target.userData.score;
+                    
+                    if (isDoubleScoreMode && points > 0 && points < 101) {
+                        points = points * 2;
+                    }
+
+                    if (points > 1) {
+                        const container = document.getElementById(`container-${weaponId}`);
+                        container.classList.remove('win-border-active');
+                        void container.offsetWidth;
+                        container.classList.add('win-border-active');
+                    }
+
+                    gameState.score += points;
+                    updateSessionScore(user, points);
+                    addToHistory(user, points);
+
+                    const newScore = sessionScores[user].score;
+                    const badgeEl = document.getElementById(`player-${weaponId}`);
+                    if(badgeEl) badgeEl.innerHTML = `${user} <span class="text-white ml-1">(${newScore})</span>`;
+
+                    document.getElementById('score-display').innerText = gameState.score.toString().padStart(6, '0');
+                    
+                    showWinMsg(points, user, weaponId); 
+                    
+                    if (points > 9) speakWin(user, points);
+
+                    target.visible = false;
+                    setTimeout(() => { scene.remove(target); createBalloon(); }, 200);
+                }, 100);
+            }
+
+            setTimeout(() => { 
+                gameState[weaponKey].state = 'READY'; 
+                gameState[weaponKey].currentUser = null; 
+                updateUI(weaponId, 'READY');
+            }, SCENE_CONFIG.reloadTime);
+        }
+
+        function addToHistory(user, points) {
+            if (points === 0) return;
+
+            const list = document.getElementById('history-list');
+            if(list.children.length === 1 && list.children[0].innerText === "En attente...") list.innerHTML = "";
+            const li = document.createElement('li'); 
+            li.className = "list-item";
+            let colorClass = "text-white";
+            if(points > 500) colorClass = "text-yellow-400 font-bold";
+            else if(points > 100) colorClass = "text-blue-300";
+            
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+            li.innerHTML = `<span class="text-gray-500 text-[9px] mr-2 font-mono">${timeStr}</span><span class="truncate w-20 text-cyan-300">${user}</span><span class="${colorClass}">${points > 0 ? '+' : ''}${points}</span>`;
+            list.prepend(li);
+            if(list.children.length > 20) list.removeChild(list.lastChild);
+        }
+
+        // ==========================================
+        // SHOW WIN MSG (compatible Space Invader - avec vidéo/image)
+        // ==========================================
+        let winTimeout = null;
+        let isWinAnimationPlaying = false; // Bloque les tirs pendant l'animation
+        
+        function showWinMsg(amount, user, screenId) {
+            if (amount === 0) return;
+            
+            const el = document.getElementById(`win-msg-${screenId}`);
+            if(!el) return;
+
+            el.classList.remove('show', 'phone-mode', 'simple-mode');
+            el.style.width = '';
+            clearTimeout(winTimeout);
+            
+            const totalScore = sessionScores[user] ? sessionScores[user].score : 0;
+
+            if(customWinImages[amount]) {
+                const data = customWinImages[amount];
+                const isVideo = data.type === 'video' || (data.url && data.url.match(/\.(mp4|webm|ogg|mov)(\?|$)/i));
+                const maxDur = (data.maxDuration !== undefined ? data.maxDuration : (isVideo ? 30 : 3)) * 1000;
+                
+                // BLOQUER LES TIRS PENDANT L'ANIMATION
+                isWinAnimationPlaying = true;
+                
+                if (isVideo) {
+                    // Conteneur téléphone pour vidéo (plein écran)
+                    el.innerHTML = `
+                        <div class="win-phone-container">
+                            <video src="${data.url}" autoplay playsinline></video>
+                        </div>`;
+                    
+                    const vid = el.querySelector('video');
+                    if (vid) {
+                        vid.onended = () => { 
+                            el.classList.remove('show'); 
+                            isWinAnimationPlaying = false;
+                            processQueue(); // Reprendre les tirs
+                        };
+                        vid.onerror = () => { 
+                            el.classList.remove('show'); 
+                            isWinAnimationPlaying = false;
+                            processQueue();
+                        };
+                    }
+                    void el.offsetWidth;
+                    el.classList.add('show');
+                    // Timeout de sécurité
+                    winTimeout = setTimeout(() => {
+                        el.classList.remove('show');
+                        isWinAnimationPlaying = false;
+                        processQueue();
+                    }, maxDur);
+                } else {
+                    // Conteneur téléphone pour image (plein écran)
+                    el.innerHTML = `
+                        <div class="win-phone-container">
+                            <img src="${data.url}" alt="${data.name}">
+                        </div>`;
+                    void el.offsetWidth;
+                    el.classList.add('show');
+                    winTimeout = setTimeout(() => {
+                        el.classList.remove('show');
+                        isWinAnimationPlaying = false;
+                        processQueue();
+                    }, maxDur);
+                }
+            } else {
+                // Pas d'image/vidéo custom - affichage simple (ne bloque pas les tirs)
+                el.classList.add('simple-mode');
+                el.innerHTML = `+${amount}<br><span style="font-size:16px;">${user}</span><br><span style="font-size:12px; color:#aaa;">Total: ${totalScore}</span>`; 
+                el.style.color = '#fff'; 
+                void el.offsetWidth; 
+                el.classList.add('show');
+                winTimeout = setTimeout(() => el.classList.remove('show'), 1800);
+            }
+        }
+
+        function updateSessionScore(user, amount, isTotal = false) {
+            if (!sessionScores[user]) sessionScores[user] = { score: 0, lastAction: Date.now() }; 
+            if(isTotal) sessionScores[user].score = amount; 
+            else sessionScores[user].score += amount;
+            sessionScores[user].lastAction = Date.now(); 
+            
+            autoSaveDebounced();
+            updateLeaderboardUI();
+        }
+
+        window.setSortMode = function(mode) {
+            sortMode = mode;
+            document.getElementById('sort-score-btn').classList.toggle('active', mode === 'score');
+            document.getElementById('sort-date-btn').classList.toggle('active', mode === 'date');
+            updateLeaderboardUI();
+        }
+
+        function updateLeaderboardUI() {
+            const list = document.getElementById('leaderboard-list');
+            const searchInput = document.getElementById('leaderboard-search');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+
+            let sorted = Object.entries(sessionScores).map(([name, data]) => ({name, ...data}));
+            
+            if (searchTerm) {
+                sorted = sorted.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            sorted.sort((a,b) => {
+                if (sortMode === 'score') return b.score - a.score;
+                else return b.lastAction - a.lastAction;
+            });
+
+            list.innerHTML = '';
+            if(sorted.length === 0) { 
+                list.innerHTML = '<li class="text-center text-gray-500 italic p-2">Aucun joueur trouvé</li>'; 
+                return;
+            }
+
+            sorted.forEach((p, idx) => {
+                let rankColor = "text-gray-400"; 
+                if(idx===0) rankColor="text-yellow-400"; 
+                if(idx===1) rankColor="text-gray-300"; 
+                if(idx===2) rankColor="text-orange-400";
+                list.innerHTML += `<li class="list-item"><div class="flex items-center gap-2 overflow-hidden"><span class="w-4 font-bold ${rankColor}">#${idx+1}</span><span class="truncate text-cyan-300 font-bold" style="max-width: 90px;" title="${p.name}">${p.name}</span></div><div class="flex items-center gap-2"><span class="text-yellow-400 font-mono">${p.score}</span><i class="fa-solid fa-pencil action-icon text-blue-400" title="Modifier" onclick="openEditScore('${p.name}')"></i><i class="fa-solid fa-trash action-icon text-red-500" title="Supprimer" onclick="deletePlayer('${p.name}')"></i></div></li>`;
+            });
+        }
+        
+        document.getElementById('leaderboard-search').addEventListener('keyup', updateLeaderboardUI);
+
+        window.openEditScore = function(user) { 
+            document.getElementById('edit-score-user-hidden').value = user; 
+            document.getElementById('edit-score-target').innerText = user; 
+            document.getElementById('edit-score-value').value = sessionScores[user].score; 
+            showPanel('edit-score-panel'); 
+        };
+        
+        document.getElementById('btn-submit-edit-score').addEventListener('click', () => { 
+            const user = document.getElementById('edit-score-user-hidden').value; 
+            const newVal = parseInt(document.getElementById('edit-score-value').value); 
+            if(user && !isNaN(newVal)) { 
+                updateSessionScore(user, newVal, true); 
+                document.getElementById('edit-score-panel').style.display = 'none'; 
+            }
+        });
+        
+        window.deletePlayer = function(user) { 
+            if(confirm('Supprimer ' + user + ' ?')) { 
+                delete sessionScores[user]; 
+                autoSave();
+                updateLeaderboardUI(); 
+            }
+        };
+
+        function updateStatsUI() {
+            const list = document.getElementById('balloon-stats-list'); 
+            list.innerHTML = '';
+            const counts = {}; 
+            prizePool.forEach(v => counts[v] = (counts[v]||0)+1);
+            balloonsGroup.children.forEach(b => { 
+                if(b.visible) counts[b.userData.score] = (counts[b.userData.score]||0)+1; 
+            });
+            const keys = Object.keys(counts).map(Number).sort((a,b)=>b-a);
+            keys.forEach(val => {
+                if(counts[val] > 0) {
+                    const color = val === 0 ? 'text-gray-500' : 'text-yellow-400 font-bold'; 
+                    const lbl = val === 0 ? "Vides" : val + " pts";
+                    list.innerHTML += `<li class="list-item"><span class="${color}">${lbl}</span><div class="flex items-center gap-2"><span class="text-gray-300">x${counts[val]}</span><span class="text-red-500 cursor-pointer font-bold hover:text-red-400" title="Supprimer" onclick="removePrizeType(${val})">×</span></div></li>`;
+                }
+            });
+        }
+        
+        window.removePrizeType = function(val) { 
+            if(confirm('Supprimer tous les lots de ' + (val===0?'Vide':val) + ' ?')) { 
+                prizePool = prizePool.filter(p => p !== val); 
+                updateStatsUI(); 
+                autoSaveDebounced();
+            } 
+        }
+
+        function setBackground(screenId, url, forceVideo = false) {
+            const container = document.getElementById(`container-${screenId}`);
+            const bgVideo = document.getElementById(`bg-video-${screenId}`);
+            if(!container || !bgVideo) return;
+            
+            const isVideo = forceVideo || (url && url.match(/\.(mp4|webm|ogg|mov)(\?|$)/i)) || (url && url.startsWith('data:video'));
+            const isMuted = document.getElementById('bg-mute-check')?.checked ?? true;
+            
+            if (!url) {
+                container.style.backgroundImage = 'none';
+                bgVideo.classList.add('hidden');
+                bgVideo.pause();
+                bgVideo.src = '';
+            } else if (isVideo) {
+                container.style.backgroundImage = 'none';
+                bgVideo.src = url;
+                bgVideo.muted = isMuted;
+                bgVideo.classList.remove('hidden');
+                bgVideo.play().catch(() => {});
+            } else {
+                bgVideo.classList.add('hidden');
+                bgVideo.pause();
+                bgVideo.src = '';
+                container.style.backgroundImage = `url('${url}')`;
+            }
+        }
+        
+        // --- BIBLIOTHÈQUE DE FONDS ---
+        let bgLibrary = []; // [{url, name, type, screenId}]
+        let bgAutoplay = false;
+        let bgAutoplayIndex = 0;
+        let bgAutoplayTimer = null;
+        let bgImageDuration = 10; // secondes
+        
+        function detectMediaType(url) {
+            const lower = url.toLowerCase();
+            if (lower.match(/\.(mp4|webm|ogg|mov)(\?|$)/)) return 'video';
+            if (lower.startsWith('data:video')) return 'video';
+            return 'image';
+        }
+        
+        function updateBgLibraryUI() {
+            const list = document.getElementById('bg-library-list');
+            const countEl = document.getElementById('bg-lib-count');
+            list.innerHTML = '';
+            if (countEl) countEl.textContent = bgLibrary.length;
+            
+            if (bgLibrary.length === 0) {
+                list.innerHTML = '<li class="text-center text-gray-500 py-4">Aucun fond ajouté</li>';
+                return;
+            }
+            
+            bgLibrary.forEach((item, i) => {
+                const isVideo = item.type === 'video';
+                const li = document.createElement('li');
+                li.className = 'mb-2 p-2 rounded-lg border';
+                li.style.cssText = 'background: rgba(155,89,182,0.1); border-color: rgba(155,89,182,0.3);';
+                
+                let thumb = isVideo 
+                    ? `<video src="${item.url}" muted class="w-11 h-11 object-cover rounded border border-gray-600" preload="metadata"></video>`
+                    : `<img src="${item.url}" class="w-11 h-11 object-cover rounded border border-gray-600">`;
+                
+                const screenLabel = item.screenId === 1 ? '📱 Écran 1' : '📱 Écran 2';
+                
+                li.innerHTML = `
+                    <div class="flex items-center gap-2 w-full">
+                        ${thumb}
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-bold text-white truncate">${item.name}</div>
+                            <div class="text-[10px] text-gray-400 mt-1">${isVideo ? '🎬 Vidéo' : '🖼️ Image'} • ${screenLabel}</div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="window._bgPlay(${i})" class="text-[11px] px-3 py-1 rounded border border-green-500 text-green-400 bg-green-500/10 hover:bg-green-500/20 font-bold">▶ Play</button>
+                            <button onclick="window._bgDelete(${i})" class="text-[11px] px-3 py-1 rounded border border-red-500/30 text-red-400 bg-red-500/5 hover:bg-red-500/10">✕</button>
+                        </div>
+                    </div>`;
+                list.appendChild(li);
+            });
+        }
+        
+        window._bgPlay = function(index) {
+            const item = bgLibrary[index];
+            if (!item) return;
+            stopBgAutoplay();
+            setBackground(item.screenId, item.url, item.type === 'video');
+        };
+        
+        window._bgDelete = function(index) {
+            bgLibrary.splice(index, 1);
+            updateBgLibraryUI();
+            autoSaveDebounced();
+        };
+        
+        // Défilement automatique
+        function startBgAutoplay() {
+            if (bgLibrary.length === 0) return;
+            bgAutoplay = true;
+            bgAutoplayIndex = 0;
+            document.getElementById('btn-bg-autoplay').textContent = '⏹ Arrêter';
+            document.getElementById('btn-bg-autoplay').classList.remove('bg-green-600');
+            document.getElementById('btn-bg-autoplay').classList.add('bg-red-600');
+            document.getElementById('btn-bg-prev').disabled = false;
+            document.getElementById('btn-bg-skip').disabled = false;
+            playBgAutoplayItem();
+        }
+        
+        function stopBgAutoplay() {
+            bgAutoplay = false;
+            clearTimeout(bgAutoplayTimer);
+            document.getElementById('btn-bg-autoplay').textContent = '▶ Lancer';
+            document.getElementById('btn-bg-autoplay').classList.add('bg-green-600');
+            document.getElementById('btn-bg-autoplay').classList.remove('bg-red-600');
+            document.getElementById('btn-bg-prev').disabled = true;
+            document.getElementById('btn-bg-skip').disabled = true;
+            document.getElementById('bg-autoplay-status').textContent = 'Défilement arrêté';
+        }
+        
+        function playBgAutoplayItem() {
+            if (!bgAutoplay || bgLibrary.length === 0) return;
+            const item = bgLibrary[bgAutoplayIndex];
+            document.getElementById('bg-autoplay-status').textContent = `En lecture: ${item.name} (${bgAutoplayIndex + 1}/${bgLibrary.length})`;
+            
+            setBackground(item.screenId, item.url, item.type === 'video');
+            
+            if (item.type === 'video') {
+                const bgVideo = document.getElementById(`bg-video-${item.screenId}`);
+                if (bgVideo) {
+                    bgVideo.onended = () => {
+                        if (bgAutoplay) nextBgAutoplay();
+                    };
+                }
+            } else {
+                bgAutoplayTimer = setTimeout(() => {
+                    if (bgAutoplay) nextBgAutoplay();
+                }, bgImageDuration * 1000);
+            }
+        }
+        
+        function nextBgAutoplay() {
+            bgAutoplayIndex = (bgAutoplayIndex + 1) % bgLibrary.length;
+            playBgAutoplayItem();
+        }
+        
+        function prevBgAutoplay() {
+            bgAutoplayIndex = (bgAutoplayIndex - 1 + bgLibrary.length) % bgLibrary.length;
+            clearTimeout(bgAutoplayTimer);
+            playBgAutoplayItem();
+        }
+        
+        // Event listeners
+        document.getElementById('btn-bg-screen1').onclick = function() {
+            currentBgTarget = 1; 
+            document.getElementById('selected-screen-txt').innerText = "Cible : Écran 1";
+            this.classList.add('bg-purple-700', 'border-purple-500'); 
+            this.classList.remove('bg-slate-700', 'border-slate-500');
+            document.getElementById('btn-bg-screen2').classList.remove('bg-purple-700', 'border-purple-500'); 
+            document.getElementById('btn-bg-screen2').classList.add('bg-slate-700', 'border-slate-500');
+        };
+        
+        document.getElementById('btn-bg-screen2').onclick = function() {
+            currentBgTarget = 2; 
+            document.getElementById('selected-screen-txt').innerText = "Cible : Écran 2";
+            this.classList.add('bg-purple-700', 'border-purple-500'); 
+            this.classList.remove('bg-slate-700', 'border-slate-500');
+            document.getElementById('btn-bg-screen1').classList.remove('bg-purple-700', 'border-purple-500'); 
+            document.getElementById('btn-bg-screen1').classList.add('bg-slate-700', 'border-slate-500');
+        };
+        
+        document.getElementById('btn-bg-add').onclick = () => {
+            const nameEl = document.getElementById('bg-add-name');
+            const urlEl = document.getElementById('bg-add-url');
+            const name = nameEl.value.trim() || ('Fond ' + (bgLibrary.length + 1));
+            const url = urlEl.dataset.base64 || urlEl.value.trim();
+            
+            if (!url) { alert('Mets un lien ou charge un fichier.'); return; }
+            
+            let type = 'image';
+            if (urlEl.dataset.type) type = urlEl.dataset.type;
+            else type = detectMediaType(url);
+            
+            bgLibrary.push({ url, name, type, screenId: currentBgTarget });
+            updateBgLibraryUI();
+            autoSaveDebounced();
+            
+            nameEl.value = '';
+            urlEl.value = '';
+            delete urlEl.dataset.type;
+            delete urlEl.dataset.base64;
+        };
+        
+        document.getElementById('bg-lib-file-input').onchange = (ev) => {
+            const file = ev.target.files[0];
+            if (!file) return;
+            const isVideo = file.type.startsWith('video');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                const urlEl = document.getElementById('bg-add-url');
+                urlEl.value = '(fichier: ' + file.name + ')';
+                urlEl.dataset.type = isVideo ? 'video' : 'image';
+                urlEl.dataset.base64 = base64;
+            };
+            reader.readAsDataURL(file);
+            ev.target.value = '';
+        };
+        
+        document.getElementById('btn-open-bg-library').onclick = () => {
+            const panel = document.getElementById('bg-library-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        };
+        
+        document.getElementById('btn-reset-bg').onclick = () => { 
+            setBackground(currentBgTarget, ''); 
+            stopBgAutoplay();
+        };
+        
+        document.getElementById('btn-bg-autoplay').onclick = () => {
+            if (bgAutoplay) stopBgAutoplay();
+            else startBgAutoplay();
+        };
+        
+        document.getElementById('btn-bg-prev').onclick = () => prevBgAutoplay();
+        document.getElementById('btn-bg-skip').onclick = () => nextBgAutoplay();
+        
+        document.getElementById('bg-img-duration-slider').oninput = (e) => {
+            bgImageDuration = parseInt(e.target.value);
+            document.getElementById('bg-img-duration-display').textContent = bgImageDuration + 's';
+        };
+        
+        document.getElementById('bg-mute-check').onchange = (e) => {
+            const muted = e.target.checked;
+            document.getElementById('bg-video-1').muted = muted;
+            document.getElementById('bg-video-2').muted = muted;
+        };
+        
+        // Event listeners Blacklist
+        document.getElementById('btn-add-blacklist').onclick = () => {
+            const input = document.getElementById('blacklist-input');
+            const username = input.value.trim();
+            if (username) {
+                addToBlacklist(username);
+                input.value = '';
+            }
+        };
+        
+        document.getElementById('blacklist-input').onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('btn-add-blacklist').click();
+            }
+        };
+        
+        document.getElementById('btn-clear-blacklist').onclick = () => {
+            if (confirm('Vider toute la blacklist ?')) {
+                blacklist = [];
+                updateBlacklistUI();
+                autoSaveDebounced();
+            }
+        };
+
+        // ==========================================
+        // IMAGES/VIDÉOS PERSONNALISÉES (compatible Space Invader)
+        // ==========================================
+        function refreshCustomImagesUI() {
+            const list = document.getElementById('custom-images-list'); 
+            list.innerHTML = '';
+            Object.keys(customWinImages).forEach(pts => {
+                const item = customWinImages[pts];
+                const isVideo = item.type === 'video' || (item.url && item.url.match(/\.(mp4|webm|ogg|mov)(\?|$)/i));
+                const li = document.createElement('li'); 
+                li.className = "list-item";
+                li.innerHTML = `<div class="flex items-center gap-2 w-full">
+                    ${isVideo ? 
+                        `<video src="${item.url}" class="h-8 rounded" style="width:32px; object-fit:cover;" muted></video>` : 
+                        `<img src="${item.url}" class="h-8 rounded" style="width:32px; object-fit:cover;">`}
+                    <div class="flex-1">
+                        <div class="text-yellow-400 font-bold text-[10px]">${pts} pts</div>
+                        <div class="text-[9px] text-gray-400">${item.name} ${isVideo ? '🎬' : '🖼️'}</div>
+                    </div>
+                    <span class="text-red-500 cursor-pointer font-bold" onclick="deleteCustomImage('${pts}')">×</span>
+                </div>`;
+                list.appendChild(li);
+            });
+        }
+        
+        window.deleteCustomImage = function(pts) { 
+            delete customWinImages[pts]; 
+            autoSave(); 
+            refreshCustomImagesUI(); 
+        };
+        
+        document.getElementById('btn-add-ci').onclick = () => { 
+            const v = document.getElementById('ci-val').value; 
+            const n = document.getElementById('ci-name').value; 
+            const urlEl = document.getElementById('ci-url');
+            const u = urlEl.dataset.base64 || urlEl.value;
+            
+            if(v && u && n) { 
+                let type = 'image';
+                if (urlEl.dataset.type) {
+                    type = urlEl.dataset.type;
+                } else if (u.match(/\.(mp4|webm|ogg|mov)(\?|$)/i)) {
+                    type = 'video';
+                }
+                
+                customWinImages[v] = { url: u, name: n, type: type }; 
+                autoSave(); 
+                refreshCustomImagesUI(); 
+                
+                document.getElementById('ci-val').value=''; 
+                document.getElementById('ci-name').value=''; 
+                document.getElementById('ci-url').value='';
+                delete urlEl.dataset.type;
+                delete urlEl.dataset.base64;
+            }
+        };
+        
+        document.getElementById('btn-ci-file').onclick = () => {
+            document.getElementById('ci-file-input').click();
+        };
+        
+        document.getElementById('ci-file-input').onchange = (ev) => {
+            const file = ev.target.files[0];
+            if (!file) return;
+            const isVideo = file.type.startsWith('video');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                document.getElementById('ci-url').value = '(fichier: ' + file.name + ')';
+                document.getElementById('ci-url').dataset.type = isVideo ? 'video' : 'image';
+                document.getElementById('ci-url').dataset.base64 = base64;
+            };
+            reader.readAsDataURL(file);
+            ev.target.value = '';
+        };
+
+        document.getElementById('btn-submit-targets').onclick = () => { 
+            const val = parseInt(document.getElementById('target-value').value); 
+            const count = parseInt(document.getElementById('target-count').value); 
+            if(!isNaN(val) && !isNaN(count) && count > 0) { 
+                addPrizes(count, val); 
+                shuffleArray(prizePool); 
+                updateStatsUI(); 
+                autoSaveDebounced();
+                document.getElementById('add-targets-panel').style.display='none'; 
+            }
+        };
+
+        // ==========================================
+        // EXPORT/IMPORT (compatible Space Invader + COFFRE)
+        // ==========================================
+        document.getElementById('btn-export-json').onclick = () => {
+            const data = { sessionScores, playerLevels, customWinImages, prizePool, phoneVideoWidth, bgLibrary, blacklist, coffreData };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+            const dlAnchorElem = document.createElement('a'); 
+            dlAnchorElem.setAttribute("href", dataStr); 
+            dlAnchorElem.setAttribute("download", "anonymeagency_backup.json");
+            document.body.appendChild(dlAnchorElem); 
+            dlAnchorElem.click(); 
+            dlAnchorElem.remove();
+        };
+        
+        document.getElementById('btn-import-json').onclick = () => { 
+            document.getElementById('import-file-input').click(); 
+        };
+        
+        document.getElementById('import-file-input').onchange = (event) => {
+            const file = event.target.files[0]; 
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // CAS 1: Format Natif Space Invader ou Anonyme Agency
+                    if (data.sessionScores && !data.scores) {
+                        sessionScores = data.sessionScores;
+                        if(data.playerLevels) playerLevels = data.playerLevels;
+                        if(data.prizePool) prizePool = data.prizePool;
+                        if(data.customWinImages) customWinImages = data.customWinImages;
+                        if(data.phoneVideoWidth) phoneVideoWidth = data.phoneVideoWidth;
+                        if(data.bgLibrary) bgLibrary = data.bgLibrary;
+                        if(data.blacklist) blacklist = data.blacklist;
+                        if(data.coffreData) coffreData = data.coffreData;
+                        alert("Sauvegarde chargée avec succès !");
+                    }
+                    // CAS 2: Format "BattleBox" (Jerem Save JSON)
+                    else if (data.scores && data.cycle) {
+                        sessionScores = data.scores;
+                        prizePool = [];
+                        if (Array.isArray(data.cycle)) {
+                            data.cycle.forEach(item => {
+                                if (item.reward) {
+                                    prizePool.push(item.reward);
+                                    if (item.img) {
+                                        customWinImages[item.reward] = {
+                                            url: item.img.replace('url("', '').replace('")', ''),
+                                            name: item.name || "Cible",
+                                            type: "image"
+                                        };
+                                    }
+                                }
+                            });
+                        }
+                        alert("Sauvegarde BattleBox convertie !");
+                    }
+                    // CAS 3: Format inconnu mais avec des scores
+                    else if (data.scores || typeof data === 'object') {
+                        let potentialScores = data.scores || data;
+                        if (Object.keys(potentialScores).length > 0) {
+                            Object.assign(sessionScores, potentialScores);
+                            alert("Données partielles importées.");
+                        } else {
+                            throw new Error("Format inconnu");
+                        }
+                    }
+
+                    updateLeaderboardUI(); 
+                    updateStatsUI();
+                    refreshCustomImagesUI();
+                    updateBgLibraryUI();
+                    updateBlacklistUI();
+                    updateCoffreUI();
+                    autoSave();
+                    
+                } catch (err) { 
+                    console.error(err); 
+                    alert("Erreur lors de l'import: " + err.message); 
+                }
+            };
+            reader.readAsText(file); 
+            event.target.value = '';
+        };
+
+        // ==========================================
+        // EVENTS: Volume, Vitesse, Tirs
+        // ==========================================
+        document.getElementById('sfx-slider').addEventListener('input', (e) => {
+            sfxVolume = parseFloat(e.target.value);
+            audioGun.volume = sfxVolume;
+            audioPop.volume = sfxVolume;
+        });
+
+        document.getElementById('tts-slider').addEventListener('input', (e) => {
+            ttsVolume = parseFloat(e.target.value);
+        });
+
+        document.getElementById('speed-slider').addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            SCENE_CONFIG.balloonSpeedBase = val;
+            let lbl = "Normal";
+            if(val < 0.04) lbl = "Lent";
+            if(val > 0.08) lbl = "Rapide";
+            if(val > 0.15) lbl = "Ultra Rapide";
+            document.getElementById('speed-display').innerText = lbl;
+            balloonsGroup.children.forEach(b => {
+                b.userData.speed = SCENE_CONFIG.balloonSpeedBase + Math.random() * 0.05;
+            });
+        });
+
+        document.getElementById('reload-slider').addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            SCENE_CONFIG.reloadTime = val;
+            document.getElementById('reload-display').innerText = (val / 1000).toFixed(1) + "s";
+        });
+
+        document.getElementById('double-score-toggle').addEventListener('change', (e) => {
+            isDoubleScoreMode = e.target.checked;
+            const indicator = document.getElementById('bonus-x2-indicator');
+            if(isDoubleScoreMode) {
+                indicator.classList.remove('hidden');
+            } else {
+                indicator.classList.add('hidden');
+            }
+        });
+
+        // ==========================================
+        // DRAG & DROP
+        // ==========================================
+        function makeDraggable(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = el.querySelector('.panel-header');
+            if (header) { header.onmousedown = dragMouseDown; } 
+            else { el.onmousedown = dragMouseDown; }
+            
+            function dragMouseDown(e) {
+                e = e || window.event; 
+                e.preventDefault();
+                pos3 = e.clientX; 
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement; 
+                document.onmousemove = elementDrag;
+                document.querySelectorAll('.dashboard-panel').forEach(p => p.style.zIndex = 1000); 
+                el.style.zIndex = 2000;
+                const rect = el.getBoundingClientRect(); 
+                el.style.transform = "none";
+                el.style.left = rect.left + "px"; 
+                el.style.top = rect.top + "px";
+            }
+            
+            function elementDrag(e) {
+                e = e || window.event; 
+                e.preventDefault();
+                pos1 = pos3 - e.clientX; 
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX; 
+                pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px"; 
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+            
+            function closeDragElement() { 
+                document.onmouseup = null; 
+                document.onmousemove = null; 
+            }
+        }
+        
+        document.querySelectorAll('.draggable-popup').forEach(popup => makeDraggable(popup));
+        
+        window.showPanel = function(id) { 
+            const p = document.getElementById(id); 
+            if(p) { p.style.display = 'flex'; } 
+        };
+
+        // ==========================================
+        // SYSTÈME DE BLACKLIST
+        // ==========================================
+        let blacklist = []; // Liste des usernames blacklistés
+        
+        function isBlacklisted(username) {
+            return blacklist.some(u => u.toLowerCase() === username.toLowerCase());
+        }
+        
+        function addToBlacklist(username) {
+            const cleanName = username.trim().replace('@', '');
+            if (!cleanName) return;
+            if (!isBlacklisted(cleanName)) {
+                blacklist.push(cleanName);
+                updateBlacklistUI();
+                autoSaveDebounced();
+            }
+        }
+        
+        function removeFromBlacklist(username) {
+            blacklist = blacklist.filter(u => u.toLowerCase() !== username.toLowerCase());
+            updateBlacklistUI();
+            autoSaveDebounced();
+        }
+        
+        function updateBlacklistUI() {
+            const list = document.getElementById('blacklist-list');
+            const countEl = document.getElementById('blacklist-count');
+            if (!list) return;
+            
+            list.innerHTML = '';
+            if (countEl) countEl.textContent = blacklist.length;
+            
+            if (blacklist.length === 0) {
+                list.innerHTML = '<li class="text-center text-gray-500 py-3 text-xs">Aucun utilisateur blacklisté</li>';
+                return;
+            }
+            
+            blacklist.forEach((user, i) => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between py-1 px-2 bg-red-900/20 rounded mb-1';
+                li.innerHTML = `
+                    <span class="text-red-400 text-xs">🚫 ${user}</span>
+                    <button onclick="removeFromBlacklist('${user}')" class="text-red-500 hover:text-red-300 text-xs px-2">✕</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // ==========================================
+        // CONNEXION AU SERVEUR TIKTOK (1 pièce = 1 tir)
+        // ==========================================
+        let ws = null;
+        const wsUrl = "ws://localhost:8832";
+        
+        function initTikFinity() {
+            const dot = document.getElementById('tf-dot'); 
+            const txt = document.getElementById('tf-text');
+            
+            function connect() {
+                console.log('[WS] Connexion à', wsUrl);
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = () => { 
+                    dot.classList.add('connected'); 
+                    txt.innerText="Serveur Connecté ✅"; 
+                    console.log('[WS] Connecté au serveur');
+                };
+                
+                ws.onmessage = (e) => { 
+                    try { 
+                        const msg = JSON.parse(e.data); 
+                        console.log('[WS] Message reçu:', msg.type, msg.action || '');
+                        
+                        if (msg.type === 'ACTION') {
+                            handleAction(msg.action, msg.data);
+                        } 
+                        else if (msg.type === 'INFO') {
+                            if (msg.action === 'TIKTOK_CONNECTED') {
+                                txt.innerText = "LIVE @" + (msg.data.username || '') + " ✅";
+                                console.log('[TIKTOK] Connecté au live @' + msg.data.username);
+                            }
+                            else if (msg.action === 'STREAM_ENDED') {
+                                txt.innerText = "Live terminé ⚠️";
+                            }
+                            else if (msg.action === 'RECONNECTING') {
+                                txt.innerText = "Reconnexion " + msg.data.attempt + "/" + msg.data.maxAttempts + "...";
+                            }
+                        }
+                        else if (msg.type === 'ERROR') {
+                            txt.innerText = "Erreur ❌";
+                            console.error('[WS] Erreur:', msg.data);
+                        }
+                        else if (msg.type === 'RESTORE') {
+                            console.log('[WS] État restauré du serveur');
+                            if (msg.data && msg.data.currentUsername) {
+                                txt.innerText = "LIVE @" + msg.data.currentUsername + " ✅";
+                            }
+                        }
+                    } catch(err) {
+                        console.error('[WS] Erreur parsing:', err);
+                    } 
+                };
+                
+                ws.onclose = () => { 
+                    dot.classList.remove('connected'); 
+                    txt.innerText="Déconnecté 🔴"; 
+                    console.log('[WS] Déconnecté, reconnexion dans 5s...');
+                    setTimeout(connect, 5000); 
+                };
+                
+                ws.onerror = (err) => {
+                    console.error('[WS] Erreur WebSocket:', err);
+                    txt.innerText = "Erreur Serveur ⚠️";
+                };
+            }
+            connect();
+        }
+        
+        function handleAction(actionId, data) {
+            const user = (data && data.user) ? data.user : "Anonyme";
+            console.log('[ACTION]', actionId, 'user:', user, 'data:', data);
+            
+            // Vérifier si l'utilisateur est blacklisté
+            if (isBlacklisted(user)) {
+                console.log('[BLACKLIST] ' + user + ' est blacklisté, action ignorée');
+                return;
+            }
+            
+            // Sauvegarde photo de profil
+            if (data && data.profilePictureUrl) {
+                playerAvatars[user] = data.profilePictureUrl;
+            }
+            
+            if (actionId === 'shoot_balloon' || actionId === 'gift') {
+                // 1 PIÈCE = 1 TIR
+                // Le serveur envoie data.count = nombre de pièces/diamants
+                const count = (data && data.count && data.count > 0) ? parseInt(data.count) : 1;
+                console.log('[SHOOT] ' + count + ' tirs pour', user, '(' + count + ' pièces)');
+                addToQueue(user, count);
+            }
+            else if (actionId.startsWith('shoot_balloon_')) {
+                // Format alternatif: shoot_balloon_X
+                const count = parseInt(actionId.replace('shoot_balloon_', '')); 
+                if(!isNaN(count) && count > 0) {
+                    console.log('[SHOOT] ' + count + ' tirs pour', user);
+                    addToQueue(user, count);
+                }
+            }
+            else if (actionId === 'like') {
+                // Optionnel: gestion des likes (ex: 500 likes = 1 tir)
+                // Désactivé par défaut, décommenter si besoin
+                /*
+                if (data && data.count) {
+                    if (!window._likeBuffer) window._likeBuffer = {};
+                    if (!window._likeBuffer[user]) window._likeBuffer[user] = 0;
+                    window._likeBuffer[user] += parseInt(data.count);
+                    const shots = Math.floor(window._likeBuffer[user] / 500);
+                    if (shots >= 1) {
+                        window._likeBuffer[user] -= shots * 500;
+                        console.log('[LIKE] ' + shots + ' tirs pour', user);
+                        addToQueue(user, shots);
+                    }
+                }
+                */
+            }
+            else if (actionId === 'chat') {
+                if (data && data.comment) {
+                    const comment = data.comment.toLowerCase().trim();
+                    
+                    // ==========================================
+                    // COMMANDE COFFRE
+                    // ==========================================
+                    const coffreMatch = comment.match(/^coffre\s*(\d+)?$/);
+                    if (coffreMatch) {
+                        // Vérifier blacklist
+                        if (isBlacklisted(user)) {
+                            console.log('[BLACKLIST] ' + user + ' est blacklisté, commande coffre ignorée');
+                            return;
+                        }
+                        
+                        const amount = coffreMatch[1] ? parseInt(coffreMatch[1]) : 0;
+                        
+                        if (amount <= 0) {
+                            // Juste "coffre" sans montant - affiche le total
+                            showCoffrePopup(user, 0, coffreData.total, false);
+                            return;
+                        }
+                        
+                        if (amount > 9999) {
+                            showCoffrePopup(user, 0, 0, false, true); // Montant trop élevé
+                            return;
+                        }
+                        
+                        const playerData = sessionScores[user];
+                        const currentPts = playerData ? playerData.score : 0;
+                        
+                        // Vérifier si assez de points
+                        if (currentPts >= amount) {
+                            // Retirer les points du classement
+                            playerData.score -= amount;
+                            updateLeaderboardUI();
+                            
+                            // Ajouter au coffre (avec -30%)
+                            const pointsAjoutes = addToCoffre(user, amount);
+                            
+                            console.log('[COFFRE] ' + user + ' dépose ' + amount + ' pts (-30% = ' + pointsAjoutes + ' au coffre)');
+                            
+                            // Popup de confirmation
+                            showCoffrePopup(user, amount, pointsAjoutes, true);
+                            
+                            autoSaveDebounced();
+                        } else {
+                            // Pas assez de points
+                            console.log('[COFFRE] ' + user + ' n\'a pas assez de points (' + currentPts + '/' + amount + ')');
+                            showCoffrePopup(user, amount, currentPts, false);
+                        }
+                        return;
+                    }
+                    
+                    // Commande "run" ou "run X" - utilise des points pour tirer
+                    const runMatch = comment.match(/^(run|tir|tire|tirs|shoot)\s*(\d+)?$/);
+                    if (runMatch) {
+                        // Vérifier blacklist
+                        if (isBlacklisted(user)) {
+                            console.log('[BLACKLIST] ' + user + ' est blacklisté, commande ignorée');
+                            return;
+                        }
+                        
+                        const amount = runMatch[2] ? parseInt(runMatch[2]) : 1;
+                        if (amount > 0 && amount <= 9999) {
+                            const playerData = sessionScores[user];
+                            const currentPts = playerData ? playerData.score : 0;
+                            
+                            // Vérifier si assez de points AVANT de faire quoi que ce soit
+                            if (currentPts >= amount) {
+                                playerData.score -= amount;
+                                updateLeaderboardUI();
+                                addToQueue(user, amount);
+                                console.log('[RUN] ' + user + ' utilise ' + amount + ' pts pour ' + amount + ' tirs');
+                                autoSaveDebounced();
+                                showPointsPopup(user, -amount, playerData.score);
+                            } else {
+                                // Pas assez de points - juste afficher popup, PAS de tir
+                                console.log('[RUN] ' + user + ' n\'a pas assez de points (' + currentPts + '/' + amount + ')');
+                                showPointsPopup(user, 0, currentPts, true);
+                            }
+                        }
+                        return;
+                    }
+                    
+                    // Commande "point" ou "etoile" - affiche les points
+                    if (comment === 'point' || comment === 'points' || comment === 'etoile' || comment === 'étoile' || comment === 'score') {
+                        const playerData = sessionScores[user];
+                        const currentPts = playerData ? playerData.score : 0;
+                        showPointsPopup(user, 0, currentPts);
+                        return;
+                    }
+                    
+                    // Commande "anon" - affiche les tokens dans le coffre
+                    if (comment === 'anon') {
+                        const userCoffreTotal = getUserCoffreTotal(user);
+                        showAnonPopup(user, userCoffreTotal);
+                        return;
+                    }
+                }
+            }
+        }
+        
+        
+        // Popup affichage des points
+        let pointsPopupTimeout = null;
+        function showPointsPopup(user, change, total, notEnough = false) {
+            let popup = document.getElementById('points-popup');
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.id = 'points-popup';
+                popup.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, 0.95);
+                    border: 3px solid #00f2ff;
+                    border-radius: 15px;
+                    padding: 25px 40px;
+                    z-index: 10000;
+                    text-align: center;
+                    box-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+                    animation: popIn 0.3s ease;
+                `;
+                document.body.appendChild(popup);
+            }
+            
+            clearTimeout(pointsPopupTimeout);
+            
+            let changeText = '';
+            if (change < 0) {
+                changeText = `<div style="color: #ff6b6b; font-size: 18px; margin: 10px 0;">${change} ⭐</div>`;
+            } else if (change > 0) {
+                changeText = `<div style="color: #00ff88; font-size: 18px; margin: 10px 0;">+${change} ⭐</div>`;
+            }
+            
+            let message = '';
+            if (notEnough) {
+                message = `<div style="color: #ff6b6b; font-size: 14px; margin-top: 10px;">❌ Pas assez de points !</div>`;
+            }
+            
+            popup.innerHTML = `
+                <div style="color: #00f2ff; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">⭐ Points ⭐</div>
+                <div style="color: #FFD700; font-size: 16px; margin: 10px 0; font-weight: bold;">${user}</div>
+                ${changeText}
+                <div style="color: #fff; font-size: 36px; font-weight: bold; text-shadow: 0 0 10px #00f2ff;">${total}</div>
+                <div style="color: #888; font-size: 12px; margin-top: 5px;">étoiles</div>
+                ${message}
+            `;
+            
+            popup.style.display = 'block';
+            
+            pointsPopupTimeout = setTimeout(() => {
+                popup.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Popup COFFRE
+        let coffrePopupTimeout = null;
+        function showCoffrePopup(user, pointsRetires, pointsOuTotal, success, tooHigh = false) {
+            let popup = document.getElementById('coffre-popup');
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.id = 'coffre-popup';
+                popup.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: linear-gradient(135deg, rgba(120, 53, 15, 0.95) 0%, rgba(146, 64, 14, 0.95) 100%);
+                    border: 3px solid #fbbf24;
+                    border-radius: 15px;
+                    padding: 25px 40px;
+                    z-index: 10000;
+                    text-align: center;
+                    box-shadow: 0 0 40px rgba(251, 191, 36, 0.6);
+                    animation: popIn 0.3s ease;
+                `;
+                document.body.appendChild(popup);
+            }
+            
+            clearTimeout(coffrePopupTimeout);
+            
+            let content = '';
+            
+            if (tooHigh) {
+                content = `
+                    <div style="color: #fbbf24; font-size: 40px; margin-bottom: 10px;">📦</div>
+                    <div style="color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Coffre</div>
+                    <div style="color: #FFD700; font-size: 16px; margin: 10px 0; font-weight: bold;">${user}</div>
+                    <div style="color: #ff6b6b; font-size: 16px; margin-top: 10px;">❌ Montant trop élevé !</div>
+                    <div style="color: #888; font-size: 11px; margin-top: 5px;">Max: 9999</div>
+                `;
+            } else if (success) {
+                const taxe = Math.floor(pointsRetires * COFFRE_TAX_RATE);
+                content = `
+                    <div style="color: #fbbf24; font-size: 40px; margin-bottom: 10px;">📦</div>
+                    <div style="color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Dépôt Coffre</div>
+                    <div style="color: #FFD700; font-size: 16px; margin: 10px 0; font-weight: bold;">${user}</div>
+                    <div style="color: #ff6b6b; font-size: 18px; margin: 5px 0;">-${pointsRetires} ⭐</div>
+                    <div style="color: #888; font-size: 11px;">(-30% = ${taxe} de taxe)</div>
+                    <div style="color: #00ff88; font-size: 24px; font-weight: bold; margin: 10px 0;">+${pointsOuTotal} au coffre</div>
+                    <div style="color: #fbbf24; font-size: 14px; margin-top: 10px;">📦 Total: ${coffreData.total} ⭐</div>
+                `;
+            } else if (pointsRetires === 0) {
+                // Juste afficher le total du coffre
+                content = `
+                    <div style="color: #fbbf24; font-size: 40px; margin-bottom: 10px;">📦</div>
+                    <div style="color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Coffre</div>
+                    <div style="color: #FFD700; font-size: 16px; margin: 10px 0; font-weight: bold;">${user}</div>
+                    <div style="color: #fff; font-size: 36px; font-weight: bold; text-shadow: 0 0 10px #fbbf24;">${pointsOuTotal}</div>
+                    <div style="color: #888; font-size: 12px; margin-top: 5px;">⭐ dans le coffre</div>
+                `;
+            } else {
+                // Pas assez de points
+                content = `
+                    <div style="color: #fbbf24; font-size: 40px; margin-bottom: 10px;">📦</div>
+                    <div style="color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Coffre</div>
+                    <div style="color: #FFD700; font-size: 16px; margin: 10px 0; font-weight: bold;">${user}</div>
+                    <div style="color: #ff6b6b; font-size: 16px; margin-top: 10px;">❌ Pas assez de points !</div>
+                    <div style="color: #888; font-size: 12px; margin-top: 5px;">Tu as ${pointsOuTotal} ⭐, tu veux déposer ${pointsRetires}</div>
+                `;
+            }
+            
+            popup.innerHTML = content;
+            popup.style.display = 'block';
+            
+            coffrePopupTimeout = setTimeout(() => {
+                popup.style.display = 'none';
+            }, 4000);
+        }
+        
+        // Calculer le total d'un user dans le coffre
+        function getUserCoffreTotal(username) {
+            let total = 0;
+            coffreData.contributions.forEach(entry => {
+                if (entry.user.toLowerCase() === username.toLowerCase()) {
+                    total += entry.pointsAjoutes;
+                }
+            });
+            return total;
+        }
+        
+        // Popup ANON - affiche les tokens du user dans le coffre
+        let anonPopupTimeout = null;
+        function showAnonPopup(user, userTotal) {
+            let popup = document.getElementById('anon-popup');
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.id = 'anon-popup';
+                popup.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: linear-gradient(135deg, rgba(88, 28, 135, 0.95) 0%, rgba(126, 34, 206, 0.95) 100%);
+                    border: 3px solid #a855f7;
+                    border-radius: 15px;
+                    padding: 25px 40px;
+                    z-index: 10000;
+                    text-align: center;
+                    box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
+                    animation: popIn 0.3s ease;
+                `;
+                document.body.appendChild(popup);
+            }
+            
+            clearTimeout(anonPopupTimeout);
+            
+            // Compter le nombre de dépôts de cet user
+            const nbDepots = coffreData.contributions.filter(e => 
+                e.user.toLowerCase() === user.toLowerCase()
+            ).length;
+            
+            let content = `
+                <div style="color: #a855f7; font-size: 40px; margin-bottom: 10px;">🎭</div>
+                <div style="color: #a855f7; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Anonyme Agency</div>
+                <div style="color: #e879f9; font-size: 18px; margin: 10px 0; font-weight: bold;">${user}</div>
+                <div style="color: #fff; font-size: 42px; font-weight: bold; text-shadow: 0 0 15px #a855f7; margin: 15px 0;">${userTotal}</div>
+                <div style="color: #c084fc; font-size: 14px;">⭐ tokens dans le coffre</div>
+                <div style="color: #888; font-size: 11px; margin-top: 10px;">${nbDepots} dépôt${nbDepots > 1 ? 's' : ''} effectué${nbDepots > 1 ? 's' : ''}</div>
+                <div style="color: #666; font-size: 10px; margin-top: 8px; border-top: 1px solid #555; padding-top: 8px;">📦 Coffre total: ${coffreData.total} ⭐</div>
+            `;
+            
+            popup.innerHTML = content;
+            popup.style.display = 'block';
+            
+            anonPopupTimeout = setTimeout(() => {
+                popup.style.display = 'none';
+            }, 4000);
+        }
+        
+        // Stockage des avatars
+        const playerAvatars = {};
+        
+        // Toggle Téléphone/Tablette
+        let isTabletMode = false;
+        function toggleDeviceMode() {
+            const frame = document.getElementById('phone-frame-1');
+            const btn = document.getElementById('device-toggle-btn');
+            isTabletMode = !isTabletMode;
+            if (isTabletMode) {
+                frame.classList.add('tablet-mode');
+                btn.textContent = '📺 → 📱';
+            } else {
+                frame.classList.remove('tablet-mode');
+                btn.textContent = '📱 → 📺';
+            }
+        }
+
+        document.getElementById('fire-btn').addEventListener('click', () => addToQueue('Moi', 1));
+        
+        document.getElementById('btn-add-manual').onclick = () => { 
+            const u = document.getElementById('manual-user').value || 'Moi'; 
+            const c = parseInt(document.getElementById('manual-count').value); 
+            if(c) { 
+                addToQueue(u, c); 
+                document.getElementById('manual-shot-panel').style.display='none'; 
+            }
+        };
+        
+        document.getElementById('btn-submit-debt').onclick = () => { 
+            const u = document.getElementById('debt-user').value; 
+            const a = parseInt(document.getElementById('debt-amount').value); 
+            if(u && a) { 
+                updateSessionScore(u, -a); 
+                document.getElementById('debt-panel').style.display='none'; 
+            }
+        };
+        
+        document.getElementById('btn-submit-bonus').onclick = () => { 
+            const u = document.getElementById('bonus-user').value; 
+            const a = parseInt(document.getElementById('bonus-amount').value); 
+            if(u && a) { 
+                updateSessionScore(u, a); 
+                document.getElementById('bonus-panel').style.display='none'; 
+            }
+        };
+
+        // ==========================================
+        // INITIALISATION
+        // ==========================================
+        loadAutoSave().then(() => {
+            refreshCustomImagesUI();
+            if (prizePool.length === 0) generatePrizePool();
+            updateStatsUI();
+            updateCoffreUI();
+        });
+        
+        initRenderers();
+        for (let i = 0; i < SCENE_CONFIG.balloonCount; i++) createBalloon();
+        initTikFinity(); 
+        animate();
+        updateUI(1, 'READY'); 
+        updateUI(2, 'READY');
+
+    </script>
+</body>
+</html>
