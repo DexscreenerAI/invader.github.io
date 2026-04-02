@@ -4997,8 +4997,28 @@
                 }
 
                 if (skinImg && skinImg.complete) {
-                    // TAILLE BALLES AUGMENTÉE (60px au lieu de 40px)
                     ctx.drawImage(skinImg, b.x - 30, b.y - 30, 60, 60);
+                } else if (b.user && playerAvatars[b.user]) {
+                    // Photo de profil du joueur en rond
+                    const avatarImg = getImage(playerAvatars[b.user]);
+                    if (avatarImg && avatarImg.complete && avatarImg.naturalWidth > 0) {
+                        const r = 15;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
+                        ctx.closePath();
+                        ctx.clip();
+                        ctx.drawImage(avatarImg, b.x - r, b.y - r, r * 2, r * 2);
+                        ctx.restore();
+                        // Contour
+                        ctx.beginPath();
+                        ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
+                        ctx.strokeStyle = '#FFD700';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    } else {
+                        ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.arc(b.x, b.y, 6, 0, Math.PI*2); ctx.fill();
+                    }
                 } else {
                     ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.arc(b.x, b.y, 6, 0, Math.PI*2); ctx.fill();
                 }
