@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script>
+    if (sessionStorage.getItem('aa_session') !== 'aa_authenticated_v1') {
+        window.location.href = 'login.html?redirect=voix.html';
+    }
+</script>
 <script type='text/javascript' src='https://ppl-ai-code-interpreter-files.s3.amazonaws.com/CgwufyZbHwWbFZbRRCRK9miXOeMjQAFlKjulUxf0r4ork9wReGI8ZTJJimD3ms6JyxNW7_CrIOHhQwf4yK4ipRXctHHWXstaV8XmVmECPJJha2hXMzlN-9ZJVR_PFE7uvWglB4cohjnsXj6EBrCAmT4QNOGTQg1X9-IPuq7rddm9oDzZIElrCqsHhSAfzhBcdu_oSjBNxH3ROeDH0tL93JRihqctM-kHB6FX3Lu-_sTBUtPpVySEdNkn86T-niWmJR3JD4M1qtrYOMldjmZ0IQGIJfHyu_nl0fYwRbk3ktfWXsqqZctojwex8CEaYf-jwmeAU2wA9ncnHvKS58fbrlkeKukhrEIDAvaOxX3AfvpKeGNaCmpJFKC9dG_QnVGqrHqgxIqwsdujYZ3Eb2hvTabDIUvFJKw0ttHPV4CEwWqDKNYdrl82GdvCSKptQOLvio9IVMLKvmv7B6Oe0MIodfupccNAkgSIr2SThKHwxm8ntLeeuUVURDQgYv4q0MyS200c3Xx3qe7YLVrBBfuZ67Q-nSVEJgagoyRRXqBC8sG-BAMG3lEiFn7OUg67J1_QgCegwREHqRe3RePndVGL9frI-wi68d-sXh27k_7rxHemvCUk0kDkwdy5jtQcz_Vnadf_SnsXV_2U5u_q467LiUIndOVCnySxZCdepuIMmUbsJaWcL23OJZxDlk-_I6bHO49JYiaz37icJMx-vamzxcEv12vYoInFJQJqvh8D_60uEzlb-Vqg4ZI0BQC0yipAREPRWCd8CVZ-zWkjHgNNyP0AkuVhZKJ0BfBlTiunZfeh_yUYZNtSovmKvAYKQq6XTknYaz_22C1R7E1-CCQiEdlCOjvSPIZn8H9mAWtC-fUtQmXXsTmOIQXsFwsXWr6YFBXh0wmPZuDmTdh7feCbYvfnPek-vvywrvtvUlb5foqYetzYygp8RA1jpwp9UZD4z0mRchl2QiOWdomA4aGcd3gY9203GbhY_mhb2IPYYmmOqYcPkNli0CntIqorT3XpAAYrU67FhitXHdGYfae-deqBHI6HQ96X-l3FQpVvXsYJb0lCuAp3MPAD2j-mPhRn5IUEf0lkaVIP0dGKdkr__cNg1WWDJKDz05RBkd3Ct2WeGLuw9GOaaldTHKipFAvuvnU5vjaU48kCiZtQbkUHUKmO2XnQrRT_Pf4lXYeJDK0fawkTATi3BEVT4lQJLNjDq9SPNWWP9MnMH4Tkp4NJwouqnrg-mFO9O_tm1lvPTU8yJQARJmOdaRvKC4WJnGh4Sj-5HPMOOzv6lSYE3SOwwWz0B-qEsdCVPb8GZMZO52Gs8s-tNz21-FDLV9wxsW298gkkb13v14A7o86GY9fUqmkVZ4WAHwxR2yVhXfEjXxbmpfSIHGSN0hPfVJaoQxcFLC4gZ5E4o2gMAWtWfdGwRG1RcXgVprLX1qFUPfS0io1CNtvKKlrS0oDOwLJqmEoUCxKF9TvdnIhW0wzqzyGuEjDSv4EwkBW2fT_NGRl3RQh01vdozC4IrBq-FnMmcofkp_z3tE093VB72-3EUq6HXixfQ2zERAd5rIYGg_kxw0GV5K9sYvVUYPVGy8pTMoRw8mjey9ud8XFgdMkt6AHLqHDS0pumw-EXdfrAZ2_3ONdkaDekifa7f8RErZhlo8qoWHhGS-XiDmmtEb8HsVxObEvZPXwpdBd4tZImv-C5sfUnVfwtwGdOAXBCx7K8UB5a-O9ir8a_LoO__onmdcXraRlaspu1-7mqA363sOk5x7c2ZXSkc1iqEHkbGBNPj_uRVNDlBd9GKD8G0IsNlhES4jFaEDLOIL3xhnr-tOcWwYdP4kcSMlF1PgG4fJq-DUGeyMU-lYLlAVe9sJBEDMiG6_uy9hbO-pC33bHW7Ccu6UjRXSrJ2fiLrykeP42DkN3TEPTFgoo1DijGKBDeg50JCZ5PoiYz4BG4xmFWyg0dSAR5dhu3e1uAR7QOGz9HT0FdMObt2pIuKwvOxx7IxUj1mbZqFIZOaoxoaWZYrJOPsaNNWP8PW3lJj-nr7mN0cmbKdpktXiNzMjQ3nJmXevJ6ZXsJ6DzABuy3jDNi4oNG6zgc2srTwBiGVfmiUz5BO6jSUqU1p6nnqDuY2mj3G2ydtap1ggVhFTDe88SN_t5ikHuY94DvDuUmpxL9_KVm_Oveb5geq_N5rVRYFStkMSn8EjT5dEu40gnNd1m66xtr08hlal3EPmMv2qUpyVBdq6H8mc7xt0hkPu-nKhBW36Kdjv3WjFMIBxlO1poSG-jG0_PvxA5WT5ltaYXp_Lqzctvn1trmvBUgNinsmu_L5zxnuaaPHJ4JtvZDmVu4URdF2V31WI4-LStTUY-VEdlwcAmyXXgRzuxfnFzpOoSirPzUWuJGbTjr-zc97EDX4wJrR5xG8l1KIoXdtDhws2FxQ6_u5dj-v1zp6mWOMwIQhNnrNoLbdaPOtT84ccxWlBpPHRGjW74B3WEpBV70G5vTGu5aB-PoqsMlpZtvvMozf1uCb57ePonbQzxv1BdZ5K-Yw0bZc3Wve7LVm4lin3BahlUmSX-AYxJYF5pZPpuqaijaIlPpCP_wMynclpKwzih2DQHvDAbG35pSP_3NrTXvF0BxNoLScoJSPEYjpfMPmgFifdaeqwUZpRVyPK7TiJaPa_3lxTwLtK7nrHZhsysJe6JszSDPQdDkXJjGJ6TZgUwUkwChahbr7q4woqc'></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8136,7 +8141,7 @@ function showArenaOverlays() {
 
     function connectWS() {
         const dot = document.getElementById('ws-dot'); const txt = document.getElementById('ws-text');
-        const ws = new WebSocket("ws://localhost:8832");
+        const ws = new WebSocket((function(){var p=new URLSearchParams(location.search).get('server');if(p)return p;var s=localStorage.getItem('wsServerUrl');if(s)return s;return'wss://serverbbgithubio-production.up.railway.app'})());
         ws.onopen = () => { dot.classList.add('on'); txt.innerText="TIKFINITY ON"; log("SYSTEM: WS ONLINE"); };
         ws.onclose = () => { dot.classList.remove('on'); txt.innerText="TIKFINITY OFF"; setTimeout(connectWS, 5000); };
         ws.onmessage = (e) => {
@@ -11680,5 +11685,13 @@ function showArenaOverlays() {
         }
     }, 3000);
 </script>
+<div id="game-nav" style="position:fixed;bottom:20px;left:20px;display:flex;gap:8px;z-index:9999;flex-wrap:wrap;">
+<a href="index.html" style="background:rgba(0,0,0,0.85);color:#00f2ff;border:2px solid #00f2ff;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(0,242,255,0.5);">👾 Space Invader</a>
+<a href="tireballon.html" style="background:rgba(0,0,0,0.85);color:#00f2ff;border:2px solid #00f2ff;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(0,242,255,0.5);">🎈 Ballon</a>
+<a href="spin.html" style="background:rgba(0,0,0,0.85);color:#FFDE00;border:2px solid #FFDE00;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,222,0,0.5);">🎰 Spin</a>
+<a href="jetx.html" style="background:rgba(0,0,0,0.85);color:#ff8800;border:2px solid #ff8800;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,136,0,0.5);">✈️ JetX</a>
+<a href="diamant.html" style="background:rgba(0,0,0,0.85);color:#ff6b6b;border:2px solid #ff6b6b;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,107,107,0.5);">💎 Diamant</a>
+<a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
+</div>
 </body>
 </html>
