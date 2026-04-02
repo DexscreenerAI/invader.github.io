@@ -59,11 +59,11 @@
         .panel-content { padding: 10px; overflow-y: auto; }
         
         /* Positions des panneaux - Ajustées pour l'écran plus large */
-        #history-container { top: 20px; right: 20px; }
+        #history-container { top: 20px; right: 20px; display: none; }
         #leaderboard-panel { top: 20px; left: 20px; width: 280px; }
         #balloon-stats-panel { bottom: 20px; right: 20px; width: 240px; }
-        #queue-panel { bottom: 20px; left: 20px; width: 280px; }
-        #level-panel { top: 20px; right: 320px; width: 300px; }
+        #queue-panel { bottom: 20px; left: 20px; width: 280px; display: none; }
+        #level-panel { top: 20px; right: 320px; width: 300px; display: none; }
         
         /* Panneaux cachés par défaut */
         #debt-panel, #manual-shot-panel, #custom-images-panel, #speed-panel, #add-targets-panel, #sound-manager-panel, #shot-skins-panel, #username-size-panel, #multi-shot-panel, #level-rewards-panel, #badges-panel, #background-panel, #bg-library-panel, #monster-skins-panel, #monster-hp-panel, #boss-panel, #ticket-panel, #nerf-panel, #coin-video-panel, #delayed-reward-panel, #debug-queue-panel, #guest-filter-panel, #session-ranking-panel, #coffre-panel {
@@ -684,6 +684,11 @@
             <div class="dashboard-btn-row">
                 <button id="btn-sort-score" class="sort-btn" style="background:#33b5e5; color:white;">💰 Montant</button>
                 <button id="btn-sort-date" class="sort-btn">🕒 Date</button>
+            </div>
+            <div class="dashboard-btn-row" style="margin-top:5px;">
+                <button id="btn-toggle-history" class="sort-btn" style="color:#33b5e5; border-color:#33b5e5;">📜 Derniers Tirs</button>
+                <button id="btn-toggle-queue" class="sort-btn" style="color:#00C851; border-color:#00C851;">📋 File d'attente</button>
+                <button id="btn-toggle-xp" class="sort-btn" style="color:#ff6b9d; border-color:#ff6b9d;">⭐ Expérience</button>
             </div>
             <div class="dashboard-btn-row" style="margin-top:5px;">
                 <button id="btn-add-debt" class="sort-btn" style="color:#ff4444; border-color:#ff4444;">📉 Dette</button>
@@ -1824,6 +1829,20 @@
                 p.style.display = (p.style.display === 'flex' ? 'none' : 'flex');
             });
         };
+        // Panneaux toggle (afficher/masquer)
+        document.getElementById('btn-toggle-history').addEventListener('click', () => {
+            const p = document.getElementById('history-container');
+            p.style.display = (p.style.display === 'none' || !p.style.display) ? 'flex' : 'none';
+        });
+        document.getElementById('btn-toggle-queue').addEventListener('click', () => {
+            const p = document.getElementById('queue-panel');
+            p.style.display = (p.style.display === 'none' || !p.style.display) ? 'flex' : 'none';
+        });
+        document.getElementById('btn-toggle-xp').addEventListener('click', () => {
+            const p = document.getElementById('level-panel');
+            p.style.display = (p.style.display === 'none' || !p.style.display) ? 'flex' : 'none';
+        });
+
         bindToggle('btn-add-debt', 'debt-panel');
         bindToggle('btn-open-manual-shot', 'manual-shot-panel');
         bindToggle('btn-open-custom-images', 'custom-images-panel');
