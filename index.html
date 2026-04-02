@@ -5042,12 +5042,6 @@
                                 
                 let hit = false;
 
-                // Bullets visuelles : pas de collision, juste affichage
-                if(b.visualOnly) {
-                    if(b.y<0 || b.y>canvas.height) bullets.splice(i, 1);
-                    continue;
-                }
-
                 if(boss.active && !hit) {
                     if(b.x > boss.x && b.x < boss.x + 200 && b.y > boss.y && b.y < boss.y + 100) {
                         boss.hp -= 10; createHitSparks(b.x, b.y); hit = true; bullets.splice(i, 1);
@@ -5193,13 +5187,6 @@
             if(currentPowerup.type === 'triple' && Date.now() < currentPowerup.until) {
                 bullets.push({ x: ship.x, y: ship.y-30, vx: Math.cos(angle - 0.3)*spd, vy: Math.sin(angle - 0.3)*spd, user: user, skin: skin, target: target });
                 bullets.push({ x: ship.x, y: ship.y-30, vx: Math.cos(angle + 0.3)*spd, vy: Math.sin(angle + 0.3)*spd, user: user, skin: skin, target: target });
-            }
-
-            // Triple tir visuel si le joueur a 500+ tirs en file d'attente (purement cosmétique)
-            const userShotsInQueue = shootingQueue.filter(s => s.user === user).length;
-            if(userShotsInQueue >= 500 && !(currentPowerup.type === 'triple' && Date.now() < currentPowerup.until)) {
-                bullets.push({ x: ship.x, y: ship.y-30, vx: Math.cos(angle - 0.3)*spd, vy: Math.sin(angle - 0.3)*spd, user: user, skin: skin, target: target, visualOnly: true });
-                bullets.push({ x: ship.x, y: ship.y-30, vx: Math.cos(angle + 0.3)*spd, vy: Math.sin(angle + 0.3)*spd, user: user, skin: skin, target: target, visualOnly: true });
             }
 
             ship.recoil = 5;
