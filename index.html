@@ -6170,6 +6170,15 @@
             ctx2.stroke();
         }
 
+        function getSegmentAtPointer(finalRotation, segCount) {
+            const segAngle = (Math.PI * 2) / segCount;
+            // Le pointeur est en haut = angle -PI/2 en canvas
+            // On cherche quel segment est sous le pointeur à la rotation finale
+            let angle = (-Math.PI / 2 - finalRotation) % (Math.PI * 2);
+            if (angle < 0) angle += Math.PI * 2;
+            return Math.floor(angle / segAngle) % segCount;
+        }
+
         function spinWheel(user) {
             if (wheelSpinning) {
                 wheelQueue.push(user);
@@ -6185,44 +6194,33 @@
             resultDisplay.textContent = '';
             overlay.classList.add('show');
 
-            const segCount = WHEEL_SEGMENTS.length;
-            const segAngle = (Math.PI * 2) / segCount;
-            // Le pointeur est en haut (angle -PI/2 depuis l'axe X)
-            // Choisir un segment gagnant aléatoire
-            const winIndex = Math.floor(Math.random() * segCount);
-            // Calculer la rotation finale pour que le segment gagnant soit sous le pointeur
-            // Le pointeur est à -PI/2 (haut). Le milieu du segment i est à i*segAngle + segAngle/2
-            // On veut: rotation_finale + winIndex*segAngle + segAngle/2 = -PI/2 (mod 2PI)
-            const targetAngle = -Math.PI / 2 - winIndex * segAngle - segAngle / 2;
-            // Ajouter plusieurs tours complets
-            const totalRotation = targetAngle - Math.PI * 2 * (5 + Math.random() * 3);
+            // Rotation totale aléatoire (5 à 8 tours complets + position aléatoire)
+            const totalSpin = Math.PI * 2 * (5 + Math.random() * 3) + Math.random() * Math.PI * 2;
 
             let startTime = null;
-            const duration = 4000; // 4 secondes
-            let currentRotation = 0;
+            const duration = 4000;
 
             function animateWheel(timestamp) {
                 if (!startTime) startTime = timestamp;
                 const elapsed = timestamp - startTime;
                 const progress = Math.min(elapsed / duration, 1);
 
-                // Easing out cubic
                 const eased = 1 - Math.pow(1 - progress, 3);
-                currentRotation = totalRotation * eased;
+                const currentRotation = totalSpin * eased;
 
                 drawWheel(currentRotation);
 
                 if (progress < 1) {
                     requestAnimationFrame(animateWheel);
                 } else {
-                    // Résultat
+                    // Calculer quel segment est sous le pointeur
+                    const winIndex = getSegmentAtPointer(totalSpin, WHEEL_SEGMENTS.length);
                     const segment = WHEEL_SEGMENTS[winIndex];
                     applyWheelResult(user, segment);
 
                     setTimeout(() => {
                         overlay.classList.remove('show');
                         wheelSpinning = false;
-                        // Traiter la file d'attente des roues
                         if (wheelQueue.length > 0) {
                             const nextUser = wheelQueue.shift();
                             setTimeout(() => spinWheel(nextUser), 500);
@@ -6332,7 +6330,6 @@
         }
 
         function spinMiniWheel(user) {
-            // Attendre que la roue principale soit libre
             if (wheelSpinning || miniWheelSpinning) {
                 miniWheelQueue.push(user);
                 return;
@@ -6347,11 +6344,7 @@
             resultDisplay.textContent = '';
             overlay.classList.add('show');
 
-            const segCount = MINI_WHEEL_SEGMENTS.length;
-            const segAngle = (Math.PI * 2) / segCount;
-            const winIndex = Math.floor(Math.random() * segCount);
-            const targetAngle = -Math.PI / 2 - winIndex * segAngle - segAngle / 2;
-            const totalRotation = targetAngle - Math.PI * 2 * (5 + Math.random() * 3);
+            const totalSpin = Math.PI * 2 * (5 + Math.random() * 3) + Math.random() * Math.PI * 2;
 
             let startTime = null;
             const duration = 4000;
@@ -6361,15 +6354,15 @@
                 const elapsed = timestamp - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 const eased = 1 - Math.pow(1 - progress, 3);
-                const currentRotation = totalRotation * eased;
+                const currentRotation = totalSpin * eased;
 
                 drawMiniWheel(currentRotation);
 
                 if (progress < 1) {
                     requestAnimationFrame(animateMiniWheel);
                 } else {
+                    const winIndex = getSegmentAtPointer(totalSpin, MINI_WHEEL_SEGMENTS.length);
                     const segment = MINI_WHEEL_SEGMENTS[winIndex];
-                    // Ajouter les tirs bonus
                     for (let i = 0; i < segment.value; i++) {
                         shootingQueue.push({ user: user, skin: null });
                     }
