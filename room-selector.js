@@ -38,7 +38,8 @@
     function loadRoomList() {
         var list = document.getElementById('room-list');
         list.innerHTML = '<div style="color:#888;font-size:11px;text-align:center;padding:8px;">Chargement...</div>';
-        fetch(getBaseHttpUrl() + '/api/rooms').then(function(r) { return r.json(); }).then(function(rooms) {
+        fetch(getBaseHttpUrl() + '/api/rooms').then(function(r) { return r.json(); }).then(function(data) {
+            var rooms = data.rooms || data || [];
             list.innerHTML = '';
             for (var i = 1; i <= 20; i++) {
                 var roomId = 'room_' + i;
