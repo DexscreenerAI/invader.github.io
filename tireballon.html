@@ -424,9 +424,74 @@
             animation: coffre-glow 3s infinite;
         }
 
+        /* --- ROUE DE LA FORTUNE --- */
+        #wheel-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+        #wheel-overlay.show { display: flex; }
+        #wheel-container {
+            position: relative;
+            width: 340px;
+            height: 340px;
+        }
+        #wheel-canvas {
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            border: 4px solid #FFD700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6), 0 0 80px rgba(255, 215, 0, 0.2);
+        }
+        #wheel-pointer {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-top: 30px solid #ff0055;
+            filter: drop-shadow(0 0 6px #ff0055);
+            z-index: 10;
+        }
+        #wheel-user-display {
+            color: #FFD700;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+        #wheel-result-display {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 40px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- ROUE DE LA FORTUNE -->
+    <div id="wheel-overlay">
+        <div id="wheel-user-display"></div>
+        <div id="wheel-container">
+            <div id="wheel-pointer"></div>
+            <canvas id="wheel-canvas" width="340" height="340"></canvas>
+        </div>
+        <div id="wheel-result-display"></div>
+    </div>
 
     <div id="save-indicator">💾 Sauvegardé</div>
 
@@ -1373,6 +1438,11 @@
             }
             for(let i=0; i<count; i++) shootingQueue.push({ user: user });
             updateQueueUI();
+            // Roue de la fortune si 500+ pièces envoyées d'un coup
+            if (count >= 500) {
+                console.log('[WHEEL] 500+ pièces pour', user, '→ Roue de la fortune !');
+                spinWheel(user);
+            }
         }
 
         function updateQueueUI() {
@@ -1547,7 +1617,13 @@
                     createExplosion(target.position, new THREE.Color(target.userData.color));
                     
                     let points = target.userData.score;
-                    
+
+                    // Roue x2 : double les points si le joueur a le buff et points < 52
+                    if (playerX2Buff && playerX2Buff[user] && points > 0 && points < 52) {
+                        points = points * 2;
+                        delete playerX2Buff[user];
+                    }
+
                     if (isDoubleScoreMode && points > 0 && points < 101) {
                         points = points * 2;
                     }
@@ -2810,6 +2886,156 @@
                 document.getElementById('bonus-panel').style.display='none'; 
             }
         };
+
+        // ==========================================
+        // ROUE DE LA FORTUNE (500+ pièces)
+        // ==========================================
+        const WHEEL_SEGMENTS = [
+            { label: '10 PTS', value: 10, type: 'pts', color: '#3498db' },
+            { label: '30 PTS', value: 30, type: 'pts', color: '#2ecc71' },
+            { label: '50 PTS', value: 50, type: 'pts', color: '#e67e22' },
+            { label: '100 PTS', value: 100, type: 'pts', color: '#9b59b6' },
+            { label: '150 PTS', value: 150, type: 'pts', color: '#1abc9c' },
+            { label: '0 PTS', value: 0, type: 'pts', color: '#7f8c8d' },
+            { label: '200 PTS', value: 200, type: 'pts', color: '#e74c3c' },
+            { label: '250 PTS', value: 250, type: 'pts', color: '#f1c40f' },
+            { label: 'x2', value: 0, type: 'x2', color: '#FFD700' },
+            { label: '💀', value: 0, type: 'skull', color: '#2c3e50' }
+        ];
+
+        let wheelSpinning = false;
+        let wheelQueue = [];
+        let playerX2Buff = {};
+
+        function drawWheel(rotation) {
+            const canvas = document.getElementById('wheel-canvas');
+            const ctx2 = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const r = cx - 5;
+            const segCount = WHEEL_SEGMENTS.length;
+            const segAngle = (Math.PI * 2) / segCount;
+
+            ctx2.clearRect(0, 0, canvas.width, canvas.height);
+
+            WHEEL_SEGMENTS.forEach((seg, i) => {
+                const startAngle = rotation + i * segAngle;
+                const endAngle = startAngle + segAngle;
+
+                ctx2.beginPath();
+                ctx2.moveTo(cx, cy);
+                ctx2.arc(cx, cy, r, startAngle, endAngle);
+                ctx2.closePath();
+                ctx2.fillStyle = seg.color;
+                ctx2.fill();
+                ctx2.strokeStyle = '#fff';
+                ctx2.lineWidth = 2;
+                ctx2.stroke();
+
+                ctx2.save();
+                ctx2.translate(cx, cy);
+                ctx2.rotate(startAngle + segAngle / 2);
+                ctx2.textAlign = 'center';
+                ctx2.fillStyle = '#fff';
+                ctx2.font = 'bold 14px "Courier New", monospace';
+                ctx2.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx2.shadowBlur = 4;
+                ctx2.fillText(seg.label, r * 0.65, 5);
+                ctx2.shadowBlur = 0;
+                ctx2.restore();
+            });
+
+            ctx2.beginPath();
+            ctx2.arc(cx, cy, 18, 0, Math.PI * 2);
+            ctx2.fillStyle = '#1a1a2e';
+            ctx2.fill();
+            ctx2.strokeStyle = '#FFD700';
+            ctx2.lineWidth = 3;
+            ctx2.stroke();
+        }
+
+        function spinWheel(user) {
+            if (wheelSpinning) {
+                wheelQueue.push(user);
+                return;
+            }
+            wheelSpinning = true;
+
+            const overlay = document.getElementById('wheel-overlay');
+            const userDisplay = document.getElementById('wheel-user-display');
+            const resultDisplay = document.getElementById('wheel-result-display');
+
+            userDisplay.textContent = '🎰 ' + user + ' 🎰';
+            resultDisplay.textContent = '';
+            overlay.classList.add('show');
+
+            const segCount = WHEEL_SEGMENTS.length;
+            const segAngle = (Math.PI * 2) / segCount;
+            const winIndex = Math.floor(Math.random() * segCount);
+            const targetAngle = -Math.PI / 2 - winIndex * segAngle - segAngle / 2;
+            const totalRotation = targetAngle - Math.PI * 2 * (5 + Math.random() * 3);
+
+            let startTime = null;
+            const duration = 4000;
+
+            function animateWheel(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentRotation = totalRotation * eased;
+
+                drawWheel(currentRotation);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateWheel);
+                } else {
+                    const segment = WHEEL_SEGMENTS[winIndex];
+                    applyWheelResult(user, segment);
+
+                    setTimeout(() => {
+                        overlay.classList.remove('show');
+                        wheelSpinning = false;
+                        if (wheelQueue.length > 0) {
+                            const nextUser = wheelQueue.shift();
+                            setTimeout(() => spinWheel(nextUser), 500);
+                        }
+                    }, 3000);
+                }
+            }
+
+            drawWheel(0);
+            requestAnimationFrame(animateWheel);
+        }
+
+        function applyWheelResult(user, segment) {
+            const resultDisplay = document.getElementById('wheel-result-display');
+
+            if (segment.type === 'pts') {
+                if (segment.value > 0) {
+                    updateSessionScore(user, segment.value);
+                    addToHistory(user, segment.value);
+                    resultDisplay.innerHTML = '🎉 +' + segment.value + ' PTS !';
+                    resultDisplay.style.color = '#00ff88';
+                } else {
+                    resultDisplay.innerHTML = '😢 0 PTS...';
+                    resultDisplay.style.color = '#ff6b6b';
+                }
+            } else if (segment.type === 'x2') {
+                playerX2Buff[user] = true;
+                resultDisplay.innerHTML = '⚡ x2 PROCHAIN DROP ! ⚡';
+                resultDisplay.style.color = '#FFD700';
+            } else if (segment.type === 'skull') {
+                const before = shootingQueue.length;
+                shootingQueue = shootingQueue.filter(s => s.user !== user);
+                const removed = before - shootingQueue.length;
+                updateQueueUI();
+                resultDisplay.innerHTML = '💀 -' + removed + ' TIRS SUPPRIMÉS !';
+                resultDisplay.style.color = '#ff0055';
+            }
+
+            autoSaveDebounced();
+        }
 
         // ==========================================
         // INITIALISATION
