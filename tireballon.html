@@ -2441,7 +2441,15 @@
         // CONNEXION AU SERVEUR TIKTOK (1 pièce = 1 tir)
         // ==========================================
         let ws = null;
-        const wsUrl = "ws://localhost:8832";
+        function getServerUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramServer = urlParams.get('server');
+            if (paramServer) return paramServer;
+            const savedServer = localStorage.getItem('wsServerUrl');
+            if (savedServer) return savedServer;
+            return "wss://serverbbgithubio-production.up.railway.app";
+        }
+        let wsUrl = getServerUrl();
         
         function initTikFinity() {
             const dot = document.getElementById('tf-dot'); 
