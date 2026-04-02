@@ -3181,10 +3181,18 @@
                 ws.onmessage = (e) => {
                     try {
                         const msg = JSON.parse(e.data);
-                        console.log('[WS] Message reçu:', msg.type, msg.action, msg.data ? msg.data.user : '');
+                        console.log('[WS] Message reçu:', msg.type, msg.action || '', JSON.stringify(msg.data || {}).substring(0, 200));
                         if (msg.type === 'ACTION') handleAction(msg.action, msg.data);
+                        else if (msg.type === 'RESTORE') {
+                            // Serveur envoie l'état initial à la connexion
+                            if (msg.data && msg.data.currentUsername) {
+                                txt.innerText = "LIVE @" + msg.data.currentUsername + " ✅";
+                                dot.classList.add('connected');
+                            }
+                        }
                         else if (msg.type === 'INFO' && msg.action === 'TIKTOK_CONNECTED') {
                             showTopNotification("🔴 LIVE connecté : @" + (msg.data.username || ''));
+                            txt.innerText = "LIVE @" + (msg.data.username || '') + " ✅";
                         } else if (msg.type === 'INFO' && msg.action === 'STREAM_ENDED') {
                             showTopNotification("⚠️ Le live est terminé.");
                         } else if (msg.type === 'ERROR') {
