@@ -8141,7 +8141,7 @@ function showArenaOverlays() {
 
     function connectWS() {
         const dot = document.getElementById('ws-dot'); const txt = document.getElementById('ws-text');
-        const ws = new WebSocket((function(){var p=new URLSearchParams(location.search).get('server');if(p)return p;var s=localStorage.getItem('wsServerUrl');if(s)return s;return'wss://serverbbgithubio-production.up.railway.app'})());
+        const ws = new WebSocket((function(){var room=new URLSearchParams(location.search).get('room')||localStorage.getItem('selectedRoom')||'room_1';localStorage.setItem('selectedRoom',room);var p=new URLSearchParams(location.search).get('server');var base=p||(localStorage.getItem('wsServerUrl')||'wss://serverbbgithubio-production.up.railway.app');return base+(base.includes('?')?'&':'?')+'room='+encodeURIComponent(room)})());
         ws.onopen = () => { dot.classList.add('on'); txt.innerText="TIKFINITY ON"; log("SYSTEM: WS ONLINE"); };
         ws.onclose = () => { dot.classList.remove('on'); txt.innerText="TIKFINITY OFF"; setTimeout(connectWS, 5000); };
         ws.onmessage = (e) => {
@@ -11693,5 +11693,6 @@ function showArenaOverlays() {
 <a href="diamant.html" style="background:rgba(0,0,0,0.85);color:#ff6b6b;border:2px solid #ff6b6b;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,107,107,0.5);">💎 Diamant</a>
 <a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
 </div>
+<script src="room-selector.js"></script>
 </body>
 </html>

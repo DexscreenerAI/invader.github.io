@@ -5013,7 +5013,7 @@ function showStarsPopupNemo(username, avatar, nemos, levelInfo){
 // ==========================================
 let ws;
 function connectWS(){
-    ws=new WebSocket((function(){var p=new URLSearchParams(location.search).get('server');if(p)return p;var s=localStorage.getItem('wsServerUrl');if(s)return s;return'wss://serverbbgithubio-production.up.railway.app'})());
+    ws=new WebSocket((function(){var room=new URLSearchParams(location.search).get('room')||localStorage.getItem('selectedRoom')||'room_1';localStorage.setItem('selectedRoom',room);var p=new URLSearchParams(location.search).get('server');var base=p||(localStorage.getItem('wsServerUrl')||'wss://serverbbgithubio-production.up.railway.app');return base+(base.includes('?')?'&':'?')+'room='+encodeURIComponent(room)})());
     const sb=document.getElementById('statusBanner');
     ws.onopen=()=>{sb.innerText="✅ Connecté au serveur Local (En attente du Live)";sb.className="connected";};
     ws.onmessage=(event)=>{
@@ -5123,5 +5123,6 @@ connectWS();
 <a href="voix.html" style="background:rgba(0,0,0,0.85);color:#a855f7;border:2px solid #a855f7;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(168,85,247,0.5);">🎤 Voix</a>
 <a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
 </div>
+<script src="room-selector.js"></script>
 </body>
 </html>

@@ -2508,6 +2508,13 @@
         // CONNEXION AU SERVEUR TIKTOK (1 pièce = 1 tir)
         // ==========================================
         let ws = null;
+        function getCurrentRoom() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramRoom = urlParams.get('room');
+            if (paramRoom) { localStorage.setItem('selectedRoom', paramRoom); return paramRoom; }
+            return localStorage.getItem('selectedRoom') || 'room_1';
+        }
+        let currentRoom = getCurrentRoom();
         function getServerUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             const paramServer = urlParams.get('server');
@@ -2516,7 +2523,12 @@
             if (savedServer) return savedServer;
             return "wss://serverbbgithubio-production.up.railway.app";
         }
-        let wsUrl = getServerUrl();
+        function getWsUrlWithRoom() {
+            const base = getServerUrl();
+            const sep = base.includes('?') ? '&' : '?';
+            return base + sep + 'room=' + encodeURIComponent(currentRoom);
+        }
+        let wsUrl = getWsUrlWithRoom();
         
         function initTikFinity() {
             const dot = document.getElementById('tf-dot'); 
@@ -3271,5 +3283,6 @@
 <a href="voix.html" style="background:rgba(0,0,0,0.85);color:#a855f7;border:2px solid #a855f7;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(168,85,247,0.5);">🎤 Voix</a>
 <a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
 </div>
+<script src="room-selector.js"></script>
 </body>
 </html>
