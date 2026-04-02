@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    if (sessionStorage.getItem('aa_session') !== 'aa_authenticated_v1') {
+      window.location.href = 'login.html?redirect=battlebox.html';
+    }
+  </script>
   <title>JEREM BATTLEBOX - TABLET LIVE</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1164,7 +1169,7 @@
     // ====== WEBSOCKET - CONNEXION PORT 8832 ======
     // =============================================
     function connectToServer() {
-      socket = new WebSocket('ws://localhost:8832');
+      socket = new WebSocket((function(){var p=new URLSearchParams(location.search).get('server');if(p)return p;var s=localStorage.getItem('wsServerUrl');if(s)return s;return'wss://serverbbgithubio-production.up.railway.app'})());
       const status = document.getElementById('statusText');
       
       socket.onopen = () => { 
@@ -1551,5 +1556,12 @@
       initGame(); connectToServer(); updateLeaderboardUI(); updateBlacklistUI();
     };
   </script>
+<div id="game-nav" style="position:fixed;bottom:20px;left:20px;display:flex;gap:8px;z-index:9999;flex-wrap:wrap;">
+<a href="index.html" style="background:rgba(0,0,0,0.85);color:#00f2ff;border:2px solid #00f2ff;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(0,242,255,0.5);">👾 Space Invader</a>
+<a href="tireballon.html" style="background:rgba(0,0,0,0.85);color:#00f2ff;border:2px solid #00f2ff;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(0,242,255,0.5);">🎈 Ballon</a>
+<a href="spin.html" style="background:rgba(0,0,0,0.85);color:#FFDE00;border:2px solid #FFDE00;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,222,0,0.5);">🎰 Spin</a>
+<a href="jetx.html" style="background:rgba(0,0,0,0.85);color:#ff8800;border:2px solid #ff8800;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(255,136,0,0.5);">✈️ JetX</a>
+<a href="https://serverbbgithubio-production.up.railway.app/" target="_blank" style="background:rgba(0,0,0,0.85);color:#4CAF50;border:2px solid #4CAF50;padding:10px 16px;border-radius:30px;font-family:'Courier New',monospace;font-size:12px;font-weight:bold;text-decoration:none;box-shadow:0 0 15px rgba(76,175,80,0.5);">🌐 Serveur</a>
+</div>
 </body>
 </html>
