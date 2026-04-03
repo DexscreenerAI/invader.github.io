@@ -187,8 +187,10 @@
 
     <script>
         // Hash SHA-256 des identifiants (pas en clair dans le code)
-        const VALID_USER_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-        const VALID_PASS_HASH = '4ffadff640ffd48d3f1893c710acaee4c32e20ff855fae87968abbd7f21e6b9a';
+        const VALID_CREDENTIALS = [
+            { user: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', pass: '4ffadff640ffd48d3f1893c710acaee4c32e20ff855fae87968abbd7f21e6b9a' },
+            { user: 'f8470d87e0b49e11e8ac290d573eb337d2b8a4560761142445e2024c0dbd034c', pass: '5564b83bf8022ab883398679e0b7746c404ddd08250a2c55fdf4c6db97b6e98d' }
+        ];
 
         // Token de session (hash unique pour vérifier la connexion)
         const SESSION_TOKEN = 'aa_authenticated_v1';
@@ -223,7 +225,7 @@
             const userHash = await sha256(username);
             const passHash = await sha256(password);
 
-            if (userHash === VALID_USER_HASH && passHash === VALID_PASS_HASH) {
+            if (VALID_CREDENTIALS.some(c => c.user === userHash && c.pass === passHash)) {
                 // Connexion réussie
                 sessionStorage.setItem('aa_session', SESSION_TOKEN);
                 errorEl.style.color = '#00ff88';
