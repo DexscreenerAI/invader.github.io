@@ -42,7 +42,7 @@ body { background: #f5f7fb; font-family: 'Inter', sans-serif; }
 
 <script>
 // ============================================
-// ⚠️ REMPLACE CET URL PAR TA BANNIÈRE ICI ⚠️
+// URL DE LA BANNIÈRE
 // ============================================
 const BANNER_URL = "https://i.ibb.co/ccV7SnG3/79554-FAF-7590-424-F-955-E-D58-DACF908-EB-Photoroom.png";
 
@@ -86,68 +86,79 @@ function handleProfileUpload(event) {
   reader.readAsDataURL(file);
 }
 
-// Superposer l'image sur la bannière (version canvas 100% gratuite)
+// Superposer l'image sur la bannière
 function generateBanner() {
   if (!profileImage || isGenerating) return;
   
   isGenerating = true;
   render();
   
-  // Charger les deux images
   const bannerImg = new Image();
   const profileImg = new Image();
+  
+  // FIX CRUCIAL : Permet d'éviter l'erreur de sécurité (Canvas Tainted) lors du export
+  bannerImg.crossOrigin = "anonymous"; 
+  profileImg.crossOrigin = "anonymous";
   
   let loadedCount = 0;
   
   function checkComplete() {
     loadedCount++;
     if (loadedCount === 2) {
-      // Créer un canvas pour la fusion
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      // Dimensions de la bannière
-      canvas.width = bannerImg.width;
-      canvas.height = bannerImg.height;
-      
-      // Dessiner la bannière en fond
-      ctx.drawImage(bannerImg, 0, 0, canvas.width, canvas.height);
-      
-      // Calculer la position centrale pour la photo de profil
-      const profileSize = Math.min(canvas.width * 0.35, 200);
-      const x = (canvas.width - profileSize) / 2;
-      const y = (canvas.height - profileSize) / 2;
-      
-      // Ajouter un cercle/ombre pour un meilleur rendu
-      ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.3)";
-      ctx.shadowBlur = 15;
-      
-      // Dessiner la photo (carrée ou circulaire selon vos goûts)
-      ctx.beginPath();
-      ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
-      ctx.drawImage(profileImg, x, y, profileSize, profileSize);
-      ctx.restore();
-      
-      // Ajouter un contour élégant
-      ctx.beginPath();
-      ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 4;
-      ctx.stroke();
-      
-      // Convertir en URL
-      resultImageUrl = canvas.toDataURL('image/png');
-      isGenerating = false;
-      render();
-      showToast("✅ Bannière générée ! Téléchargez-la ci-dessous.");
+      try {
+        // Créer un canvas pour la fusion
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Dimensions de la bannière
+        canvas.width = bannerImg.width;
+        canvas.height = bannerImg.height;
+        
+        // Dessiner la bannière en fond
+        ctx.drawImage(bannerImg, 0, 0, canvas.width, canvas.height);
+        
+        // Calculer la position centrale pour la photo de profil
+        const profileSize = Math.min(canvas.width * 0.35, 200);
+        const x = (canvas.width - profileSize) / 2;
+        const y = (canvas.height - profileSize) / 2;
+        
+        // Ajouter un cercle/ombre pour un meilleur rendu
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,0.3)";
+        ctx.shadowBlur = 15;
+        
+        // Découper en cercle
+        ctx.beginPath();
+        ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(profileImg, x, y, profileSize, profileSize);
+        ctx.restore();
+        
+        // Ajouter un contour blanc élégant
+        ctx.beginPath();
+        ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        
+        // Convertir en URL
+        resultImageUrl = canvas.toDataURL('image/png');
+        isGenerating = false;
+        render();
+        showToast("✅ Bannière générée ! Téléchargez-la ci-dessous.");
+      } catch (error) {
+        console.error(error);
+        showToast("Erreur lors de la génération. Problème de droits d'image.", true);
+        isGenerating = false;
+        render();
+      }
     }
   }
   
   bannerImg.onload = checkComplete;
   profileImg.onload = checkComplete;
+  
   bannerImg.onerror = () => {
     showToast("Erreur : la bannière n'a pas pu être chargée", true);
     isGenerating = false;
@@ -178,7 +189,6 @@ function render() {
   document.getElementById('app').innerHTML = `
     <div style="max-width: 600px; margin: 0 auto; padding: 20px 16px 80px;">
       
-      <!-- En-tête -->
       <div style="text-align: center; margin-bottom: 32px;">
         <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 20px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -187,7 +197,6 @@ function render() {
         <p style="color: #64748b; font-size: 14px; margin-top: 8px;">Ajoute ta photo au centre de la bannière gratuitement</p>
       </div>
 
-      <!-- Bannière originale -->
       <div class="canva-card" style="overflow: hidden; margin-bottom: 24px;">
         <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
           <span style="font-size: 12px; font-weight: 600; color: #475569;">📸 Bannière de base</span>
@@ -198,7 +207,6 @@ function render() {
         </div>
       </div>
 
-      <!-- Upload photo -->
       <div class="canva-card" style="padding: 20px; margin-bottom: 24px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
           <span style="font-size: 20px;">👤</span>
@@ -225,7 +233,6 @@ function render() {
         `}
       </div>
 
-      <!-- Bouton générer -->
       <button onclick="generateBanner()" ${!canGenerate ? 'disabled' : ''} class="btn-primary" style="width: 100%; padding: 16px; border-radius: 40px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px;">
         ${isGenerating ? `
           <span style="display: inline-block; width: 18px; height: 18px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite;"></span>
@@ -243,7 +250,6 @@ function render() {
         </div>
       ` : ''}
 
-      <!-- Résultat -->
       ${resultImageUrl ? `
         <div class="canva-card" style="overflow: hidden; margin-bottom: 24px; animation: fadeUp 0.3s ease;">
           <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
@@ -258,7 +264,6 @@ function render() {
         </div>
       ` : ''}
 
-      <!-- Footer -->
       <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
         <span style="font-size: 11px; color: #94a3b8;">ANONYME AGENCY AI — Version 100% Gratuite (sans API)</span>
       </div>
