@@ -35,6 +35,87 @@ button:hover { filter:brightness(1.1) !important; }
 .mobile-menu a:hover { background: #101822; }
 .mobile-menu a.active { color: #00d4ff; background: rgba(0,212,255,0.12); }
 @media (max-width: 900px) {  .nav-links { display: none; }  .mobile-menu-btn { display: block; } }
+
+/* ═══ MODAL CONFIG ═══ */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.modal.open {
+  display: flex;
+}
+.modal-content {
+  background: #0b1018;
+  border: 1px solid #1a2636;
+  border-radius: 16px;
+  max-width: 460px;
+  width: 90%;
+  padding: 28px 24px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  animation: fadeUp 0.2s ease;
+}
+.modal-content h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  color: #00d4ff;
+  margin-bottom: 8px;
+}
+.modal-content p {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+}
+.modal-content input {
+  width: 100%;
+  background: #060a10;
+  border: 1px solid #1a2636;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #dfe4ed;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  margin-bottom: 20px;
+}
+.modal-content input:focus {
+  outline: none;
+  border-color: #00d4ff;
+}
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+}
+.modal-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-buttons button:first-child {
+  background: #1a2636;
+  border: 1px solid #2a3a4a;
+  color: #dfe4ed;
+}
+.modal-buttons button:first-child:hover {
+  background: #253241;
+}
+.modal-buttons button:last-child {
+  background: #00d4ff;
+  border: none;
+  color: #000;
+}
 </style>
 </head>
 <body>
@@ -47,6 +128,7 @@ button:hover { filter:brightness(1.1) !important; }
   <div class="nav-links">
     <a href="./index.html" class="nav-link">App</a>
     <a href="./imagine.html" class="nav-link active">Banner Maker</a>
+    <button onclick="openConfigModal()" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;padding:6px 12px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer;letter-spacing:1px;">⚙️ CONFIG</button>
   </div>
   <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
 </nav>
@@ -56,16 +138,27 @@ button:hover { filter:brightness(1.1) !important; }
   <a href="./imagine.html" class="active">🎨 Banner Maker</a>
 </div>
 
+<!-- MODAL CONFIGURATION API -->
+<div id="configModal" class="modal">
+  <div class="modal-content">
+    <h3>⚙️ Configuration OpenAI</h3>
+    <p>Insérez votre clé API OpenAI pour utiliser DALL-E 3</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-..." value="">
+    <div class="modal-buttons">
+      <button onclick="closeConfigModal()">Annuler</button>
+      <button onclick="saveApiKey()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div id="app"></div>
 
 <script>
 // La bannière fixe par défaut
 const BANNER_URL = "https://i.ibb.co/vCR0rk3b/79554-FAF-7590-424-F-955-E-D58-DACF908-EB.png";
 
-// ==========================================
-// ⚠️ INSÈRE TA NOUVELLE CLÉ OPENAI ICI ⚠️
-// ==========================================
-const OPENAI_API_KEY = "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"; 
+// Clé API stockée dans localStorage
+let OPENAI_API_KEY = localStorage.getItem("openai_api_key") || "";
 
 const VISION_API = "https://dexscreener-telegram-bot-production.up.railway.app/api/vision";
 
@@ -101,10 +194,48 @@ function secLabel(t, extra=''){
 }
 
 // ═══════════════════════════════════════════
+// MODAL CONFIG
+// ═══════════════════════════════════════════
+function openConfigModal() {
+  const modal = document.getElementById('configModal');
+  const input = document.getElementById('apiKeyInput');
+  input.value = OPENAI_API_KEY;
+  modal.classList.add('open');
+}
+
+function closeConfigModal() {
+  document.getElementById('configModal').classList.remove('open');
+}
+
+function saveApiKey() {
+  const input = document.getElementById('apiKeyInput');
+  const newKey = input.value.trim();
+  
+  if(newKey && !newKey.startsWith('sk-')) {
+    alert("La clé API OpenAI doit commencer par 'sk-'");
+    return;
+  }
+  
+  OPENAI_API_KEY = newKey;
+  localStorage.setItem("openai_api_key", OPENAI_API_KEY);
+  closeConfigModal();
+  
+  if(OPENAI_API_KEY && OPENAI_API_KEY !== "") {
+    const msg = document.createElement('div');
+    msg.style.cssText = `position:fixed;bottom:20px;right:20px;background:#00ff88;color:#000;padding:12px 20px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11px;z-index:2000;animation:fadeUp 0.3s ease;`;
+    msg.textContent = "✓ Clé API enregistrée !";
+    document.body.appendChild(msg);
+    setTimeout(() => msg.remove(), 3000);
+  }
+}
+
+// ═══════════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════════
 function render(){
   const ready = !!charPreview;
+  const hasApiKey = OPENAI_API_KEY && OPENAI_API_KEY !== "";
+  const generateDisabled = loading || !ready || !hasApiKey;
 
   document.getElementById('app').innerHTML = `
   <div style="min-height:100vh;background:${V.bg};color:${V.t};font-family:${V.s};-webkit-font-smoothing:antialiased;position:relative;overflow:hidden;">
@@ -122,6 +253,10 @@ function render(){
           </div>
         </div>
         <p style="color:${V.t2};font-size:12px;margin:12px 0 0;">Uploade ta photo de profil, DALL-E l'intègre automatiquement au centre de la bannière.</p>
+        ${!hasApiKey ? `<div style="background:rgba(255,170,0,0.1);border:1px solid rgba(255,170,0,0.3);border-radius:8px;padding:10px;margin-top:12px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:16px;">⚠️</span>
+          <span style="font-size:11px;color:${V.yl};">Clique sur <strong>CONFIG</strong> dans la barre de navigation pour ajouter ta clé OpenAI</span>
+        </div>` : ''}
         <div style="height:1px;background:linear-gradient(90deg,${V.cy}44,transparent);margin-top:16px;"></div>
       </div>
 
@@ -171,7 +306,7 @@ function render(){
           </div>
         </div>
 
-        <button onclick="generate()" ${loading||!ready?'disabled':''} style="width:100%;padding:16px;border:none;border-radius:8px;background:linear-gradient(135deg,${V.cy},#0090b3);color:#000;font-size:13px;font-weight:700;letter-spacing:3px;cursor:${loading?'wait':!ready?'not-allowed':'pointer'};font-family:${V.m};box-shadow:0 4px 24px rgba(0,212,255,0.2);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;opacity:${!ready?'0.35':'1'};">
+        <button onclick="generate()" ${generateDisabled?'disabled':''} style="width:100%;padding:16px;border:none;border-radius:8px;background:linear-gradient(135deg,${V.cy},#0090b3);color:#000;font-size:13px;font-weight:700;letter-spacing:3px;cursor:${loading?'wait':!ready?'not-allowed':!hasApiKey?'not-allowed':'pointer'};font-family:${V.m};box-shadow:0 4px 24px rgba(0,212,255,0.2);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;opacity:${(!ready || !hasApiKey)?'0.35':'1'};">
           ${loading?`
             <span style="display:flex;align-items:center;justify-content:center;gap:10px;">
               <span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;"></span>
@@ -268,8 +403,8 @@ function compressImage(dataUrl, maxSize=800, quality=0.6){
 async function generate(){
   if(!charPreview||loading) return;
   
-  if(OPENAI_API_KEY === "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") {
-    alert("Veuillez insérer une vraie clé OpenAI dans le code à la ligne 128.");
+  if(!OPENAI_API_KEY || OPENAI_API_KEY === "") {
+    alert("Veuillez configurer votre clé API OpenAI via le bouton CONFIG dans la barre de navigation.");
     return;
   }
 
@@ -277,7 +412,7 @@ async function generate(){
   const style = STYLES.find(s=>s.id===selectedStyle);
 
   try {
-    stepText='Compression de l\\'image...'; render();
+    stepText='Compression de l\'image...'; render();
     const compressedChar = await compressImage(charPreview);
     const charB64 = compressedChar.split(",")[1];
     
