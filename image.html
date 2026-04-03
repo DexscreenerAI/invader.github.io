@@ -1,447 +1,495 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script type='text/javascript' src='https://dexscreenerai.com/CNJslOmMbNItY_W_INcTwNlsaM8mW6XyXQEKWTfewbc0qQl0s_4VXogC5uNFnT5gZyRcxR8jiw4Cf7bhOg4l5G_lWoa_VlpzIqvzd21jVjZri8geD7aEEe4vfhQWY9TNNKw_H_t-JqtONjCOSLUpol8vJTBP3d2nuo93CYVEH9Agyxg6TbV_B1xbqn4ED-xm_8H0e01XResccKgtuP2SQ86s-XX-V3pluhm5KLiydpW2_VKqvbJfr9ZkHn3uxASR8og2ULukR-xwXa49Q5pqIwLYKoFn0H5Jlxh5FpxJ9diNvIum8AXn5oFLVVYTruV6XuE6IiEds1DehJj4PMXSM2i5sGjT5RkfBKEL2x9Yu74R9SmaCnpOiNwIWlKXa-zyw7VCJMJWpyxyUMrcEZF9gYXEJXv8Z-ReArNpMVtrxcrswrd5fPyG3Rxtcauei54Hv_imzWu11ZRqKUUtZAmZyKtbV96_Fgo'></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Banner Maker — Anonyme Agency AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Anonyme Agency AI - Banner Maker Gratuit</title>
 <link rel="icon" type="image/png" href="https://i.ibb.co/DH9f2N8X/97069894-3988-4278-bb76-85e863640cfe.png">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:#060a10; }
-button:hover { filter:brightness(1.1) !important; }
-::-webkit-scrollbar { height:3px; width:3px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:#1a2636; border-radius:3px; }
-@keyframes spin { to { transform:rotate(360deg); } }
-@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-@keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
-  50% { box-shadow: 0 0 0 3px rgba(0,212,255,0.2); }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* ═══ NAVBAR SIMPLIFIÉE ═══ */
-.navbar {  
-  position: fixed; 
-  top: 0; 
-  left: 0; 
-  right: 0; 
-  height: 56px;  
-  background: rgba(6,10,16,0.95); 
-  backdrop-filter: blur(10px);  
-  border-bottom: 1px solid #1a2636; 
-  display: flex; 
-  align-items: center;  
-  padding: 0 20px; 
+body {
+  background: #f5f7fb;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 500;
   z-index: 1000;
+  animation: fadeUp 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-.nav-logo { 
-  display: flex; 
-  align-items: center; 
-  gap: 10px; 
-  text-decoration: none; 
-  color: #fff; 
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
-.nav-logo img { 
-  width: 28px; 
-  height: 28px; 
-  border-radius: 6px; 
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
-.nav-logo span { 
-  font-family: 'JetBrains Mono', monospace; 
-  font-size: 13px; 
-  font-weight: 700; 
-  letter-spacing: 1px; 
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Boutons et interactions */
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* Style Canva - Cartes arrondies */
+.canva-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  transition: all 0.2s ease;
+}
+
+.canva-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* Scrollbar stylée */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 </style>
 </head>
 <body>
 
-<nav class="navbar">
-  <a href="#" class="nav-logo">
-    <img src="https://i.ibb.co/DH9f2N8X/97069894-3988-4278-bb76-85e863640cfe.png" alt="Anonyme Agency AI">
-    <span>ANONYME AGENCY AI — BANNER MAKER</span>
-  </a>
-</nav>
-
 <div id="app"></div>
 
 <script>
-// La bannière fixe par défaut
+// Bannière par défaut
 const BANNER_URL = "https://i.ibb.co/vCR0rk3b/79554-FAF-7590-424-F-955-E-D58-DACF908-EB.png";
 
-// Clé API stockée dans localStorage
+// Stockage de la clé API
 let OPENAI_API_KEY = localStorage.getItem("openai_api_key") || "";
-let apiInputVisible = !OPENAI_API_KEY;
 
 const VISION_API = "https://dexscreener-telegram-bot-production.up.railway.app/api/vision";
 
 const STYLES = [
-  { id:"photorealistic", label:"Réaliste", icon:"📸", suffix:"photorealistic, 8k, cinematic lighting, ultra detailed" },
-  { id:"cartoon", label:"Cartoon", icon:"🎨", suffix:"Pixar style 3D cartoon, vibrant colors, stylized, fun" },
-  { id:"anime", label:"Anime", icon:"⛩️", suffix:"anime style, detailed illustration, vivid colors" },
-  { id:"cyberpunk", label:"Cyberpunk", icon:"⚡", suffix:"cyberpunk style, neon lights, futuristic, high tech" },
+  { id: "naturel", label: "Naturel", icon: "🌿", suffix: "natural lighting, authentic, professional portrait" },
+  { id: "studio", label: "Studio", icon: "📷", suffix: "studio lighting, clean background, professional headshot" },
+  { id: "cinema", label: "Cinéma", icon: "🎬", suffix: "cinematic lighting, film grain, dramatic" },
+  { id: "soft", label: "Douceur", icon: "✨", suffix: "soft lighting, dreamy, ethereal, gentle" }
 ];
 
-const V = {
-  bg:"#060a10", bg2:"#0b1018", bg3:"#101822",
-  card:"#111a26", cb:"#1a2636",
-  cy:"#00d4ff", cd:"rgba(0,212,255,0.12)",
-  gr:"#00ff88", rd:"#ff3b4f", yl:"#ffaa00",
-  t:"#dfe4ed", t2:"rgba(255,255,255,0.50)", t3:"rgba(255,255,255,0.22)",
-  m:"'JetBrains Mono',monospace", s:"'DM Sans',sans-serif",
-};
-
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let charFile = null, charPreview = null;
-let selectedStyle = "photorealistic";
+// État
+let charFile = null;
+let charPreview = null;
+let selectedStyle = "naturel";
 let resultImg = null;
-let loading = false, stepText = "", errText = "";
+let loading = false;
+let stepText = "";
+let errText = "";
 let history = [];
 
-function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
-function secLabel(t, extra=''){
-  return `<div style="font-family:${V.m};font-size:9px;letter-spacing:2.5px;color:${V.cy};margin-bottom:10px;font-weight:600;display:flex;align-items:center;gap:8px;"><span>${t}</span><div style="flex:1;height:1px;background:${V.cb};"></div>${extra}</div>`;
+// Helper
+function showToast(message, isError = false) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+  if (isError) toast.style.background = '#ef4444';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 
-// ═══════════════════════════════════════════
-// API CONFIG
-// ═══════════════════════════════════════════
+// Rendu principal
+function render() {
+  const hasApiKey = OPENAI_API_KEY && OPENAI_API_KEY !== "";
+  const hasPhoto = !!charPreview;
+  const canGenerate = hasPhoto && hasApiKey && !loading;
+
+  document.getElementById('app').innerHTML = `
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px 16px 80px;">
+      
+      <!-- En-tête -->
+      <div style="text-align: center; margin-bottom: 32px;">
+        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 20px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <h1 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Banner Maker</h1>
+        <p style="color: #64748b; font-size: 14px; margin-top: 8px;">Ajoute ta photo au centre de la bannière en un clic</p>
+      </div>
+
+      <!-- Section API Key (gratuite) -->
+      ${!hasApiKey ? `
+      <div class="canva-card" style="padding: 20px; margin-bottom: 24px; background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #f59e0b20;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <span style="font-size: 28px;">🎁</span>
+          <div>
+            <h3 style="font-size: 16px; font-weight: 700; color: #92400e;">Version Gratuite</h3>
+            <p style="font-size: 12px; color: #b45309;">Insère ta clé API OpenAI pour activer DALL-E 3</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <input type="password" id="apiKeyInput" placeholder="sk-..." style="flex: 1; padding: 12px 14px; border: 1px solid #fcd34d; border-radius: 16px; font-size: 12px; font-family: monospace; background: white;">
+          <button onclick="saveApiKey()" class="btn-primary" style="padding: 0 20px; border-radius: 16px; font-size: 13px;">Activer</button>
+        </div>
+        <p style="font-size: 10px; color: #92400e; margin-top: 10px;">🔑 <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #d97706;">Obtenir une clé gratuitement →</a> (quelques centimes d'utilisation)</p>
+      </div>
+      ` : `
+      <div class="canva-card" style="padding: 12px 16px; margin-bottom: 24px; background: #f0fdf4; border: 1px solid #bbf7d0;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">✅</span>
+            <div>
+              <span style="font-size: 13px; font-weight: 600; color: #166534;">API activée</span>
+              <span style="font-size: 10px; color: #15803d; margin-left: 8px;">${OPENAI_API_KEY.slice(0,6)}...${OPENAI_API_KEY.slice(-4)}</span>
+            </div>
+          </div>
+          <button onclick="resetApiKey()" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer;">Changer</button>
+        </div>
+      </div>
+      `}
+
+      <!-- Bannière originale -->
+      <div class="canva-card" style="overflow: hidden; margin-bottom: 24px;">
+        <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+          <span style="font-size: 12px; font-weight: 600; color: #475569;">📸 Bannière de base</span>
+        </div>
+        <img src="${BANNER_URL}" style="width: 100%; display: block;">
+        <div style="padding: 10px 12px; background: #f8fafc; font-size: 11px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0;">
+          Le fond reste identique — seule ta photo sera ajoutée
+        </div>
+      </div>
+
+      <!-- Upload photo -->
+      <div class="canva-card" style="padding: 20px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 20px;">👤</span>
+          <span style="font-weight: 600; font-size: 14px;">Ta photo de profil</span>
+        </div>
+        
+        <input type="file" id="fileInput" accept="image/*" onchange="handleCharUpload(event)" style="display: none;">
+        
+        ${!charPreview ? `
+          <button onclick="document.getElementById('fileInput').click()" class="btn-secondary" style="width: 100%; padding: 40px 20px; border-radius: 20px; border: 2px dashed #cbd5e1; background: #fafbfc; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span style="font-weight: 500; color: #475569;">Cliquer pour uploader</span>
+            <span style="font-size: 11px; color: #94a3b8;">PNG, JPG, WEBP</span>
+          </button>
+        ` : `
+          <div style="display: flex; align-items: center; gap: 16px; background: #f8fafc; border-radius: 20px; padding: 12px;">
+            <img src="${charPreview}" style="width: 64px; height: 64px; object-fit: cover; border-radius: 16px; border: 2px solid #e2e8f0;">
+            <div style="flex: 1;">
+              <div style="font-weight: 500; font-size: 13px; color: #1e293b;">${charFile ? charFile.name.substring(0, 30) : 'photo'}</div>
+              <div style="font-size: 11px; color: #10b981; margin-top: 4px;">✓ Prête à être intégrée</div>
+            </div>
+            <button onclick="clearChar(event)" style="background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 12px; cursor: pointer; color: #ef4444; font-size: 16px;">✕</button>
+          </div>
+          <button onclick="document.getElementById('fileInput').click()" class="btn-secondary" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 16px; font-size: 12px;">Changer la photo</button>
+        `}
+      </div>
+
+      <!-- Styles -->
+      <div style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 18px;">🎨</span>
+          <span style="font-weight: 600; font-size: 14px;">Style d'intégration</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          ${STYLES.map(s => `
+            <button onclick="pickStyle('${s.id}')" style="padding: 10px 18px; border-radius: 40px; font-size: 13px; font-weight: 500; border: 1.5px solid ${selectedStyle === s.id ? '#6366f1' : '#e2e8f0'}; background: ${selectedStyle === s.id ? '#eef2ff' : 'white'}; color: ${selectedStyle === s.id ? '#6366f1' : '#475569'}; cursor: pointer; transition: all 0.2s;">
+              ${s.icon} ${s.label}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Bouton générer -->
+      <button onclick="generate()" ${!canGenerate ? 'disabled' : ''} class="btn-primary" style="width: 100%; padding: 16px; border-radius: 40px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px;">
+        ${loading ? `
+          <span style="display: inline-block; width: 18px; height: 18px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite;"></span>
+          <span>${stepText}</span>
+        ` : `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>Générer la bannière</span>
+        `}
+      </button>
+
+      ${!hasApiKey && !loading ? `
+        <div style="background: #eff6ff; border-radius: 20px; padding: 16px; margin-bottom: 24px; text-align: center;">
+          <span style="font-size: 28px; display: block; margin-bottom: 8px;">⚡</span>
+          <p style="font-size: 12px; color: #3b82f6;">Active l'API ci-dessus pour générer ta bannière</p>
+        </div>
+      ` : ''}
+
+      ${!hasPhoto && !loading && hasApiKey ? `
+        <div style="background: #fef2f2; border-radius: 20px; padding: 16px; margin-bottom: 24px; text-align: center;">
+          <span style="font-size: 28px; display: block; margin-bottom: 8px;">📷</span>
+          <p style="font-size: 12px; color: #ef4444;">Uploade une photo pour commencer</p>
+        </div>
+      ` : ''}
+
+      ${errText ? `
+        <div style="background: #fef2f2; border-radius: 20px; padding: 16px; margin-bottom: 24px;">
+          <div style="font-weight: 600; color: #dc2626; font-size: 12px; margin-bottom: 6px;">⚠️ Erreur</div>
+          <div style="font-size: 12px; color: #991b1b;">${errText}</div>
+        </div>
+      ` : ''}
+
+      <!-- Résultat -->
+      ${resultImg ? `
+        <div class="canva-card" style="overflow: hidden; margin-bottom: 24px; animation: fadeUp 0.3s ease;">
+          <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+            <span style="font-size: 12px; font-weight: 600; color: #475569;">✨ Ta bannière personnalisée</span>
+          </div>
+          <img src="${resultImg}" style="width: 100%; display: block;">
+          <div style="padding: 16px;">
+            <button onclick="downloadResult()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 40px; font-size: 14px;">
+              📥 Télécharger l'image
+            </button>
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Historique -->
+      ${history.length > 0 ? `
+        <div>
+          <div style="font-weight: 600; font-size: 13px; color: #475569; margin-bottom: 12px;">📂 Historique</div>
+          <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;">
+            ${history.map(h => `
+              <img src="${h.img}" onclick="viewHistImg('${h.ts}')" style="width: 60px; height: 60px; object-fit: cover; border-radius: 16px; border: 2px solid #e2e8f0; cursor: pointer; flex-shrink: 0;">
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Footer -->
+      <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+        <span style="font-size: 11px; color: #94a3b8;">ANONYME AGENCY AI × DALL-E 3 — Version Gratuite</span>
+      </div>
+    </div>
+  `;
+}
+
+// Sauvegarde clé API
 function saveApiKey() {
   const input = document.getElementById('apiKeyInput');
   const newKey = input.value.trim();
   
-  if(newKey && !newKey.startsWith('sk-')) {
-    alert("La clé API OpenAI doit commencer par 'sk-'");
+  if (newKey && !newKey.startsWith('sk-')) {
+    showToast("La clé doit commencer par 'sk-'", true);
     return;
   }
   
   OPENAI_API_KEY = newKey;
   localStorage.setItem("openai_api_key", OPENAI_API_KEY);
-  apiInputVisible = false;
-  
   render();
-  
-  if(OPENAI_API_KEY && OPENAI_API_KEY !== "") {
-    const msg = document.createElement('div');
-    msg.style.cssText = `position:fixed;bottom:20px;right:20px;background:#00ff88;color:#000;padding:12px 20px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11px;z-index:2000;animation:fadeUp 0.3s ease;`;
-    msg.textContent = "✓ Clé API enregistrée !";
-    document.body.appendChild(msg);
-    setTimeout(() => msg.remove(), 3000);
-  }
+  if (newKey) showToast("✓ Clé API enregistrée");
 }
 
 function resetApiKey() {
   OPENAI_API_KEY = "";
   localStorage.removeItem("openai_api_key");
-  apiInputVisible = true;
   render();
+  showToast("Clé API supprimée");
 }
 
-// ═══════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════
-function render(){
-  const ready = !!charPreview;
-  const hasApiKey = OPENAI_API_KEY && OPENAI_API_KEY !== "";
-  const generateDisabled = loading || !ready || !hasApiKey;
-
-  document.getElementById('app').innerHTML = `
-  <div style="min-height:100vh;background:${V.bg};color:${V.t};font-family:${V.s};-webkit-font-smoothing:antialiased;position:relative;overflow:hidden;">
-    <div style="position:fixed;top:-40%;left:50%;transform:translateX(-50%);width:120%;height:60%;background:radial-gradient(ellipse at center,rgba(0,212,255,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
-    <div style="position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 16px 80px;">
-
-      <div style="padding:76px 0 20px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-          <div style="width:40px;height:40px;border-radius:10px;background:${V.cd};border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${V.cy}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          </div>
-          <div>
-            <div style="font-family:${V.m};font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;">BANNER MAKER</div>
-            <div style="font-family:${V.m};font-size:8px;letter-spacing:3px;color:${V.cy};margin-top:1px;font-weight:600;">ANONYME AGENCY AI STUDIO</div>
-          </div>
-        </div>
-        <p style="color:${V.t2};font-size:12px;margin:8px 0 0;">Uploade ta photo de profil, elle sera intégrée au centre de la bannière sans modifier le fond.</p>
-      </div>
-
-      <!-- ═══ SECTION API KEY EN ÉVIDENCE ═══ -->
-      ${apiInputVisible || !hasApiKey ? `
-      <div style="margin-bottom:28px;animation:fadeUp 0.4s ease;">
-        <div style="background:linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,212,255,0.02));border:2px solid ${V.cy};border-radius:12px;padding:20px;position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${V.cy},#0090b3,${V.cy});animation:glowPulse 2s infinite;"></div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-            <div style="width:32px;height:32px;border-radius:8px;background:${V.cd};display:flex;align-items:center;justify-content:center;">
-              <span style="font-size:18px;">🔑</span>
-            </div>
-            <div>
-              <div style="font-family:${V.m};font-size:12px;font-weight:700;color:${V.cy};letter-spacing:1px;">CONFIGURATION REQUISE</div>
-              <div style="font-size:10px;color:${V.t2};">Insérez votre clé API OpenAI pour activer DALL-E 3</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <input type="password" id="apiKeyInput" placeholder="sk-..." value="${OPENAI_API_KEY}" style="flex:1;background:#060a10;border:1px solid #1a2636;border-radius:8px;padding:12px 14px;color:#dfe4ed;font-family:'JetBrains Mono',monospace;font-size:11px;">
-            <button onclick="saveApiKey()" style="padding:0 20px;background:${V.cy};border:none;border-radius:8px;color:#000;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;">VALIDER</button>
-          </div>
-          <div style="margin-top:12px;font-size:9px;color:${V.t3};font-family:${V.m};display:flex;gap:16px;">
-            <span>🔒 Stockée localement</span>
-            <span>⚡ Nécessaire pour générer</span>
-            <a href="https://platform.openai.com/api-keys" target="_blank" style="color:${V.cy};text-decoration:none;">🔑 Obtenir une clé →</a>
-          </div>
-        </div>
-      </div>
-      ` : `
-      <div style="margin-bottom:28px;">
-        <div style="background:${V.card};border:1px solid ${V.gr};border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:rgba(0,255,136,0.1);display:flex;align-items:center;justify-content:center;">
-              <span style="font-size:14px;">✓</span>
-            </div>
-            <div>
-              <div style="font-family:${V.m};font-size:11px;color:${V.gr};">API configurée</div>
-              <div style="font-size:9px;color:${V.t3};">Clé: ${OPENAI_API_KEY.slice(0,8)}...${OPENAI_API_KEY.slice(-4)}</div>
-            </div>
-          </div>
-          <button onclick="resetApiKey()" style="padding:6px 12px;background:rgba(255,59,79,0.1);border:1px solid rgba(255,59,79,0.3);border-radius:6px;color:${V.rd};font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer;">Changer</button>
-        </div>
-      </div>
-      `}
-
-      <div style="display:flex;flex-direction:column;gap:24px;">
-
-        <div>
-          ${secLabel("01 — LA BANNIÈRE (INCHANGÉE)")}
-          <div style="border-radius:8px;overflow:hidden;border:1px solid ${V.cb};background:${V.bg2};">
-            <img src="${BANNER_URL}" style="width:100%;display:block;opacity:0.8;">
-          </div>
-          <div style="margin-top:8px;font-size:9px;color:${V.t3};text-align:center;">Le fond reste identique, seule la photo sera ajoutée au centre</div>
-        </div>
-
-        <div>
-          ${secLabel("02 — TA PHOTO DE PROFIL")}
-          <div style="font-size:11px;color:${V.t2};margin-bottom:12px;">Uploade la personne à placer au centre de la bannière</div>
-          <input type="file" id="fileInput" accept="image/*" onchange="handleCharUpload(event)" style="display:none;">
-          ${charPreview?`
-          <div style="position:relative;display:flex;align-items:center;gap:12px;background:${V.card};border:1px solid ${V.cy};border-radius:8px;padding:10px;box-shadow:0 0 16px ${V.cd};">
-            <img src="${charPreview}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid ${V.cb};">
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:12px;color:${V.t};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${charFile?esc(charFile.name):''}</div>
-              <div style="font-size:10px;color:${V.gr};font-family:${V.m};margin-top:2px;">✓ PRÊT</div>
-            </div>
-            <button onclick="document.getElementById('fileInput').click()" style="background:${V.bg2};border:1px solid ${V.cb};color:${V.t2};padding:8px 10px;cursor:pointer;border-radius:6px;display:flex;align-items:center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            </button>
-            <button onclick="clearChar(event)" style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:${V.rd};border:2px solid ${V.bg};color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:${V.m};font-weight:700;z-index:2;">✕</button>
-          </div>
-          `:`
-          <button onclick="document.getElementById('fileInput').click()" style="width:100%;padding:28px 16px;background:${V.bg2};border:1px dashed ${V.cb};border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:${V.s};transition:all .2s;">
-            <div style="width:48px;height:48px;border-radius:12px;background:${V.card};border:1px solid ${V.cb};display:flex;align-items:center;justify-content:center;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${V.t3}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </div>
-            <span style="color:${V.t2};font-size:12px;font-weight:600;">Upload ta photo</span>
-            <span style="color:${V.t3};font-size:9px;font-family:${V.m};">PNG, JPG, WEBP</span>
-          </button>
-          `}
-        </div>
-
-        <div>
-          ${secLabel("03 — STYLE (Optionnel)")}
-          <div style="display:flex;flex-wrap:wrap;gap:6px;">
-            ${STYLES.map(s=>{
-              const a=selectedStyle===s.id;
-              return `<button onclick="pickStyle('${s.id}')" style="padding:8px 14px;font-size:11px;font-weight:600;font-family:${V.m};border:1px solid ${a?V.cy:V.cb};border-radius:6px;cursor:pointer;color:${a?V.cy:V.t2};background:${a?V.cd:V.bg2};transition:all .2s;letter-spacing:.5px;">${s.icon} ${s.label}</button>`;
-            }).join('')}
-          </div>
-        </div>
-
-        <button onclick="generate()" ${generateDisabled?'disabled':''} style="width:100%;padding:16px;border:none;border-radius:8px;background:${!hasApiKey?'#1a2636':'linear-gradient(135deg,#00d4ff,#0090b3)'};color:${!hasApiKey?V.t2:'#000'};font-size:13px;font-weight:700;letter-spacing:3px;cursor:${loading?'wait':!ready?'not-allowed':!hasApiKey?'not-allowed':'pointer'};font-family:${V.m};box-shadow:${hasApiKey?'0 4px 24px rgba(0,212,255,0.2)':'none'};transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;opacity:${(!ready || !hasApiKey)?'0.5':'1'};">
-          ${loading?`
-            <span style="display:flex;align-items:center;justify-content:center;gap:10px;">
-              <span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;"></span>
-              <span style="font-family:${V.m};font-size:11px;letter-spacing:1px;">${stepText}</span>
-            </span>
-          `:`
-            <span style="display:flex;align-items:center;justify-content:center;gap:8px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              GÉNÉRER LA BANNIÈRE
-            </span>
-          `}
-        </button>
-
-        ${errText?`<div style="background:rgba(255,59,79,0.06);border:1px solid rgba(255,59,79,0.2);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;"><span style="color:${V.rd};font-family:${V.m};font-size:10px;font-weight:600;">ERREUR</span><span style="color:rgba(255,59,79,0.8);font-size:11px;">${esc(errText)}</span></div>`:''}
-
-        ${resultImg?`
-        <div>
-          ${secLabel("RÉSULTAT")}
-          <div style="background:${V.card};border:1px solid ${V.cb};border-radius:10px;padding:12px;animation:fadeUp .35s ease;">
-            <img src="${resultImg}" style="width:100%;border-radius:6px;display:block;border:1px solid ${V.cb};">
-            <div style="display:flex;gap:8px;margin-top:10px;">
-              <button onclick="downloadResult()" style="flex:1;padding:10px;background:${V.cd};color:${V.cy};border:1px solid rgba(0,212,255,0.25);border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:${V.m};letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:6px;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>TÉLÉCHARGER
-              </button>
-            </div>
-          </div>
-        </div>`:''}
-
-        ${history.length>0?`<div>${secLabel("HISTORIQUE")}<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;">${history.map(h=>`<img src="${h.img}" onclick="viewHistImg('${h.ts}')" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid ${V.cb};cursor:pointer;flex-shrink:0;opacity:0.55;transition:all .2s;">`).join('')}</div></div>`:''}
-
-      </div>
-
-      <div style="text-align:center;padding:32px 0 16px;border-top:1px solid ${V.cb};margin-top:32px;">
-        <span style="font-family:${V.m};font-size:9px;color:${V.t3};letter-spacing:2px;">POWERED BY ANONYME AGENCY AI × OPENAI</span>
-      </div>
-    </div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════════
-// ACTIONS
-// ═══════════════════════════════════════════
-function handleCharUpload(e){
-  const f=e.target.files[0]; if(!f)return;
-  charFile=f; charPreview=null; resultImg=null;
-  const r=new FileReader();
-  r.onload=ev=>{ charPreview=ev.target.result; render(); };
+function handleCharUpload(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  charFile = f;
+  charPreview = null;
+  resultImg = null;
+  const r = new FileReader();
+  r.onload = ev => { charPreview = ev.target.result; render(); };
   r.readAsDataURL(f);
 }
 
-function clearChar(e){
+function clearChar(e) {
   e.stopPropagation();
-  charPreview=null; charFile=null; resultImg=null;
+  charPreview = null;
+  charFile = null;
+  resultImg = null;
   render();
 }
 
-function pickStyle(id){ selectedStyle=id; resultImg=null; render(); }
-
-function downloadResult(){
-  if(!resultImg) return;
-  const a=document.createElement('a'); a.href=resultImg; a.download=`banner-profile-${Date.now()}.png`; a.click();
+function pickStyle(id) {
+  selectedStyle = id;
+  resultImg = null;
+  render();
 }
 
-function viewHistImg(ts){
-  const h=history.find(x=>String(x.ts)===ts);
-  if(h){ resultImg=h.img; render(); }
+function downloadResult() {
+  if (!resultImg) return;
+  const a = document.createElement('a');
+  a.href = resultImg;
+  a.download = `banner-${Date.now()}.png`;
+  a.click();
 }
 
-// ═══════════════════════════════════════════
-// IMAGE COMPRESSION
-// ═══════════════════════════════════════════
-function compressImage(dataUrl, maxSize=800, quality=0.6){
-  return new Promise((resolve)=>{
-    const img=new Image();
-    img.onload=()=>{
-      const canvas=document.createElement('canvas');
-      let w=img.width, h=img.height;
-      if(w>h){ if(w>maxSize){h=Math.round(h*maxSize/w);w=maxSize;} }
-      else { if(h>maxSize){w=Math.round(w*maxSize/h);h=maxSize;} }
-      canvas.width=w; canvas.height=h;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0,w,h);
-      const compressed=canvas.toDataURL('image/jpeg',quality);
-      resolve(compressed);
+function viewHistImg(ts) {
+  const h = history.find(x => String(x.ts) === ts);
+  if (h) { resultImg = h.img; render(); }
+}
+
+// Compression d'image
+function compressImage(dataUrl, maxSize = 800, quality = 0.7) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; } }
+      else { if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; } }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
     };
-    img.onerror=()=>resolve(dataUrl);
-    img.src=dataUrl;
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
   });
 }
 
-// ═══════════════════════════════════════════
-// GENERATE (VISION -> OPENAI DALL-E)
-// ═══════════════════════════════════════════
-async function generate(){
-  if(!charPreview||loading) return;
-  
-  if(!OPENAI_API_KEY || OPENAI_API_KEY === "") {
-    alert("Veuillez configurer votre clé API OpenAI dans le champ ci-dessus.");
+// Génération
+async function generate() {
+  if (!charPreview || loading) return;
+  if (!OPENAI_API_KEY) {
+    showToast("Configure ta clé API OpenAI", true);
     return;
   }
 
-  loading=true; errText=""; resultImg=null;
-  const style = STYLES.find(s=>s.id===selectedStyle);
+  loading = true;
+  errText = "";
+  resultImg = null;
+  const style = STYLES.find(s => s.id === selectedStyle);
+  render();
 
   try {
-    stepText='Compression de l\'image...'; render();
+    stepText = "Compression...";
+    render();
     const compressedChar = await compressImage(charPreview);
     const charB64 = compressedChar.split(",")[1];
-    
-    const bannerContent = {type:"image",source:{type:"url",url:BANNER_URL}};
-    const charContent = {type:"image",source:{type:"base64",media_type:"image/jpeg",data:charB64}};
 
-    stepText=`Analyse et création du prompt...`; render();
-    
-    // PROMPT CORRIGÉ : préserve EXACTEMENT la bannière, ajoute juste la photo au centre
-    const promptInstructions = `TASK: Take the EXACT banner from IMAGE 1 and place the person from IMAGE 2 directly in the CENTER of it.
+    const bannerContent = { type: "image", source: { type: "url", url: BANNER_URL } };
+    const charContent = { type: "image", source: { type: "base64", media_type: "image/jpeg", data: charB64 } };
 
-CRITICAL RULES:
-- The background of the banner MUST remain 100% identical to IMAGE 1
-- Do NOT modify, recolor, or alter the banner background in any way
-- Simply composite/overlay the person from IMAGE 2 onto the center of the banner
-- The person should look naturally integrated but the banner stays exactly the same
-- Describe the person from IMAGE 2 in detail for accurate rendering
+    stepText = "Analyse...";
+    render();
 
-First, describe the banner from IMAGE 1 EXACTLY as it appears (colors, design, layout, gradients, elements).
-Then, describe the person from IMAGE 2 in detail (clothing, hair, face, posture, expression).
-Finally, instruct to place this person in the center of the banner, keeping the banner 100% unchanged.
+    const promptInstructions = `Take the banner from IMAGE 1. Keep the background EXACTLY the same. Place the person from IMAGE 2 in the center. Do NOT modify the banner background. Style: ${style.suffix}. Output only the prompt.`;
 
-Style suffix to apply to the rendering: ${style.suffix}
-
-Output ONLY the raw prompt. No preamble, no explanation.`;
-
-    // 1. Analyse via le backend existant
-    const res = await fetch(VISION_API,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        max_tokens:500,
-        messages:[{role:"user",content:[bannerContent, charContent, {type:"text",text:promptInstructions}]}]
+    const res = await fetch(VISION_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        max_tokens: 400,
+        messages: [{ role: "user", content: [bannerContent, charContent, { type: "text", text: promptInstructions }] }]
       })
     });
 
-    if(!res.ok){
-      const txt=await res.text();
-      throw new Error(`Erreur Vision API: ${res.status} — ${txt.slice(0,100)}`);
-    }
-    const d=await res.json();
-    if(d.error) throw new Error(d.error.message || d.error);
-    const generatedPrompt=(d.content||[]).map(c=>c.text||"").join("").trim();
+    if (!res.ok) throw new Error(`Vision API error: ${res.status}`);
+    const d = await res.json();
+    if (d.error) throw new Error(d.error.message);
+    const generatedPrompt = (d.content || []).map(c => c.text || "").join("").trim();
 
-    console.log("Prompt généré:", generatedPrompt);
+    stepText = "Génération DALL-E 3...";
+    render();
 
-    // 2. Génération via OpenAI (DALL-E 3)
-    stepText=`Génération DALL-E 3...`; render();
-    const imgRes = await fetch("https://api.openai.com/v1/images/generations",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":`Bearer ${OPENAI_API_KEY}`
+    const imgRes = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`
       },
-      body:JSON.stringify({
-        model:"dall-e-3",
-        prompt:generatedPrompt,
-        n:1,
-        size:"1024x1024",
-        response_format:"b64_json"
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: generatedPrompt,
+        n: 1,
+        size: "1024x1024",
+        response_format: "b64_json"
       })
     });
-    
-    const imgD=await imgRes.json();
-    if(imgD.error) throw new Error(imgD.error.message||JSON.stringify(imgD.error));
 
-    resultImg=`data:image/png;base64,${imgD.data[0].b64_json}`;
-    history.unshift({img:resultImg,ts:Date.now()});
-    
-    if(history.length>15) history=history.slice(0,15);
+    const imgD = await imgRes.json();
+    if (imgD.error) throw new Error(imgD.error.message);
 
-  } catch(e) {
-    errText=e.message;
+    resultImg = `data:image/png;base64,${imgD.data[0].b64_json}`;
+    history.unshift({ img: resultImg, ts: Date.now() });
+    if (history.length > 12) history.pop();
+
+    showToast("✓ Bannière générée !");
+  } catch (e) {
+    errText = e.message;
+    showToast("Erreur: " + e.message.substring(0, 60), true);
   }
-  
-  loading=false; stepText=""; render();
+
+  loading = false;
+  stepText = "";
+  render();
 }
 
+// Initialisation
 render();
 </script>
 </body>
