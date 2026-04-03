@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Banner Maker Gratuit - Anonyme Agency AI</title>
+<title>Banner Maker Pro - Anonyme Agency AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,19 +12,20 @@ body { background: #f5f7fb; font-family: 'Inter', sans-serif; }
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 100px;
   font-size: 14px; font-weight: 500; z-index: 1000; animation: fadeUp 0.3s ease;
+  pointer-events: none;
 }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateX(-50%) translateY(20px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 .btn-primary {
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   border: none; color: white; font-weight: 600; cursor: pointer;
   transition: all 0.2s ease;
+  width: 100%; padding: 16px; border-radius: 40px; font-size: 15px; 
+  display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.3); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.3); }
 .btn-secondary {
   background: white; border: 1px solid #e2e8f0; cursor: pointer;
   transition: all 0.2s ease;
@@ -32,246 +33,264 @@ body { background: #f5f7fb; font-family: 'Inter', sans-serif; }
 .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
 .canva-card {
   background: white; border-radius: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: hidden; margin-bottom: 24px;
+}
+#editorCanvas {
+  width: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none; /* Empêche le scroll quand on glisse la photo */
+  background: #e2e8f0;
+}
+#editorCanvas:active {
+  cursor: grabbing;
+}
+.slider-container {
+  padding: 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+input[type=range] {
+  width: 100%;
+  accent-color: #6366f1;
 }
 </style>
 </head>
 <body>
 
-<div id="app"></div>
+<div style="max-width: 600px; margin: 0 auto; padding: 20px 16px 80px;">
+  
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 20px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    </div>
+    <h1 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Banner Maker</h1>
+    <p style="color: #64748b; font-size: 14px; margin-top: 8px;">Ajuste ta photo parfaitement derrière la bannière</p>
+  </div>
+
+  <div id="uploadView" class="canva-card" style="padding: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+      <span style="font-size: 20px;">👤</span>
+      <span style="font-weight: 600; font-size: 14px;">Commence par choisir ta photo</span>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="handleProfileUpload(event)" style="display: none;">
+    <button onclick="document.getElementById('fileInput').click()" class="btn-secondary" style="width: 100%; padding: 40px 20px; border-radius: 20px; border: 2px dashed #cbd5e1; background: #fafbfc; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span style="font-weight: 500; color: #475569;">Cliquer pour uploader</span>
+      <span style="font-size: 11px; color: #94a3b8;">PNG, JPG, WEBP</span>
+    </button>
+  </div>
+
+  <div id="editorView" style="display: none;">
+    <div class="canva-card">
+      <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 12px; font-weight: 600; color: #475569;">✨ Déplace ta photo pour l'ajuster</span>
+        <button onclick="resetApp()" style="font-size: 12px; background: none; border: none; color: #ef4444; cursor: pointer; font-weight: 600;">Recommencer</button>
+      </div>
+      
+      <canvas id="editorCanvas"></canvas>
+
+      <div class="slider-container">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 500;">
+          <span>🔍 Zoom Arrière</span>
+          <span>Zoom Avant 🔍</span>
+        </div>
+        <input type="range" id="zoomSlider" min="0.1" max="3" step="0.02" value="1" oninput="updateZoom()">
+      </div>
+    </div>
+
+    <button onclick="downloadResult()" class="btn-primary">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Télécharger ma bannière</span>
+    </button>
+  </div>
+
+  <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+    <span style="font-size: 11px; color: #94a3b8;">ANONYME AGENCY AI — Studio interactif</span>
+  </div>
+</div>
 
 <script>
 // ============================================
-// URL DE LA BANNIÈRE
+// CONFIGURATION DE LA BANNIÈRE
 // ============================================
 const BANNER_URL = "https://i.ibb.co/ccV7SnG3/79554-FAF-7590-424-F-955-E-D58-DACF908-EB-Photoroom.png";
 
-// État
-let profileImage = null;
-let profilePreview = null;
-let resultImageUrl = null;
-let isGenerating = false;
+// Variables globales
+const canvas = document.getElementById('editorCanvas');
+const ctx = canvas.getContext('2d');
+const zoomSlider = document.getElementById('zoomSlider');
 
-function showToast(message, isError = false) {
+let bannerImg = new Image();
+let profileImg = new Image();
+
+// Paramètres de la photo
+let profileScale = 1;
+let profileX = 0;
+let profileY = 0;
+
+// Gestion du drag (déplacement)
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+// Initialiser la bannière
+bannerImg.crossOrigin = "anonymous";
+bannerImg.src = BANNER_URL;
+
+// Système de notification
+function showToast(message) {
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.textContent = message;
-  if (isError) toast.style.background = '#ef4444';
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
 
-// Télécharger l'image générée
-function downloadResult() {
-  if (!resultImageUrl) return;
-  const link = document.createElement('a');
-  link.download = `banner-${Date.now()}.png`;
-  link.href = resultImageUrl;
-  link.click();
-}
-
-// Upload de la photo de profil
+// Gérer l'upload de l'image
 function handleProfileUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   
   const reader = new FileReader();
   reader.onload = (e) => {
-    profileImage = e.target.result;
-    profilePreview = profileImage;
-    resultImageUrl = null;
-    render();
-    showToast("✓ Photo chargée, prête à être intégrée");
+    profileImg.src = e.target.result;
+    profileImg.onload = () => {
+      initEditor();
+    };
   };
   reader.readAsDataURL(file);
 }
 
-// Superposer l'image sur la bannière
-function generateBanner() {
-  if (!profileImage || isGenerating) return;
+// Initialiser l'éditeur interactif
+function initEditor() {
+  // Configurer la taille du canvas selon l'image de la bannière
+  canvas.width = bannerImg.width || 1500;
+  canvas.height = bannerImg.height || 500;
+
+  // Calculer une échelle initiale pour que la photo ne soit pas géante
+  // On estime qu'elle doit faire environ 80% de la hauteur de la bannière
+  const targetHeight = canvas.height * 0.8;
+  profileScale = targetHeight / profileImg.height;
   
-  isGenerating = true;
-  render();
-  
-  const bannerImg = new Image();
-  const profileImg = new Image();
-  
-  // FIX CRUCIAL : Permet d'éviter l'erreur de sécurité (Canvas Tainted) lors du export
-  bannerImg.crossOrigin = "anonymous"; 
-  profileImg.crossOrigin = "anonymous";
-  
-  let loadedCount = 0;
-  
-  function checkComplete() {
-    loadedCount++;
-    if (loadedCount === 2) {
-      try {
-        // Créer un canvas pour la fusion
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Dimensions de la bannière
-        canvas.width = bannerImg.width;
-        canvas.height = bannerImg.height;
-        
-        // Dessiner la bannière en fond
-        ctx.drawImage(bannerImg, 0, 0, canvas.width, canvas.height);
-        
-        // Calculer la position centrale pour la photo de profil
-        const profileSize = Math.min(canvas.width * 0.35, 200);
-        const x = (canvas.width - profileSize) / 2;
-        const y = (canvas.height - profileSize) / 2;
-        
-        // Ajouter un cercle/ombre pour un meilleur rendu
-        ctx.save();
-        ctx.shadowColor = "rgba(0,0,0,0.3)";
-        ctx.shadowBlur = 15;
-        
-        // Découper en cercle
-        ctx.beginPath();
-        ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(profileImg, x, y, profileSize, profileSize);
-        ctx.restore();
-        
-        // Ajouter un contour blanc élégant
-        ctx.beginPath();
-        ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 4;
-        ctx.stroke();
-        
-        // Convertir en URL
-        resultImageUrl = canvas.toDataURL('image/png');
-        isGenerating = false;
-        render();
-        showToast("✅ Bannière générée ! Téléchargez-la ci-dessous.");
-      } catch (error) {
-        console.error(error);
-        showToast("Erreur lors de la génération. Problème de droits d'image.", true);
-        isGenerating = false;
-        render();
-      }
-    }
+  // Centrer la photo
+  profileX = (canvas.width - (profileImg.width * profileScale)) / 2;
+  profileY = (canvas.height - (profileImg.height * profileScale)) / 2;
+
+  // Configurer le slider
+  zoomSlider.value = profileScale;
+  zoomSlider.min = profileScale * 0.2; // Zoom arrière max
+  zoomSlider.max = profileScale * 4;   // Zoom avant max
+
+  // Afficher l'interface d'édition
+  document.getElementById('uploadView').style.display = 'none';
+  document.getElementById('editorView').style.display = 'block';
+
+  drawCanvas();
+  showToast("Glisse pour déplacer, utilise la barre pour zoomer");
+}
+
+// Dessiner les éléments sur le Canvas
+function drawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 1. DESSINER LA PHOTO EN DEUXIÈME PLAN (EN DESSOUS)
+  if (profileImg.src) {
+    const w = profileImg.width * profileScale;
+    const h = profileImg.height * profileScale;
+    ctx.drawImage(profileImg, profileX, profileY, w, h);
   }
+
+  // 2. DESSINER LA BANNIÈRE EN PREMIER PLAN (AU DESSUS)
+  if (bannerImg.src) {
+    ctx.drawImage(bannerImg, 0, 0, canvas.width, canvas.height);
+  }
+}
+
+// Gestion du Zoom
+function updateZoom() {
+  const oldScale = profileScale;
+  profileScale = parseFloat(zoomSlider.value);
+
+  // Ajuster les coordonnées pour zoomer depuis le centre de l'image
+  const centerX = profileX + (profileImg.width * oldScale) / 2;
+  const centerY = profileY + (profileImg.height * oldScale) / 2;
   
-  bannerImg.onload = checkComplete;
-  profileImg.onload = checkComplete;
+  profileX = centerX - (profileImg.width * profileScale) / 2;
+  profileY = centerY - (profileImg.height * profileScale) / 2;
+
+  drawCanvas();
+}
+
+// Utilitaires pour la position de la souris/doigt
+function getMousePos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
   
-  bannerImg.onerror = () => {
-    showToast("Erreur : la bannière n'a pas pu être chargée", true);
-    isGenerating = false;
-    render();
+  // Ratio entre la taille réelle du canvas et sa taille d'affichage CSS
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  
+  return {
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
   };
-  profileImg.onerror = () => {
-    showToast("Erreur : la photo n'a pas pu être chargée", true);
-    isGenerating = false;
-    render();
-  };
-  
-  bannerImg.src = BANNER_URL;
-  profileImg.src = profileImage;
 }
 
-function clearProfile() {
-  profileImage = null;
-  profilePreview = null;
-  resultImageUrl = null;
-  render();
-  showToast("Photo supprimée");
+// Événements de souris / tactile pour le drag & drop
+canvas.addEventListener('mousedown', startDrag);
+canvas.addEventListener('touchstart', startDrag, { passive: false });
+
+canvas.addEventListener('mousemove', drag);
+canvas.addEventListener('touchmove', drag, { passive: false });
+
+window.addEventListener('mouseup', endDrag);
+window.addEventListener('touchend', endDrag);
+
+function startDrag(e) {
+  if (e.touches) e.preventDefault();
+  isDragging = true;
+  const pos = getMousePos(e);
+  dragStartX = pos.x - profileX;
+  dragStartY = pos.y - profileY;
 }
 
-function render() {
-  const hasProfile = !!profilePreview;
-  const canGenerate = hasProfile && !isGenerating;
-  
-  document.getElementById('app').innerHTML = `
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px 16px 80px;">
-      
-      <div style="text-align: center; margin-bottom: 32px;">
-        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 20px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </div>
-        <h1 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Banner Maker</h1>
-        <p style="color: #64748b; font-size: 14px; margin-top: 8px;">Ajoute ta photo au centre de la bannière gratuitement</p>
-      </div>
-
-      <div class="canva-card" style="overflow: hidden; margin-bottom: 24px;">
-        <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
-          <span style="font-size: 12px; font-weight: 600; color: #475569;">📸 Bannière de base</span>
-        </div>
-        <img src="${BANNER_URL}" style="width: 100%; display: block;" onerror="this.src='https://placehold.co/600x200?text=Bannière+non+trouvée'">
-        <div style="padding: 10px 12px; background: #f8fafc; font-size: 11px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0;">
-          Ta photo sera ajoutée automatiquement au centre
-        </div>
-      </div>
-
-      <div class="canva-card" style="padding: 20px; margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-          <span style="font-size: 20px;">👤</span>
-          <span style="font-weight: 600; font-size: 14px;">Ta photo de profil</span>
-        </div>
-        
-        <input type="file" id="fileInput" accept="image/*" onchange="handleProfileUpload(event)" style="display: none;">
-        
-        ${!profilePreview ? `
-          <button onclick="document.getElementById('fileInput').click()" class="btn-secondary" style="width: 100%; padding: 40px 20px; border-radius: 20px; border: 2px dashed #cbd5e1; background: #fafbfc; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span style="font-weight: 500; color: #475569;">Cliquer pour uploader</span>
-            <span style="font-size: 11px; color: #94a3b8;">PNG, JPG, WEBP</span>
-          </button>
-        ` : `
-          <div style="display: flex; align-items: center; gap: 16px; background: #f8fafc; border-radius: 20px; padding: 12px;">
-            <img src="${profilePreview}" style="width: 64px; height: 64px; object-fit: cover; border-radius: 16px; border: 2px solid #e2e8f0;">
-            <div style="flex: 1;">
-              <div style="font-weight: 500; font-size: 13px; color: #1e293b;">Photo chargée</div>
-              <div style="font-size: 11px; color: #10b981; margin-top: 4px;">✓ Prête à être intégrée</div>
-            </div>
-            <button onclick="clearProfile()" style="background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 12px; cursor: pointer; color: #ef4444; font-size: 16px;">✕</button>
-          </div>
-        `}
-      </div>
-
-      <button onclick="generateBanner()" ${!canGenerate ? 'disabled' : ''} class="btn-primary" style="width: 100%; padding: 16px; border-radius: 40px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px;">
-        ${isGenerating ? `
-          <span style="display: inline-block; width: 18px; height: 18px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite;"></span>
-          <span>Génération en cours...</span>
-        ` : `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>Ajouter la photo à la bannière</span>
-        `}
-      </button>
-
-      ${!hasProfile && !isGenerating ? `
-        <div style="background: #eff6ff; border-radius: 20px; padding: 16px; margin-bottom: 24px; text-align: center;">
-          <span style="font-size: 28px; display: block; margin-bottom: 8px;">📷</span>
-          <p style="font-size: 12px; color: #3b82f6;">Uploade ta photo pour l'ajouter au centre de la bannière</p>
-        </div>
-      ` : ''}
-
-      ${resultImageUrl ? `
-        <div class="canva-card" style="overflow: hidden; margin-bottom: 24px; animation: fadeUp 0.3s ease;">
-          <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
-            <span style="font-size: 12px; font-weight: 600; color: #475569;">✨ Ta bannière personnalisée</span>
-          </div>
-          <img src="${resultImageUrl}" style="width: 100%; display: block;">
-          <div style="padding: 16px;">
-            <button onclick="downloadResult()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 40px; font-size: 14px;">
-              📥 Télécharger l'image
-            </button>
-          </div>
-        </div>
-      ` : ''}
-
-      <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
-        <span style="font-size: 11px; color: #94a3b8;">ANONYME AGENCY AI — Version 100% Gratuite (sans API)</span>
-      </div>
-    </div>
-  `;
+function drag(e) {
+  if (!isDragging) return;
+  e.preventDefault();
+  const pos = getMousePos(e);
+  profileX = pos.x - dragStartX;
+  profileY = pos.y - dragStartY;
+  drawCanvas();
 }
 
-render();
+function endDrag() {
+  isDragging = false;
+}
+
+// Télécharger le résultat
+function downloadResult() {
+  try {
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = `banniere-pro-${Date.now()}.png`;
+    link.href = dataUrl;
+    link.click();
+  } catch (err) {
+    showToast("Erreur de téléchargement. Vérifiez les droits CORS de la bannière.");
+    console.error(err);
+  }
+}
+
+// Réinitialiser
+function resetApp() {
+  profileImg = new Image();
+  document.getElementById('fileInput').value = "";
+  document.getElementById('uploadView').style.display = 'block';
+  document.getElementById('editorView').style.display = 'none';
+}
 </script>
 </body>
 </html>
