@@ -2,122 +2,37 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Anonyme Agency AI - Banner Maker Gratuit</title>
-<link rel="icon" type="image/png" href="https://i.ibb.co/DH9f2N8X/97069894-3988-4278-bb76-85e863640cfe.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banner Maker Gratuit - Anonyme Agency AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #f5f7fb;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Toast notification */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #f5f7fb; font-family: 'Inter', sans-serif; }
 .toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1a1a2e;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 100px;
-  font-size: 14px;
-  font-weight: 500;
-  z-index: 1000;
-  animation: fadeUp 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 100px;
+  font-size: 14px; font-weight: 500; z-index: 1000; animation: fadeUp 0.3s ease;
 }
-
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-/* Boutons et interactions */
+@keyframes spin { to { transform: rotate(360deg); } }
 .btn-primary {
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border: none;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
+  border: none; color: white; font-weight: 600; cursor: pointer;
   transition: all 0.2s ease;
 }
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
+.btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.3); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-secondary {
-  background: white;
-  border: 1px solid #e2e8f0;
-  cursor: pointer;
+  background: white; border: 1px solid #e2e8f0; cursor: pointer;
   transition: all 0.2s ease;
 }
-
-.btn-secondary:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-/* Style Canva - Cartes arrondies */
+.btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
 .canva-card {
-  background: white;
-  border-radius: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
-  transition: all 0.2s ease;
-}
-
-.canva-card:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-}
-
-/* Scrollbar stylée */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: white; border-radius: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 </style>
 </head>
@@ -126,32 +41,17 @@ body {
 <div id="app"></div>
 
 <script>
-// Bannière par défaut
-const BANNER_URL = "https://i.ibb.co/vCR0rk3b/79554-FAF-7590-424-F-955-E-D58-DACF908-EB.png";
-
-// Stockage de la clé API
-let OPENAI_API_KEY = localStorage.getItem("openai_api_key") || "";
-
-const VISION_API = "https://dexscreener-telegram-bot-production.up.railway.app/api/vision";
-
-const STYLES = [
-  { id: "naturel", label: "Naturel", icon: "🌿", suffix: "natural lighting, authentic, professional portrait" },
-  { id: "studio", label: "Studio", icon: "📷", suffix: "studio lighting, clean background, professional headshot" },
-  { id: "cinema", label: "Cinéma", icon: "🎬", suffix: "cinematic lighting, film grain, dramatic" },
-  { id: "soft", label: "Douceur", icon: "✨", suffix: "soft lighting, dreamy, ethereal, gentle" }
-];
+// ============================================
+// ⚠️ REMPLACE CET URL PAR TA BANNIÈRE ICI ⚠️
+// ============================================
+const BANNER_URL = "https://i.ibb.co/ccV7SnG3/79554-FAF-7590-424-F-955-E-D58-DACF908-EB-Photoroom.png";
 
 // État
-let charFile = null;
-let charPreview = null;
-let selectedStyle = "naturel";
-let resultImg = null;
-let loading = false;
-let stepText = "";
-let errText = "";
-let history = [];
+let profileImage = null;
+let profilePreview = null;
+let resultImageUrl = null;
+let isGenerating = false;
 
-// Helper
 function showToast(message, isError = false) {
   const toast = document.createElement('div');
   toast.className = 'toast';
@@ -161,12 +61,120 @@ function showToast(message, isError = false) {
   setTimeout(() => toast.remove(), 3000);
 }
 
-// Rendu principal
-function render() {
-  const hasApiKey = OPENAI_API_KEY && OPENAI_API_KEY !== "";
-  const hasPhoto = !!charPreview;
-  const canGenerate = hasPhoto && hasApiKey && !loading;
+// Télécharger l'image générée
+function downloadResult() {
+  if (!resultImageUrl) return;
+  const link = document.createElement('a');
+  link.download = `banner-${Date.now()}.png`;
+  link.href = resultImageUrl;
+  link.click();
+}
 
+// Upload de la photo de profil
+function handleProfileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    profileImage = e.target.result;
+    profilePreview = profileImage;
+    resultImageUrl = null;
+    render();
+    showToast("✓ Photo chargée, prête à être intégrée");
+  };
+  reader.readAsDataURL(file);
+}
+
+// Superposer l'image sur la bannière (version canvas 100% gratuite)
+function generateBanner() {
+  if (!profileImage || isGenerating) return;
+  
+  isGenerating = true;
+  render();
+  
+  // Charger les deux images
+  const bannerImg = new Image();
+  const profileImg = new Image();
+  
+  let loadedCount = 0;
+  
+  function checkComplete() {
+    loadedCount++;
+    if (loadedCount === 2) {
+      // Créer un canvas pour la fusion
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Dimensions de la bannière
+      canvas.width = bannerImg.width;
+      canvas.height = bannerImg.height;
+      
+      // Dessiner la bannière en fond
+      ctx.drawImage(bannerImg, 0, 0, canvas.width, canvas.height);
+      
+      // Calculer la position centrale pour la photo de profil
+      const profileSize = Math.min(canvas.width * 0.35, 200);
+      const x = (canvas.width - profileSize) / 2;
+      const y = (canvas.height - profileSize) / 2;
+      
+      // Ajouter un cercle/ombre pour un meilleur rendu
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.3)";
+      ctx.shadowBlur = 15;
+      
+      // Dessiner la photo (carrée ou circulaire selon vos goûts)
+      ctx.beginPath();
+      ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(profileImg, x, y, profileSize, profileSize);
+      ctx.restore();
+      
+      // Ajouter un contour élégant
+      ctx.beginPath();
+      ctx.arc(x + profileSize/2, y + profileSize/2, profileSize/2, 0, Math.PI * 2);
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      
+      // Convertir en URL
+      resultImageUrl = canvas.toDataURL('image/png');
+      isGenerating = false;
+      render();
+      showToast("✅ Bannière générée ! Téléchargez-la ci-dessous.");
+    }
+  }
+  
+  bannerImg.onload = checkComplete;
+  profileImg.onload = checkComplete;
+  bannerImg.onerror = () => {
+    showToast("Erreur : la bannière n'a pas pu être chargée", true);
+    isGenerating = false;
+    render();
+  };
+  profileImg.onerror = () => {
+    showToast("Erreur : la photo n'a pas pu être chargée", true);
+    isGenerating = false;
+    render();
+  };
+  
+  bannerImg.src = BANNER_URL;
+  profileImg.src = profileImage;
+}
+
+function clearProfile() {
+  profileImage = null;
+  profilePreview = null;
+  resultImageUrl = null;
+  render();
+  showToast("Photo supprimée");
+}
+
+function render() {
+  const hasProfile = !!profilePreview;
+  const canGenerate = hasProfile && !isGenerating;
+  
   document.getElementById('app').innerHTML = `
     <div style="max-width: 600px; margin: 0 auto; padding: 20px 16px 80px;">
       
@@ -175,49 +183,18 @@ function render() {
         <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 20px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         </div>
-        <h1 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Banner Maker</h1>
-        <p style="color: #64748b; font-size: 14px; margin-top: 8px;">Ajoute ta photo au centre de la bannière en un clic</p>
+        <h1 style="font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Banner Maker</h1>
+        <p style="color: #64748b; font-size: 14px; margin-top: 8px;">Ajoute ta photo au centre de la bannière gratuitement</p>
       </div>
-
-      <!-- Section API Key (gratuite) -->
-      ${!hasApiKey ? `
-      <div class="canva-card" style="padding: 20px; margin-bottom: 24px; background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1px solid #f59e0b20;">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-          <span style="font-size: 28px;">🎁</span>
-          <div>
-            <h3 style="font-size: 16px; font-weight: 700; color: #92400e;">Version Gratuite</h3>
-            <p style="font-size: 12px; color: #b45309;">Insère ta clé API OpenAI pour activer DALL-E 3</p>
-          </div>
-        </div>
-        <div style="display: flex; gap: 10px;">
-          <input type="password" id="apiKeyInput" placeholder="sk-..." style="flex: 1; padding: 12px 14px; border: 1px solid #fcd34d; border-radius: 16px; font-size: 12px; font-family: monospace; background: white;">
-          <button onclick="saveApiKey()" class="btn-primary" style="padding: 0 20px; border-radius: 16px; font-size: 13px;">Activer</button>
-        </div>
-        <p style="font-size: 10px; color: #92400e; margin-top: 10px;">🔑 <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #d97706;">Obtenir une clé gratuitement →</a> (quelques centimes d'utilisation)</p>
-      </div>
-      ` : `
-      <div class="canva-card" style="padding: 12px 16px; margin-bottom: 24px; background: #f0fdf4; border: 1px solid #bbf7d0;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 20px;">✅</span>
-            <div>
-              <span style="font-size: 13px; font-weight: 600; color: #166534;">API activée</span>
-              <span style="font-size: 10px; color: #15803d; margin-left: 8px;">${OPENAI_API_KEY.slice(0,6)}...${OPENAI_API_KEY.slice(-4)}</span>
-            </div>
-          </div>
-          <button onclick="resetApiKey()" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer;">Changer</button>
-        </div>
-      </div>
-      `}
 
       <!-- Bannière originale -->
       <div class="canva-card" style="overflow: hidden; margin-bottom: 24px;">
         <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
           <span style="font-size: 12px; font-weight: 600; color: #475569;">📸 Bannière de base</span>
         </div>
-        <img src="${BANNER_URL}" style="width: 100%; display: block;">
+        <img src="${BANNER_URL}" style="width: 100%; display: block;" onerror="this.src='https://placehold.co/600x200?text=Bannière+non+trouvée'">
         <div style="padding: 10px 12px; background: #f8fafc; font-size: 11px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0;">
-          Le fond reste identique — seule ta photo sera ajoutée
+          Ta photo sera ajoutée automatiquement au centre
         </div>
       </div>
 
@@ -228,9 +205,9 @@ function render() {
           <span style="font-weight: 600; font-size: 14px;">Ta photo de profil</span>
         </div>
         
-        <input type="file" id="fileInput" accept="image/*" onchange="handleCharUpload(event)" style="display: none;">
+        <input type="file" id="fileInput" accept="image/*" onchange="handleProfileUpload(event)" style="display: none;">
         
-        ${!charPreview ? `
+        ${!profilePreview ? `
           <button onclick="document.getElementById('fileInput').click()" class="btn-secondary" style="width: 100%; padding: 40px 20px; border-radius: 20px; border: 2px dashed #cbd5e1; background: #fafbfc; display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span style="font-weight: 500; color: #475569;">Cliquer pour uploader</span>
@@ -238,71 +215,41 @@ function render() {
           </button>
         ` : `
           <div style="display: flex; align-items: center; gap: 16px; background: #f8fafc; border-radius: 20px; padding: 12px;">
-            <img src="${charPreview}" style="width: 64px; height: 64px; object-fit: cover; border-radius: 16px; border: 2px solid #e2e8f0;">
+            <img src="${profilePreview}" style="width: 64px; height: 64px; object-fit: cover; border-radius: 16px; border: 2px solid #e2e8f0;">
             <div style="flex: 1;">
-              <div style="font-weight: 500; font-size: 13px; color: #1e293b;">${charFile ? charFile.name.substring(0, 30) : 'photo'}</div>
+              <div style="font-weight: 500; font-size: 13px; color: #1e293b;">Photo chargée</div>
               <div style="font-size: 11px; color: #10b981; margin-top: 4px;">✓ Prête à être intégrée</div>
             </div>
-            <button onclick="clearChar(event)" style="background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 12px; cursor: pointer; color: #ef4444; font-size: 16px;">✕</button>
+            <button onclick="clearProfile()" style="background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 12px; cursor: pointer; color: #ef4444; font-size: 16px;">✕</button>
           </div>
-          <button onclick="document.getElementById('fileInput').click()" class="btn-secondary" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 16px; font-size: 12px;">Changer la photo</button>
         `}
-      </div>
-
-      <!-- Styles -->
-      <div style="margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-          <span style="font-size: 18px;">🎨</span>
-          <span style="font-weight: 600; font-size: 14px;">Style d'intégration</span>
-        </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          ${STYLES.map(s => `
-            <button onclick="pickStyle('${s.id}')" style="padding: 10px 18px; border-radius: 40px; font-size: 13px; font-weight: 500; border: 1.5px solid ${selectedStyle === s.id ? '#6366f1' : '#e2e8f0'}; background: ${selectedStyle === s.id ? '#eef2ff' : 'white'}; color: ${selectedStyle === s.id ? '#6366f1' : '#475569'}; cursor: pointer; transition: all 0.2s;">
-              ${s.icon} ${s.label}
-            </button>
-          `).join('')}
-        </div>
       </div>
 
       <!-- Bouton générer -->
-      <button onclick="generate()" ${!canGenerate ? 'disabled' : ''} class="btn-primary" style="width: 100%; padding: 16px; border-radius: 40px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px;">
-        ${loading ? `
+      <button onclick="generateBanner()" ${!canGenerate ? 'disabled' : ''} class="btn-primary" style="width: 100%; padding: 16px; border-radius: 40px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px;">
+        ${isGenerating ? `
           <span style="display: inline-block; width: 18px; height: 18px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite;"></span>
-          <span>${stepText}</span>
+          <span>Génération en cours...</span>
         ` : `
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>Générer la bannière</span>
+          <span>Ajouter la photo à la bannière</span>
         `}
       </button>
 
-      ${!hasApiKey && !loading ? `
+      ${!hasProfile && !isGenerating ? `
         <div style="background: #eff6ff; border-radius: 20px; padding: 16px; margin-bottom: 24px; text-align: center;">
-          <span style="font-size: 28px; display: block; margin-bottom: 8px;">⚡</span>
-          <p style="font-size: 12px; color: #3b82f6;">Active l'API ci-dessus pour générer ta bannière</p>
-        </div>
-      ` : ''}
-
-      ${!hasPhoto && !loading && hasApiKey ? `
-        <div style="background: #fef2f2; border-radius: 20px; padding: 16px; margin-bottom: 24px; text-align: center;">
           <span style="font-size: 28px; display: block; margin-bottom: 8px;">📷</span>
-          <p style="font-size: 12px; color: #ef4444;">Uploade une photo pour commencer</p>
-        </div>
-      ` : ''}
-
-      ${errText ? `
-        <div style="background: #fef2f2; border-radius: 20px; padding: 16px; margin-bottom: 24px;">
-          <div style="font-weight: 600; color: #dc2626; font-size: 12px; margin-bottom: 6px;">⚠️ Erreur</div>
-          <div style="font-size: 12px; color: #991b1b;">${errText}</div>
+          <p style="font-size: 12px; color: #3b82f6;">Uploade ta photo pour l'ajouter au centre de la bannière</p>
         </div>
       ` : ''}
 
       <!-- Résultat -->
-      ${resultImg ? `
+      ${resultImageUrl ? `
         <div class="canva-card" style="overflow: hidden; margin-bottom: 24px; animation: fadeUp 0.3s ease;">
           <div style="background: #f1f5f9; padding: 12px; border-bottom: 1px solid #e2e8f0;">
             <span style="font-size: 12px; font-weight: 600; color: #475569;">✨ Ta bannière personnalisée</span>
           </div>
-          <img src="${resultImg}" style="width: 100%; display: block;">
+          <img src="${resultImageUrl}" style="width: 100%; display: block;">
           <div style="padding: 16px;">
             <button onclick="downloadResult()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 40px; font-size: 14px;">
               📥 Télécharger l'image
@@ -311,185 +258,14 @@ function render() {
         </div>
       ` : ''}
 
-      <!-- Historique -->
-      ${history.length > 0 ? `
-        <div>
-          <div style="font-weight: 600; font-size: 13px; color: #475569; margin-bottom: 12px;">📂 Historique</div>
-          <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;">
-            ${history.map(h => `
-              <img src="${h.img}" onclick="viewHistImg('${h.ts}')" style="width: 60px; height: 60px; object-fit: cover; border-radius: 16px; border: 2px solid #e2e8f0; cursor: pointer; flex-shrink: 0;">
-            `).join('')}
-          </div>
-        </div>
-      ` : ''}
-
       <!-- Footer -->
       <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
-        <span style="font-size: 11px; color: #94a3b8;">ANONYME AGENCY AI × DALL-E 3 — Version Gratuite</span>
+        <span style="font-size: 11px; color: #94a3b8;">ANONYME AGENCY AI — Version 100% Gratuite (sans API)</span>
       </div>
     </div>
   `;
 }
 
-// Sauvegarde clé API
-function saveApiKey() {
-  const input = document.getElementById('apiKeyInput');
-  const newKey = input.value.trim();
-  
-  if (newKey && !newKey.startsWith('sk-')) {
-    showToast("La clé doit commencer par 'sk-'", true);
-    return;
-  }
-  
-  OPENAI_API_KEY = newKey;
-  localStorage.setItem("openai_api_key", OPENAI_API_KEY);
-  render();
-  if (newKey) showToast("✓ Clé API enregistrée");
-}
-
-function resetApiKey() {
-  OPENAI_API_KEY = "";
-  localStorage.removeItem("openai_api_key");
-  render();
-  showToast("Clé API supprimée");
-}
-
-function handleCharUpload(e) {
-  const f = e.target.files[0];
-  if (!f) return;
-  charFile = f;
-  charPreview = null;
-  resultImg = null;
-  const r = new FileReader();
-  r.onload = ev => { charPreview = ev.target.result; render(); };
-  r.readAsDataURL(f);
-}
-
-function clearChar(e) {
-  e.stopPropagation();
-  charPreview = null;
-  charFile = null;
-  resultImg = null;
-  render();
-}
-
-function pickStyle(id) {
-  selectedStyle = id;
-  resultImg = null;
-  render();
-}
-
-function downloadResult() {
-  if (!resultImg) return;
-  const a = document.createElement('a');
-  a.href = resultImg;
-  a.download = `banner-${Date.now()}.png`;
-  a.click();
-}
-
-function viewHistImg(ts) {
-  const h = history.find(x => String(x.ts) === ts);
-  if (h) { resultImg = h.img; render(); }
-}
-
-// Compression d'image
-function compressImage(dataUrl, maxSize = 800, quality = 0.7) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > h) { if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; } }
-      else { if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; } }
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
-}
-
-// Génération
-async function generate() {
-  if (!charPreview || loading) return;
-  if (!OPENAI_API_KEY) {
-    showToast("Configure ta clé API OpenAI", true);
-    return;
-  }
-
-  loading = true;
-  errText = "";
-  resultImg = null;
-  const style = STYLES.find(s => s.id === selectedStyle);
-  render();
-
-  try {
-    stepText = "Compression...";
-    render();
-    const compressedChar = await compressImage(charPreview);
-    const charB64 = compressedChar.split(",")[1];
-
-    const bannerContent = { type: "image", source: { type: "url", url: BANNER_URL } };
-    const charContent = { type: "image", source: { type: "base64", media_type: "image/jpeg", data: charB64 } };
-
-    stepText = "Analyse...";
-    render();
-
-    const promptInstructions = `Take the banner from IMAGE 1. Keep the background EXACTLY the same. Place the person from IMAGE 2 in the center. Do NOT modify the banner background. Style: ${style.suffix}. Output only the prompt.`;
-
-    const res = await fetch(VISION_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        max_tokens: 400,
-        messages: [{ role: "user", content: [bannerContent, charContent, { type: "text", text: promptInstructions }] }]
-      })
-    });
-
-    if (!res.ok) throw new Error(`Vision API error: ${res.status}`);
-    const d = await res.json();
-    if (d.error) throw new Error(d.error.message);
-    const generatedPrompt = (d.content || []).map(c => c.text || "").join("").trim();
-
-    stepText = "Génération DALL-E 3...";
-    render();
-
-    const imgRes = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "dall-e-3",
-        prompt: generatedPrompt,
-        n: 1,
-        size: "1024x1024",
-        response_format: "b64_json"
-      })
-    });
-
-    const imgD = await imgRes.json();
-    if (imgD.error) throw new Error(imgD.error.message);
-
-    resultImg = `data:image/png;base64,${imgD.data[0].b64_json}`;
-    history.unshift({ img: resultImg, ts: Date.now() });
-    if (history.length > 12) history.pop();
-
-    showToast("✓ Bannière générée !");
-  } catch (e) {
-    errText = e.message;
-    showToast("Erreur: " + e.message.substring(0, 60), true);
-  }
-
-  loading = false;
-  stepText = "";
-  render();
-}
-
-// Initialisation
 render();
 </script>
 </body>
