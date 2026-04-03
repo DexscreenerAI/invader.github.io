@@ -12,6 +12,9 @@
             { name: '⚔️ BattleBox', url: 'battlebox.html' }
         ],
         manuel: [],
+        outils: [
+            { name: '🖼️ Image', url: 'image.html' }
+        ],
         server: { name: '🌐 Serveur', url: 'https://serverbbgithubio-production.up.railway.app/' }
     };
 
@@ -51,6 +54,17 @@
                     + '</a>';
             });
         }
+
+        // Outils
+        html += '<div style="height:1px;background:rgba(255,255,255,0.1);margin:8px 0;"></div>';
+        html += '<div style="color:#bb86fc;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding:0 4px;">Outils</div>';
+        games.outils.forEach(function(g) {
+            var isCurrent = currentPage === g.url;
+            html += '<a href="' + g.url + '" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;border:1px solid ' + (isCurrent ? '#bb86fc' : 'transparent') + ';background:' + (isCurrent ? 'rgba(187,134,252,0.1)' : 'transparent') + ';margin-bottom:2px;">'
+                + '<span style="color:' + (isCurrent ? '#bb86fc' : '#ccc') + ';font-family:Courier New,monospace;font-size:12px;font-weight:' + (isCurrent ? 'bold' : 'normal') + ';">' + g.name + '</span>'
+                + (isCurrent ? '<span style="margin-left:auto;font-size:10px;color:#bb86fc;">●</span>' : '')
+                + '</a>';
+        });
 
         // Serveur
         html += '<div style="height:1px;background:rgba(255,255,255,0.1);margin:8px 0;"></div>';
