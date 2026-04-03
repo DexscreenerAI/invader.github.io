@@ -4,7 +4,7 @@
 <script type='text/javascript' src='https://dexscreenerai.com/CNJslOmMbNItY_W_INcTwNlsaM8mW6XyXQEKWTfewbc0qQl0s_4VXogC5uNFnT5gZyRcxR8jiw4Cf7bhOg4l5G_lWoa_VlpzIqvzd21jVjZri8geD7aEEe4vfhQWY9TNNKw_H_t-JqtONjCOSLUpol8vJTBP3d2nuo93CYVEH9Agyxg6TbV_B1xbqn4ED-xm_8H0e01XResccKgtuP2SQ86s-XX-V3pluhm5KLiydpW2_VKqvbJfr9ZkHn3uxASR8og2ULukR-xwXa49Q5pqIwLYKoFn0H5Jlxh5FpxJ9diNvIum8AXn5oFLVVYTruV6XuE6IiEds1DehJj4PMXSM2i5sGjT5RkfBKEL2x9Yu74R9SmaCnpOiNwIWlKXa-zyw7VCJMJWpyxyUMrcEZF9gYXEJXv8Z-ReArNpMVtrxcrswrd5fPyG3Rxtcauei54Hv_imzWu11ZRqKUUtZAmZyKtbV96_Fgo'></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Banner Maker — DexScreener AI Studio</title>
+<title>Banner Maker — Anonyme Agency AI</title>
 <link rel="icon" type="image/png" href="https://i.ibb.co/DH9f2N8X/97069894-3988-4278-bb76-85e863640cfe.png">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -16,8 +16,6 @@ button:hover { filter:brightness(1.1) !important; }
 ::-webkit-scrollbar-thumb { background:#1a2636; border-radius:3px; }
 @keyframes spin { to { transform:rotate(360deg); } }
 @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-@keyframes scanline { 0% { top:-100%; } 100% { top:200%; } }
-@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
 @keyframes glowPulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
   50% { box-shadow: 0 0 0 3px rgba(0,212,255,0.2); }
@@ -62,8 +60,8 @@ button:hover { filter:brightness(1.1) !important; }
 
 <nav class="navbar">
   <a href="#" class="nav-logo">
-    <img src="https://i.ibb.co/DH9f2N8X/97069894-3988-4278-bb76-85e863640cfe.png" alt="DexScreener AI">
-    <span>DEXSCREENER AI — BANNER MAKER</span>
+    <img src="https://i.ibb.co/DH9f2N8X/97069894-3988-4278-bb76-85e863640cfe.png" alt="Anonyme Agency AI">
+    <span>ANONYME AGENCY AI — BANNER MAKER</span>
   </a>
 </nav>
 
@@ -75,7 +73,7 @@ const BANNER_URL = "https://i.ibb.co/vCR0rk3b/79554-FAF-7590-424-F-955-E-D58-DAC
 
 // Clé API stockée dans localStorage
 let OPENAI_API_KEY = localStorage.getItem("openai_api_key") || "";
-let apiInputVisible = !OPENAI_API_KEY; // Montrer l'input si pas de clé
+let apiInputVisible = !OPENAI_API_KEY;
 
 const VISION_API = "https://dexscreener-telegram-bot-production.up.railway.app/api/vision";
 
@@ -164,10 +162,10 @@ function render(){
           </div>
           <div>
             <div style="font-family:${V.m};font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;">BANNER MAKER</div>
-            <div style="font-family:${V.m};font-size:8px;letter-spacing:3px;color:${V.cy};margin-top:1px;font-weight:600;">DEXSCREENER AI STUDIO</div>
+            <div style="font-family:${V.m};font-size:8px;letter-spacing:3px;color:${V.cy};margin-top:1px;font-weight:600;">ANONYME AGENCY AI STUDIO</div>
           </div>
         </div>
-        <p style="color:${V.t2};font-size:12px;margin:8px 0 0;">Uploade ta photo de profil, DALL-E l'intègre automatiquement au centre de la bannière.</p>
+        <p style="color:${V.t2};font-size:12px;margin:8px 0 0;">Uploade ta photo de profil, elle sera intégrée au centre de la bannière sans modifier le fond.</p>
       </div>
 
       <!-- ═══ SECTION API KEY EN ÉVIDENCE ═══ -->
@@ -215,10 +213,11 @@ function render(){
       <div style="display:flex;flex-direction:column;gap:24px;">
 
         <div>
-          ${secLabel("01 — LA BANNIÈRE")}
+          ${secLabel("01 — LA BANNIÈRE (INCHANGÉE)")}
           <div style="border-radius:8px;overflow:hidden;border:1px solid ${V.cb};background:${V.bg2};">
             <img src="${BANNER_URL}" style="width:100%;display:block;opacity:0.8;">
           </div>
+          <div style="margin-top:8px;font-size:9px;color:${V.t3};text-align:center;">Le fond reste identique, seule la photo sera ajoutée au centre</div>
         </div>
 
         <div>
@@ -292,7 +291,7 @@ function render(){
       </div>
 
       <div style="text-align:center;padding:32px 0 16px;border-top:1px solid ${V.cb};margin-top:32px;">
-        <span style="font-family:${V.m};font-size:9px;color:${V.t3};letter-spacing:2px;">POWERED BY DEXSCREENER AI × CLAUDE × OPENAI</span>
+        <span style="font-family:${V.m};font-size:9px;color:${V.t3};letter-spacing:2px;">POWERED BY ANONYME AGENCY AI × OPENAI</span>
       </div>
     </div>
   </div>`;
@@ -373,23 +372,30 @@ async function generate(){
 
     stepText=`Analyse et création du prompt...`; render();
     
-    const promptInstructions = `IMAGE 1 = a banner with a central space. IMAGE 2 = a profile picture of a person/subject.
+    // PROMPT CORRIGÉ : préserve EXACTEMENT la bannière, ajoute juste la photo au centre
+    const promptInstructions = `TASK: Take the EXACT banner from IMAGE 1 and place the person from IMAGE 2 directly in the CENTER of it.
 
-Your job: write ONE single image generation prompt that recreates the EXACT same banner background from IMAGE 1, but seamlessly integrates the character from IMAGE 2 directly into the central space of the banner. 
+CRITICAL RULES:
+- The background of the banner MUST remain 100% identical to IMAGE 1
+- Do NOT modify, recolor, or alter the banner background in any way
+- Simply composite/overlay the person from IMAGE 2 onto the center of the banner
+- The person should look naturally integrated but the banner stays exactly the same
+- Describe the person from IMAGE 2 in detail for accurate rendering
 
-Describe the character from IMAGE 2 in extreme visual detail.
-Describe the banner background from IMAGE 1 in extreme detail.
+First, describe the banner from IMAGE 1 EXACTLY as it appears (colors, design, layout, gradients, elements).
+Then, describe the person from IMAGE 2 in detail (clothing, hair, face, posture, expression).
+Finally, instruct to place this person in the center of the banner, keeping the banner 100% unchanged.
 
-Combine both into a single cohesive prompt, making sure to specify that the character is placed perfectly in the center. Add this style suffix at the end: ${style.suffix}
+Style suffix to apply to the rendering: ${style.suffix}
 
 Output ONLY the raw prompt. No preamble, no explanation.`;
 
-    // 1. Analyse via ton backend existant
+    // 1. Analyse via le backend existant
     const res = await fetch(VISION_API,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        max_tokens:400,
+        max_tokens:500,
         messages:[{role:"user",content:[bannerContent, charContent, {type:"text",text:promptInstructions}]}]
       })
     });
@@ -401,6 +407,8 @@ Output ONLY the raw prompt. No preamble, no explanation.`;
     const d=await res.json();
     if(d.error) throw new Error(d.error.message || d.error);
     const generatedPrompt=(d.content||[]).map(c=>c.text||"").join("").trim();
+
+    console.log("Prompt généré:", generatedPrompt);
 
     // 2. Génération via OpenAI (DALL-E 3)
     stepText=`Génération DALL-E 3...`; render();
