@@ -34,11 +34,7 @@ button:hover { filter:brightness(1.1) !important; }
 .mobile-menu a {  color: #dfe4ed; text-decoration: none; font-family: 'JetBrains Mono', monospace;  font-size: 12px; padding: 12px 16px; border-radius: 8px; transition: background 0.15s;}
 .mobile-menu a:hover { background: #101822; }
 .mobile-menu a.active { color: #00d4ff; background: rgba(0,212,255,0.12); }
-.nav-social-icons { display: none; align-items: center; gap: 12px; margin-left: auto; margin-right: 12px; }
-.nav-social-icons a {  display: flex; align-items: center; justify-content: center;  width: 36px; height: 36px; border-radius: 8px; background: #101822;  color: rgba(255,255,255,0.50); transition: all 0.15s;}
-.nav-social-icons a:hover { background: rgba(0,212,255,0.12); color: #00d4ff; }
-.nav-social-icons svg { width: 18px; height: 18px; }
-@media (max-width: 900px) {  .nav-links { display: none; }  .mobile-menu-btn { display: block; }  .nav-social-icons { display: flex; }}
+@media (max-width: 900px) {  .nav-links { display: none; }  .mobile-menu-btn { display: block; } }
 </style>
 </head>
 <body>
@@ -66,7 +62,11 @@ button:hover { filter:brightness(1.1) !important; }
 // La bannière fixe par défaut
 const BANNER_URL = "https://i.ibb.co/vCR0rk3b/79554-FAF-7590-424-F-955-E-D58-DACF908-EB.png";
 
-const API_KEY = "tgp_v1__-BumDi3dVUXnhbab602R5tZlhpZW6blob7nHStvpUk";
+// ==========================================
+// ⚠️ INSÈRE TA NOUVELLE CLÉ OPENAI ICI ⚠️
+// ==========================================
+const OPENAI_API_KEY = "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"; 
+
 const VISION_API = "https://dexscreener-telegram-bot-production.up.railway.app/api/vision";
 
 const STYLES = [
@@ -121,7 +121,7 @@ function render(){
             <div style="font-family:${V.m};font-size:8px;letter-spacing:3px;color:${V.cy};margin-top:1px;font-weight:600;">DEXSCREENER AI STUDIO</div>
           </div>
         </div>
-        <p style="color:${V.t2};font-size:12px;margin:12px 0 0;">Uploade ta photo de profil, l'IA l'intègre automatiquement au centre de la bannière.</p>
+        <p style="color:${V.t2};font-size:12px;margin:12px 0 0;">Uploade ta photo de profil, DALL-E l'intègre automatiquement au centre de la bannière.</p>
         <div style="height:1px;background:linear-gradient(90deg,${V.cy}44,transparent);margin-top:16px;"></div>
       </div>
 
@@ -205,7 +205,7 @@ function render(){
       </div>
 
       <div style="text-align:center;padding:32px 0 16px;border-top:1px solid ${V.cb};margin-top:32px;">
-        <span style="font-family:${V.m};font-size:9px;color:${V.t3};letter-spacing:2px;">POWERED BY DEXSCREENER AI × CLAUDE × FLUX</span>
+        <span style="font-family:${V.m};font-size:9px;color:${V.t3};letter-spacing:2px;">POWERED BY DEXSCREENER AI × CLAUDE × OPENAI</span>
       </div>
     </div>
   </div>`;
@@ -263,15 +263,21 @@ function compressImage(dataUrl, maxSize=800, quality=0.6){
 }
 
 // ═══════════════════════════════════════════
-// GENERATE 
+// GENERATE (VISION -> OPENAI DALL-E)
 // ═══════════════════════════════════════════
 async function generate(){
   if(!charPreview||loading) return;
+  
+  if(OPENAI_API_KEY === "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") {
+    alert("Veuillez insérer une vraie clé OpenAI dans le code à la ligne 128.");
+    return;
+  }
+
   loading=true; errText=""; resultImg=null;
   const style = STYLES.find(s=>s.id===selectedStyle);
 
   try {
-    stepText='Compression de l\'image...'; render();
+    stepText='Compression de l\\'image...'; render();
     const compressedChar = await compressImage(charPreview);
     const charB64 = compressedChar.split(",")[1];
     
@@ -280,7 +286,6 @@ async function generate(){
 
     stepText=`Analyse et création du prompt...`; render();
     
-    // Le prompt explique clairement de mettre la PFP de l'image 2 au centre de la bannière de l'image 1
     const promptInstructions = `IMAGE 1 = a banner with a central space. IMAGE 2 = a profile picture of a person/subject.
 
 Your job: write ONE single image generation prompt that recreates the EXACT same banner background from IMAGE 1, but seamlessly integrates the character from IMAGE 2 directly into the central space of the banner. 
@@ -292,6 +297,7 @@ Combine both into a single cohesive prompt, making sure to specify that the char
 
 Output ONLY the raw prompt. No preamble, no explanation.`;
 
+    // 1. Analyse via ton backend existant
     const res = await fetch(VISION_API,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -303,18 +309,27 @@ Output ONLY the raw prompt. No preamble, no explanation.`;
 
     if(!res.ok){
       const txt=await res.text();
-      throw new Error(`Erreur Serveur: ${res.status} — ${txt.slice(0,100)}`);
+      throw new Error(`Erreur Vision API: ${res.status} — ${txt.slice(0,100)}`);
     }
     const d=await res.json();
     if(d.error) throw new Error(d.error.message || d.error);
-    const prompt=(d.content||[]).map(c=>c.text||"").join("").trim();
+    const generatedPrompt=(d.content||[]).map(c=>c.text||"").join("").trim();
 
-    // Génération FLUX
-    stepText=`Génération de la bannière...`; render();
-    const imgRes = await fetch("https://api.together.xyz/v1/images/generations",{
+    // 2. Génération via OpenAI (DALL-E 3)
+    stepText=`Génération DALL-E 3...`; render();
+    const imgRes = await fetch("https://api.openai.com/v1/images/generations",{
       method:"POST",
-      headers:{"Content-Type":"application/json",Authorization:`Bearer ${API_KEY}`},
-      body:JSON.stringify({model:"black-forest-labs/FLUX.1-schnell",prompt,width:1024,height:1024,steps:4,n:1,response_format:"b64_json"})
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":`Bearer ${OPENAI_API_KEY}`
+      },
+      body:JSON.stringify({
+        model:"dall-e-3",
+        prompt:generatedPrompt,
+        n:1,
+        size:"1024x1024",
+        response_format:"b64_json"
+      })
     });
     
     const imgD=await imgRes.json();
