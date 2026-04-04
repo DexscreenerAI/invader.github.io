@@ -5013,7 +5013,7 @@ function showStarsPopupNemo(username, avatar, nemos, levelInfo){
 // ==========================================
 let ws;
 function connectWS(){
-    ws=new WebSocket((function(){var room=new URLSearchParams(location.search).get('room')||localStorage.getItem('selectedRoom')||'room_1';localStorage.setItem('selectedRoom',room);var p=new URLSearchParams(location.search).get('server');var base=p||(localStorage.getItem('wsServerUrl')||'wss://serverbbgithubio-production.up.railway.app');return base+(base.includes('?')?'&':'?')+'room='+encodeURIComponent(room)})());
+    ws=new WebSocket((function(){var room=new URLSearchParams(location.search).get('room')||localStorage.getItem('selectedRoom')||'room_1';localStorage.setItem('selectedRoom',room);var p=new URLSearchParams(location.search).get('server');var base=p||(localStorage.getItem('wsServerUrl')||'wss://serverbbgithubio-production.up.railway.app');var u=base+(base.includes('?')?'&':'?')+'room='+encodeURIComponent(room);var pin=sessionStorage.getItem('roomPin');if(pin)u+='&pin='+encodeURIComponent(pin);return u})());
     const sb=document.getElementById('statusBanner');
     ws.onopen=()=>{sb.innerText="✅ Connecté au serveur Local (En attente du Live)";sb.className="connected";};
     ws.onmessage=(event)=>{

@@ -126,6 +126,11 @@
             }
         }
         localStorage.setItem('selectedRoom', roomId);
+        if (ROOM_PINS[roomId]) {
+            sessionStorage.setItem('roomPin', pin);
+        } else {
+            sessionStorage.removeItem('roomPin');
+        }
         window.location.reload();
     }
 

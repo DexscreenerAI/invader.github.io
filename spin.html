@@ -5053,7 +5053,7 @@
           var p = new URLSearchParams(window.location.search).get('server');
           if (p) base = p;
           else { var s = localStorage.getItem('wsServerUrl'); base = s || 'wss://serverbbgithubio-production.up.railway.app'; }
-          return base + (base.includes('?') ? '&' : '?') + 'room=' + encodeURIComponent(room);
+          var u = base + (base.includes('?') ? '&' : '?') + 'room=' + encodeURIComponent(room); var pin = sessionStorage.getItem('roomPin'); if (pin) u += '&pin=' + encodeURIComponent(pin); return u;
         })();
       }
 
