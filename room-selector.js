@@ -113,7 +113,18 @@
         list.appendChild(btn);
     }
 
+    // Rooms protégées par PIN
+    var ROOM_PINS = { 'room_2': '1986' };
+
     function switchRoom(roomId) {
+        if (ROOM_PINS[roomId]) {
+            var pin = prompt('🔒 Code PIN requis pour ' + roomId + ' :');
+            if (pin === null) return; // annulé
+            if (pin !== ROOM_PINS[roomId]) {
+                alert('❌ Code PIN incorrect');
+                return;
+            }
+        }
         localStorage.setItem('selectedRoom', roomId);
         window.location.reload();
     }
