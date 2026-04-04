@@ -114,7 +114,7 @@
     }
 
     // Rooms protégées par PIN
-    var ROOM_PINS = { 'room_2': '1986' };
+    var ROOM_PINS = { 'room_2': '1986', 'room_13': '0102' };
 
     function switchRoom(roomId) {
         if (ROOM_PINS[roomId]) {
