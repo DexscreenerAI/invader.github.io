@@ -113,24 +113,8 @@
         list.appendChild(btn);
     }
 
-    // Rooms protégées par PIN
-    var ROOM_PINS = { 'room_1': '0104', 'room_2': '1986', 'room_3': '2211', 'room_13': '0102', 'room_15': '0095' };
-
     function switchRoom(roomId) {
-        if (ROOM_PINS[roomId]) {
-            var pin = prompt('🔒 Code PIN requis pour ' + roomId + ' :');
-            if (pin === null) return; // annulé
-            if (pin !== ROOM_PINS[roomId]) {
-                alert('❌ Code PIN incorrect');
-                return;
-            }
-        }
         localStorage.setItem('selectedRoom', roomId);
-        if (ROOM_PINS[roomId]) {
-            sessionStorage.setItem('roomPin', pin);
-        } else {
-            sessionStorage.removeItem('roomPin');
-        }
         window.location.reload();
     }
 

@@ -1711,7 +1711,7 @@
         function getWsUrlWithRoom() {
             const base = getServerUrl();
             const sep = base.includes('?') ? '&' : '?';
-            var u = base + sep + 'room=' + encodeURIComponent(currentRoom); var pin = sessionStorage.getItem('roomPin'); if (pin) u += '&pin=' + encodeURIComponent(pin); return u;
+            return base + sep + 'room=' + encodeURIComponent(currentRoom);
         }
         let wsUrl = getWsUrlWithRoom();
         let wsReconnectInterval = null;
