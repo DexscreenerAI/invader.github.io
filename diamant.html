@@ -1169,7 +1169,7 @@
     // ====== WEBSOCKET - CONNEXION PORT 8832 ======
     // =============================================
     function connectToServer() {
-      socket = new WebSocket((function(){var room=new URLSearchParams(location.search).get('room')||localStorage.getItem('selectedRoom')||'room_1';localStorage.setItem('selectedRoom',room);var p=new URLSearchParams(location.search).get('server');var base=p||(localStorage.getItem('wsServerUrl')||'wss://serverbbgithubio-production.up.railway.app');return base+(base.includes('?')?'&':'?')+'room='+encodeURIComponent(room)})());
+      socket = new WebSocket((function(){var room=new URLSearchParams(location.search).get('room')||localStorage.getItem('selectedRoom')||'room_1';localStorage.setItem('selectedRoom',room);var p=new URLSearchParams(location.search).get('server');var base=p||(localStorage.getItem('wsServerUrl')||'wss://serverbbgithubio-production.up.railway.app');var u=base+(base.includes('?')?'&':'?')+'room='+encodeURIComponent(room);var pin=sessionStorage.getItem('roomPin');if(pin)u+='&pin='+encodeURIComponent(pin);return u})());
       const status = document.getElementById('statusText');
       
       socket.onopen = () => { 
