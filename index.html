@@ -5671,6 +5671,16 @@
                         if(data.monsterSkins) monsterSkins = data.monsterSkins;
                         if(data.enemyMaxHp) enemyMaxHp = data.enemyMaxHp;
                         if(data.coinVideoTriggers) coinVideoTriggers = data.coinVideoTriggers;
+                        if(data.phoneVideoWidth) phoneVideoWidth = data.phoneVideoWidth;
+                        if(data.bossImgUrl) bossImgUrl = data.bossImgUrl;
+                        if(data.bossDefaultHp) bossDefaultHp = data.bossDefaultHp;
+                        if(data.bossReward) bossReward = data.bossReward;
+                        if(data.playerTickets) playerTickets = data.playerTickets;
+                        if(data.nerfList) nerfList = data.nerfList;
+                        if(data.guestFilterUsername) guestFilterUsername = data.guestFilterUsername;
+                        if(data.guestFilterEnabled !== undefined) guestFilterEnabled = data.guestFilterEnabled;
+                        if(data.coffreTotal !== undefined) coffreTotal = data.coffreTotal;
+                        if(data.coffreContributions) coffreContributions = data.coffreContributions;
                         showTopNotification("Sauvegarde Space Invader chargée !");
                     }
                      // CAS 2: Format "Diamant" (Jerem Save JSON)
@@ -5781,6 +5791,7 @@
                      updateTicketUI();
                      updateNerfUI();
                      updateCoinVideoUI();
+                     updateCoffreUI();
                 updateDelayedRewardUI();
                      
                      // Si le pool est vide après import Diamant, on génère un pool par défaut pour que le jeu tourne
